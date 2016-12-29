@@ -12,3 +12,7 @@ lazy val root = (project in file("."))
     ),
     scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
   )
+  .dependsOn(mogCore)
+
+lazy val mogCore = ProjectRef(uri("git://github.com/mogproject/mog-core-scala.git#master"), "mogCoreJS")
+
