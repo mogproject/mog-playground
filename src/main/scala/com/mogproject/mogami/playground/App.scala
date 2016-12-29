@@ -1,7 +1,7 @@
 package com.mogproject.mogami.playground
 
 import scala.scalajs.js.JSApp
-import com.mogproject.mogami.core._
+import com.mogproject.mogami._
 
 object App extends JSApp {
   def main(): Unit = {
