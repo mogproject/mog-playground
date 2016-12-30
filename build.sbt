@@ -8,9 +8,11 @@ lazy val root = (project in file("."))
     )),
     name := "mog-playground",
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.1"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.1",
+      "com.lihaoyi" %%% "scalatags" % "0.6.2"
     ),
-    scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
+    scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation"),
+    jsDependencies += RuntimeDOM
   )
   .dependsOn(mogCore)
 

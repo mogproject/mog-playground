@@ -27,3 +27,6 @@ project/plugins/project/
 # for debug
 src/debug/
 
+# Node.js
+node_modules/
+
