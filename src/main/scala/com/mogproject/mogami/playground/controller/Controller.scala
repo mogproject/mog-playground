@@ -54,6 +54,7 @@ case class Controller(elem: Element, args: Arguments, baseUrl: String) {
     renderer.drawPieces(game.currentState)
     renderer.drawTurn(game.currentState.turn)
     updateUrls()
+    updateLastMove()
 
     if (game.moves.isEmpty) {
       // Play mode
@@ -71,6 +72,18 @@ case class Controller(elem: Element, args: Arguments, baseUrl: String) {
     // todo: add lang setting
     renderer.updateSnapshotUrl(baseUrl + "?sfen=" + encodeURIComponent(Game(game.currentState).toSfenString))
     renderer.updateRecordUrl(baseUrl + "?sfen=" + encodeURIComponent(game.toSfenString))
+  }
+
+  private[this] def updateLastMove(): Unit = lastMoveToCursors().foreach(renderer.drawLastMoveArea)
+
+  private[this] def clearLastMove(): Unit = lastMoveToCursors().foreach(renderer.clearLastMoveArea)
+
+  private[this] def lastMoveToCursors(): Option[Seq[Cursor]] = game.lastMove.map { m =>
+    val fr = m.from match {
+      case None => Cursor(m.player, m.oldPtype)
+      case Some(sq) => Cursor(sq)
+    }
+    List(fr, Cursor(m.to))
   }
 
   def mouseMove(evt: MouseEvent): Unit = {
@@ -103,8 +116,10 @@ case class Controller(elem: Element, args: Arguments, baseUrl: String) {
           nextGame.foreach { g =>
             renderer.drawPieces(g.currentState)
             renderer.drawTurn(g.currentState.turn)
-            updateUrls()
+            clearLastMove()
             game = g
+            updateUrls()
+            updateLastMove()
           }
         case _ => // do nothing
       }

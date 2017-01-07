@@ -7,7 +7,6 @@ import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.{CanvasRenderingContext2D, Element, MouseEvent}
 import org.scalajs.dom.html.{Canvas, Div}
-import scala.scalajs.js.URIUtils.{decodeURIComponent, encodeURIComponent}
 
 import scalatags.JsDom.all._
 
@@ -197,6 +196,13 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
     * Draw the selected area.
     */
   def drawSelectedArea(cursor: Cursor): Unit = cursorToRect(cursor).drawFill(layer0, layout.color.cursor, 2)
+
+  /**
+    * Draw the last move area.
+    */
+  def drawLastMoveArea(cs: Seq[Cursor]): Unit = cs.foreach(cursorToRect(_).drawFill(layer0, layout.color.light, 1))
+
+  def clearLastMoveArea(cs: Seq[Cursor]): Unit = cs.foreach(cursorToRect(_).clear(layer0))
 
   /**
     * Clear a selected area.
