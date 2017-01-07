@@ -11,6 +11,7 @@ object App extends JSApp {
   def main(): Unit = {
     val elem = dom.document.getElementById("app")
     val args = Arguments().parseQueryString(dom.window.location.search)
-    Controller.initialize(elem, args)
+    val baseUrl = s"${dom.window.location.protocol}//${dom.window.location.host}${dom.window.location.pathname}"
+    Controller(elem, args, baseUrl).initialize()
   }
 }

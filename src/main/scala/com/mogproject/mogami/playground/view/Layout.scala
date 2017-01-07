@@ -31,6 +31,7 @@ case class Layout(canvasWidth: Int, canvasHeight: Int) {
   object color {
     val fg = "black"  // foreground
     val bg = "#fefdfa"  // background
+    val red = "#b22222"  // promoted pieces
     val active = "#45A1CF"
     val cursor = "#E1B265"
     val dark = "#353535"

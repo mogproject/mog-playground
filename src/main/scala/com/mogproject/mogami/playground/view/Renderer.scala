@@ -7,6 +7,7 @@ import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.{CanvasRenderingContext2D, Element, MouseEvent}
 import org.scalajs.dom.html.{Canvas, Div}
+import scala.scalajs.js.URIUtils.{decodeURIComponent, encodeURIComponent}
 
 import scalatags.JsDom.all._
 
@@ -15,13 +16,10 @@ import scalatags.JsDom.all._
   */
 case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer) {
 
-  private[this] val header: Div = div(
+  private[this] val header: Div = div(cls := "row",
     position := "relative",
-    p(textAlign := "center", "Shogi Playground")
-  ).render
 
-  private[this] val footer: Div = div(
-    position := "relative"
+    p(textAlign := "center", "Shogi Playground")
   ).render
 
   private[this] val canvas0: Canvas = createCanvas(0)
@@ -34,7 +32,43 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
   private[this] val layer2: CanvasRenderingContext2D = canvas2.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
   private[this] val layer3: CanvasRenderingContext2D = canvas3.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
 
-  private[this] val canvasDiv: Div = div(position := "relative", canvas0, canvas1, canvas2, canvas3).render
+  private[this] val canvasDiv: Div = div(cls := "row",
+    position := "relative",
+    height := layout.canvasHeight,
+
+    div(cls := "col-md-12",
+      canvas0, canvas1, canvas2, canvas3
+    )
+  ).render
+
+  private[this] val snapshotInput = createInput()
+  private[this] val recordInput = createInput()
+
+  private[this] def createInput() = input(
+    tpe := "text", cls := "form-control", aria.label := "...", readonly := "readonly"
+  ).render
+
+  private[this] def createInputGroup(labelString: String, inputElem: Element) = div(cls := "row",
+    position := "relative",
+
+    div(cls := "col-md-1"),
+    div(cls := "col-md-10",
+      label(labelString),
+      div(cls := "input-group",
+        inputElem,
+        span(
+          cls := "input-group-btn",
+          button(cls := "btn btn-default", tpe := "button", "Copy!")
+        )
+      ),
+      div(cls := "col-md-1")
+    )
+  ).render
+
+  private[this] val footer: Div = div(
+    createInputGroup("Snapshot URL", snapshotInput),
+    createInputGroup("Record URL", recordInput)
+  ).render
 
   initialize()
 
@@ -169,4 +203,7 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
     */
   def clearSelectedArea(cursor: Cursor): Unit = cursorToRect(cursor).clear(layer0)
 
+  def updateSnapshotUrl(url: String): Unit = snapshotInput.value = url
+
+  def updateRecordUrl(url: String): Unit = recordInput.value = url
 }

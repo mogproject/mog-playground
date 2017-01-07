@@ -2,6 +2,7 @@ package com.mogproject.mogami.playground.view.piece
 
 import com.mogproject.mogami.{Piece, Square, Hand}
 import com.mogproject.mogami.playground.view.Layout
+import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom.CanvasRenderingContext2D
 
 /**
@@ -16,7 +17,8 @@ case class SimpleJapanesePieceRenderer(layout: Layout) extends PieceRenderer {
       (-layout.board.left - layout.PIECE_WIDTH * (10 - square.file) + 3,
         -layout.board.top - layout.PIECE_HEIGHT * (square.rank - 1) - 7)
     }
-    drawText(ctx, piece.ptype.toJapaneseSimpleName, x, y, piece.owner.isWhite, layout.font.pieceJapanese, layout.color.fg)
+    val col = piece.isPromoted.fold(layout.color.red, layout.color.fg)
+    drawText(ctx, piece.ptype.toJapaneseSimpleName, x, y, piece.owner.isWhite, layout.font.pieceJapanese, col)
   }
 
   override def drawInHand(ctx: CanvasRenderingContext2D, piece: Hand, numPieces: Int): Unit = {

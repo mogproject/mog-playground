@@ -13,8 +13,11 @@ import scala.scalajs.js.URIUtils.{decodeURIComponent, encodeURIComponent}
 
 /**
   * logic controller
+  *
+  * @param elem parent HTML element
+  * @param args Arguments instance
   */
-object Controller {
+case class Controller(elem: Element, args: Arguments, baseUrl: String) {
 
   // variables
   private[this] var game: Game = Game()
@@ -26,11 +29,8 @@ object Controller {
 
   /**
     * Initialize the game and renderer
-    *
-    * @param elem parent HTML element
-    * @param args Arguments instance
     */
-  def initialize(elem: Element, args: Arguments): Unit = {
+  def initialize(): Unit = {
     // create game
     args.sfen.foreach { s =>
       val g = Game.parseSfenString(s)
@@ -53,6 +53,7 @@ object Controller {
     renderer.drawBoard()
     renderer.drawPieces(game.currentState)
     renderer.drawTurn(game.currentState.turn)
+    updateUrls()
 
     if (game.moves.isEmpty) {
       // Play mode
@@ -64,7 +65,12 @@ object Controller {
     renderer.setEventListener("mousemove", mouseMove)
     renderer.setEventListener("mousedown", mouseDown)
 
-    println(encodeURIComponent(game.toSfenString))
+  }
+
+  private[this] def updateUrls(): Unit = {
+    // todo: add lang setting
+    renderer.updateSnapshotUrl(baseUrl + "?sfen=" + encodeURIComponent(Game(game.currentState).toSfenString))
+    renderer.updateRecordUrl(baseUrl + "?sfen=" + encodeURIComponent(game.toSfenString))
   }
 
   def mouseMove(evt: MouseEvent): Unit = {
@@ -97,6 +103,7 @@ object Controller {
           nextGame.foreach { g =>
             renderer.drawPieces(g.currentState)
             renderer.drawTurn(g.currentState.turn)
+            updateUrls()
             game = g
           }
         case _ => // do nothing
