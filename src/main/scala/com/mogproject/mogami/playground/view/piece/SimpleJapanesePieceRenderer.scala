@@ -30,7 +30,7 @@ case class SimpleJapanesePieceRenderer(layout: Layout) extends PieceRenderer {
 
       } else {
         (-layout.handWhite.right + layout.HAND_UNIT_WIDTH * (piece.ptype.sortId - 1) + 3,
-          layout.handWhite.top - 7)
+          layout.handWhite.top - 11)
       }
       drawText(ctx, piece.ptype.toJapaneseSimpleName, x, y, piece.owner.isWhite, layout.font.pieceJapanese, layout.color.fg)
 

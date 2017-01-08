@@ -1,6 +1,6 @@
 package com.mogproject.mogami.playground.view
 
-import com.mogproject.mogami.playground.controller.Cursor
+import com.mogproject.mogami.playground.controller.{Controller, Cursor, Mode, Playing, Viewing, Editing, Language, Japanese, English}
 import com.mogproject.mogami.{Hand, Piece, Player, Ptype, Square, State}
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.util.Implicits._
@@ -14,13 +14,7 @@ import scalatags.JsDom.all._
   * controls canvas rendering
   */
 case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer) {
-
-  private[this] val header: Div = div(cls := "row",
-    position := "relative",
-
-    p(textAlign := "center", "Shogi Playground")
-  ).render
-
+  // main canvas
   private[this] val canvas0: Canvas = createCanvas(0)
   private[this] val canvas1: Canvas = createCanvas(1)
   private[this] val canvas2: Canvas = createCanvas(2)
@@ -31,14 +25,66 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
   private[this] val layer2: CanvasRenderingContext2D = canvas2.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
   private[this] val layer3: CanvasRenderingContext2D = canvas3.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
 
-  private[this] val canvasDiv: Div = div(cls := "row",
-    position := "relative",
+  private[this] val canvasContainer: Div = div(cls := "col-md-6",
+    padding := 0,
     height := layout.canvasHeight,
-
-    div(cls := "col-md-12",
-      canvas0, canvas1, canvas2, canvas3
-    )
+    canvas0,
+    canvas1,
+    canvas2,
+    canvas3
   ).render
+
+  // forms
+  private[this] val recordSelector = select(cls := "form-control thin-select",
+    option("-"),
+    option("+7776FU"),
+    option("-3334FU")
+  ).render
+
+  private[this] val modeLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false,
+    "Play",
+    span(cls := "caret")
+  ).render
+
+  private[this] val langLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false,
+    "JP",
+    span(cls := "caret")
+  ).render
+
+  private[this] val navigator = tag("nav")(cls := "navbar navbar-default navbar-fixed-top",
+    div(cls := "container",
+      div(cls := "row")(
+        div(cls := "navbar-header col-md-10 col-md-offset-1",
+          ul(cls := "nav navbar-nav",
+            li(cls := "dropdown",
+              widthA := "60px",
+              modeLabel,
+              ul(cls := "dropdown-menu",
+                li(cls:="dropdown-header", "Mode"),
+                li(a(href := "#", "Play", onclick := (() => Controller.setMode(Playing)))),
+                li(a(href := "#", "View", onclick := (() => Controller.setMode(Viewing)))),
+                li(a(href := "#", "Edit", onclick := (() => Controller.setMode(Editing))))
+              )
+            ),
+            li(cls := "navbar-form",
+              div(cls := "form-group",
+                recordSelector
+              )
+            ),
+            li(cls := "dropdown pull-right",
+              textAlign := "right",
+              langLabel,
+              ul(cls := "dropdown-menu",
+                li(cls:="dropdown-header", "Language"),
+                li(a(href := "#", "Japanese", onclick := (() => Controller.setLanauge(Japanese)))),
+                li(a(href := "#", "English", onclick := (() => Controller.setLanauge(English))))
+              )
+            )
+          )
+        )
+      )
+    )
+  )
 
   private[this] val snapshotInput = createInput()
   private[this] val recordInput = createInput()
@@ -72,16 +118,21 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
   initialize()
 
   private[this] def initialize(): Unit = {
-    elem.appendChild(header)
-    elem.appendChild(canvasDiv)
-    elem.appendChild(footer)
+    elem.appendChild(div(cls := "container",
+      div(cls := "row navbar",
+        div(cls := "col-md-12", navigator)
+      ),
+      div(cls := "row",
+        canvasContainer,
+        div(cls := "col-md-6", footer)
+      )
+    ).render)
   }
 
   private[this] def createCanvas(zIndexVal: Int): Canvas = {
     canvas(
       widthA := layout.canvasWidth,
       heightA := layout.canvasHeight,
-      position := "absolute",
       marginLeft := "auto",
       marginRight := "auto",
       left := 0,
@@ -91,7 +142,7 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
     ).render
   }
 
-  def setEventListener(eventType: String, f: MouseEvent => Unit): Unit = canvasDiv.addEventListener(eventType, f, useCapture = false)
+  def setEventListener(eventType: String, f: MouseEvent => Unit): Unit = canvasContainer.addEventListener(eventType, f, useCapture = false)
 
   def drawBoard(): Unit = {
     layout.board.draw(layer1)
@@ -212,4 +263,12 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
   def updateSnapshotUrl(url: String): Unit = snapshotInput.value = url
 
   def updateRecordUrl(url: String): Unit = recordInput.value = url
+
+  def setMode(mode: Mode): Unit = {
+    modeLabel.innerHTML = mode.label + span(cls := "caret").toString()
+  }
+
+  def setLang(lang: Language): Unit = {
+    langLabel.innerHTML = lang.label + span(cls := "caret").toString()
+  }
 }

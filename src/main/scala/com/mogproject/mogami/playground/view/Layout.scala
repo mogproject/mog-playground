@@ -15,7 +15,7 @@ case class Layout(canvasWidth: Int, canvasHeight: Int) {
   val BOARD_HEIGHT: Int = PIECE_HEIGHT * 9
 
   // rectangles
-  val handWhite = Rectangle(BOARD_LEFT, 0, BOARD_WIDTH, PIECE_HEIGHT)
+  val handWhite = Rectangle(BOARD_LEFT, 2, BOARD_WIDTH, PIECE_HEIGHT)
   val indicatorWhite = Rectangle(BOARD_LEFT, handWhite.bottom + 2, BOARD_WIDTH, INDICATOR_HEIGHT)
   val board = Rectangle(BOARD_LEFT, indicatorWhite.bottom + 2, BOARD_WIDTH, BOARD_HEIGHT)
   val indicatorBlack = Rectangle(BOARD_LEFT, board.bottom + 2, BOARD_WIDTH, INDICATOR_HEIGHT)
