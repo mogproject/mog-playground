@@ -16,5 +16,8 @@ clean:
 develop:
 	${SBT} fastOptJS && ${OPEN} index-dev.html
 
-.PHONY: build test console clean develop
+publish:
+	${SBT} fullOptJS && cp -f target/scala-2.12/mog-playground-opt.js docs/js/ && cp -f css/main.css docs/css/
+
+.PHONY: build test console clean develop publish
 
