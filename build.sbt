@@ -1,3 +1,4 @@
+
 enablePlugins(ScalaJSPlugin)
 
 lazy val root = (project in file("."))
@@ -12,7 +13,9 @@ lazy val root = (project in file("."))
       "com.lihaoyi" %%% "scalatags" % "0.6.2"
     ),
     scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation"),
-    jsDependencies += RuntimeDOM
+    jsDependencies ++= Seq(
+      RuntimeDOM
+    )
   )
   .dependsOn(mogCore)
 

@@ -6,7 +6,7 @@ import com.mogproject.mogami.playground.view.piece.SimpleJapanesePieceRenderer
 import com.mogproject.mogami.playground.view.{Layout, Renderer}
 import com.mogproject.mogami.{Game, Hand, Piece, Square, State}
 import com.mogproject.mogami.util.Implicits._
-import org.scalajs.dom.{Element, MouseEvent}
+import org.scalajs.dom.{Element, MouseEvent, TouchEvent}
 
 import scala.annotation.tailrec
 import scala.scalajs.js.URIUtils.encodeURIComponent
@@ -22,6 +22,7 @@ object Controller {
   private[this] var currentMode: Mode = Playing
   private[this] var currentLang: Language = Japanese
   private[this] var game: Game = Game()
+  private[this] var currentMove: Int = 0
   private[this] var rendererVal: Option[Renderer] = None
   private[this] var activeCursor: Option[Cursor] = None
   private[this] var selectedCursor: Option[Cursor] = None
@@ -66,8 +67,12 @@ object Controller {
     setMode(game.moves.isEmpty.fold(Playing, Viewing))
 
     // register mouse event handlers
-    renderer.setEventListener("mousemove", mouseMove)
-    renderer.setEventListener("mousedown", mouseDown)
+    if (renderer.hasTouchEvent) {
+      renderer.setEventListener("touchstart", touchStart)
+    } else {
+      renderer.setEventListener("mousemove", mouseMove)
+      renderer.setEventListener("mousedown", mouseDown)
+    }
 
   }
 
@@ -91,7 +96,7 @@ object Controller {
 
   def mouseMove(evt: MouseEvent): Unit = currentMode match {
     case Playing =>
-      val ret = renderer.getCursor(evt)
+      val ret = renderer.getCursor(evt.clientX, evt.clientY)
 
       if (ret != activeCursor) {
         activeCursor.foreach(renderer.clearCursor)
@@ -101,49 +106,54 @@ object Controller {
     case _ =>
   }
 
-  def mouseDown(evt: MouseEvent): Unit = currentMode match {
+  def mouseDown(evt: MouseEvent): Unit = mouseDown(evt.clientX, evt.clientY)
+
+  private[this] def mouseDown(x: Double, y: Double): Unit = currentMode match {
     case Playing =>
-      val ret = renderer.getCursor(evt)
-
-      if (selectedCursor.isDefined) {
-        // move
-        val selected = selectedCursor.get
-        renderer.clearSelectedArea(selected)
-        selectedCursor = None
-
-        (selected, ret) match {
-          case (Cursor(from), Some(Cursor(Left(to)))) if game.currentState.canAttack(from, to) =>
-            val nextGame: Option[Game] = game.currentState.getPromotionFlag(from, to) match {
-              case Some(PromotionFlag.CannotPromote) => game.makeMove(MoveBuilderSfen(from, to, promote = false))
-              case Some(PromotionFlag.CanPromote) => game.makeMove(MoveBuilderSfen(from, to, renderer.askPromote()))
-              case Some(PromotionFlag.MustPromote) => game.makeMove(MoveBuilderSfen(from, to, promote = true))
-              case None => None
-            }
-            nextGame.foreach { g =>
-              renderer.drawPieces(g.currentState)
-              renderer.drawTurn(g.currentState.turn)
-              clearLastMove()
-              game = g
-              updateUrls()
-              updateLastMove()
-            }
-          case _ => // do nothing
-        }
-      } else {
-        // select
-        ret.foreach { cursor =>
-          val canSelect = cursor match {
-            case Cursor(Left(sq)) => game.currentState.board.get(sq).exists(game.currentState.turn == _.owner)
-            case Cursor(Right(h)) => h.owner == game.currentState.turn && game.currentState.hand.get(h).exists(_ > 0)
-          }
-          if (canSelect) {
-            selectedCursor = ret
-            renderer.drawSelectedArea(cursor)
-          }
-        }
+      (selectedCursor, renderer.getCursor(x, y)) match {
+        case (Some(selected), Some(moveTo)) => moveAction(selected, moveTo)
+        case (None, Some(selected)) => selectAction(selected)
+        case _ => // do nothing
       }
     case _ =>
   }
+
+  private[this] def moveAction(selected: Cursor, moveTo: Cursor): Unit = {
+    renderer.clearSelectedArea(selected)
+    selectedCursor = None
+
+    (selected, moveTo) match {
+      case (Cursor(from), Cursor(Left(to))) if game.currentState.canAttack(from, to) =>
+        val nextGame: Option[Game] = game.currentState.getPromotionFlag(from, to) match {
+          case Some(PromotionFlag.CannotPromote) => game.makeMove(MoveBuilderSfen(from, to, promote = false))
+          case Some(PromotionFlag.CanPromote) => game.makeMove(MoveBuilderSfen(from, to, renderer.askPromote()))
+          case Some(PromotionFlag.MustPromote) => game.makeMove(MoveBuilderSfen(from, to, promote = true))
+          case None => None
+        }
+        nextGame.foreach { g =>
+          renderer.drawPieces(g.currentState)
+          renderer.drawTurn(g.currentState.turn)
+          clearLastMove()
+          game = g
+          updateUrls()
+          updateLastMove()
+        }
+      case _ => // do nothing
+    }
+  }
+
+  private[this] def selectAction(selected: Cursor): Unit = {
+    val canSelect = selected match {
+      case Cursor(Left(sq)) => game.currentState.board.get(sq).exists(game.currentState.turn == _.owner)
+      case Cursor(Right(h)) => h.owner == game.currentState.turn && game.currentState.hand.get(h).exists(_ > 0)
+    }
+    if (canSelect) {
+      selectedCursor = Some(selected)
+      renderer.drawSelectedArea(selected)
+    }
+  }
+
+  def touchStart(evt: TouchEvent): Unit = mouseDown(evt.changedTouches(0).clientX, evt.changedTouches(0).clientY)
 
   def setMode(mode: Mode): Unit = {
     if (currentMode != mode) {
