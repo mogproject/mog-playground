@@ -1,13 +1,15 @@
 package com.mogproject.mogami.playground.view
 
-import com.mogproject.mogami.playground.controller.{Controller, Cursor, Mode, Playing, Viewing, Editing, Language, Japanese, English}
+import com.mogproject.mogami.playground.controller.{Controller, Cursor, Editing, English, Japanese, Language, Mode, Playing, Viewing}
 import com.mogproject.mogami.{Hand, Piece, Player, Ptype, Square, State}
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
+import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
-import org.scalajs.dom.{CanvasRenderingContext2D, Element, MouseEvent}
+import org.scalajs.dom.{CanvasRenderingContext2D, Element, MouseEvent, TouchEvent}
 import org.scalajs.dom.html.{Canvas, Div}
 
+import scala.scalajs.js
 import scalatags.JsDom.all._
 
 /**
@@ -60,7 +62,7 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
               widthA := "60px",
               modeLabel,
               ul(cls := "dropdown-menu",
-                li(cls:="dropdown-header", "Mode"),
+                li(cls := "dropdown-header", "Mode"),
                 li(a(href := "#", "Play", onclick := (() => Controller.setMode(Playing)))),
                 li(a(href := "#", "View", onclick := (() => Controller.setMode(Viewing)))),
                 li(a(href := "#", "Edit", onclick := (() => Controller.setMode(Editing))))
@@ -75,7 +77,7 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
               textAlign := "right",
               langLabel,
               ul(cls := "dropdown-menu",
-                li(cls:="dropdown-header", "Language"),
+                li(cls := "dropdown-header", "Language"),
                 li(a(href := "#", "Japanese", onclick := (() => Controller.setLanauge(Japanese)))),
                 li(a(href := "#", "English", onclick := (() => Controller.setLanauge(English))))
               )
@@ -86,14 +88,14 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
     )
   )
 
-  private[this] val snapshotInput = createInput()
-  private[this] val recordInput = createInput()
+  private[this] val snapshotInput = createInput("snapshot")
+  private[this] val recordInput = createInput("record")
 
-  private[this] def createInput() = input(
-    tpe := "text", cls := "form-control", aria.label := "...", readonly := "readonly"
+  private[this] def createInput(ident: String) = input(
+    tpe := "text", id := ident, cls := "form-control", aria.label := "...", readonly := "readonly"
   ).render
 
-  private[this] def createInputGroup(labelString: String, inputElem: Element) = div(cls := "row",
+  private[this] def createInputGroup(labelString: String, inputElem: Element, target: String) = div(cls := "row",
     position := "relative",
 
     div(cls := "col-md-1"),
@@ -103,7 +105,7 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
         inputElem,
         span(
           cls := "input-group-btn",
-          button(cls := "btn btn-default", tpe := "button", "Copy!")
+          button(cls := "btn btn-default", data("clipboard-target") := s"#${target}", tpe := "button", "Copy!")
         )
       ),
       div(cls := "col-md-1")
@@ -111,8 +113,8 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
   ).render
 
   private[this] val footer: Div = div(
-    createInputGroup("Snapshot URL", snapshotInput),
-    createInputGroup("Record URL", recordInput)
+    createInputGroup("Snapshot URL", snapshotInput, "snapshot"),
+    createInputGroup("Record URL", recordInput, "record")
   ).render
 
   initialize()
@@ -127,6 +129,11 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
         div(cls := "col-md-6", footer)
       )
     ).render)
+
+    // initialize clipboard.js
+    val cp = new Clipboard(".btn")
+
+    // todo: show tooptip @see http://stackoverflow.com/questions/37381640/tooltips-highlight-animation-with-clipboard-js-click/37395225
   }
 
   private[this] def createCanvas(zIndexVal: Int): Canvas = {
@@ -142,7 +149,9 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
     ).render
   }
 
-  def setEventListener(eventType: String, f: MouseEvent => Unit): Unit = canvasContainer.addEventListener(eventType, f, useCapture = false)
+  def hasTouchEvent: Boolean = dom.window.hasOwnProperty("ontouchstart")
+
+  def setEventListener[A](eventType: String, f: A => Unit): Unit = canvasContainer.addEventListener(eventType, f, useCapture = false)
 
   def drawBoard(): Unit = {
     layout.board.draw(layer1)
@@ -184,19 +193,14 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
     dom.window.confirm("Do you want to promote?")
   }
 
-  def setDebug(text: String): Unit = {
-    footer.innerHTML += br.toString + text
-  }
-
   /**
     * Convert MouseEvent to Cursor
     *
-    * @param evt mouse event
     * @return Cursor if the mouse position is inside the specific area
     */
-  def getCursor(evt: MouseEvent): Option[Cursor] = {
+  def getCursor(clientX: Double, clientY: Double): Option[Cursor] = {
     val rect = canvas2.getBoundingClientRect()
-    val (x, y) = (evt.clientX - rect.left, evt.clientY - rect.top)
+    val (x, y) = (clientX - rect.left, clientY - rect.top)
 
     (layout.board.isInside(x, y), layout.handBlack.isInside(x, y), layout.handWhite.isInside(x, y)) match {
       case (true, _, _) =>
