@@ -1,7 +1,8 @@
 package com.mogproject.mogami.playground.view
 
-import com.mogproject.mogami.playground.controller.{Controller, Cursor, Editing, English, Japanese, Language, Mode, Playing, Viewing}
-import com.mogproject.mogami.{Hand, Piece, Player, Ptype, Square, State}
+import com.mogproject.mogami.playground.controller._
+import com.mogproject.mogami._
+import com.mogproject.mogami.core.Game.GameStatus
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.util.Implicits._
@@ -184,9 +185,21 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
     layout.handBlack.clear(layer2)
   }
 
-  def drawTurn(turn: Player): Unit = {
-    (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).clear(layer2)
-    (if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.active)
+  def drawIndicators(game: Game): Unit = {
+    game.status match {
+      case GameStatus.Playing =>
+        (if (game.turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).clear(layer2)
+        (if (game.turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.active)
+      case GameStatus.Mated =>
+        (if (game.turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).drawFill(layer2, layout.color.win)
+        (if (game.turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.lose)
+      case GameStatus.Illegal =>
+        (if (game.turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).drawFill(layer2, layout.color.lose)
+        (if (game.turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.win)
+      case GameStatus.Drawn =>
+        layout.indicatorWhite.drawFill(layer2, layout.color.draw)
+        layout.indicatorBlack.drawFill(layer2, layout.color.draw)
+    }
   }
 
   def askPromote(): Boolean = {

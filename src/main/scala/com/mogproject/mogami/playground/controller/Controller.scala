@@ -59,7 +59,7 @@ object Controller {
     // draw board and pieces
     renderer.drawBoard()
     renderer.drawPieces(game.currentState)
-    renderer.drawTurn(game.currentState.turn)
+    renderer.drawIndicators(game)
     updateUrls()
     updateLastMove()
 
@@ -132,7 +132,7 @@ object Controller {
         }
         nextGame.foreach { g =>
           renderer.drawPieces(g.currentState)
-          renderer.drawTurn(g.currentState.turn)
+          renderer.drawIndicators(g)
           clearLastMove()
           game = g
           updateUrls()
