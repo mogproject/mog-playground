@@ -21,4 +21,11 @@ trait PieceRenderer {
       ctx.fillText(text, x, y)
     }
   }
+
+  protected def drawPieceText(ctx: CanvasRenderingContext2D, text: String, x: Int, y: Int, rotated: Boolean, font: String, color: String, pieceWidth: Int): Unit = {
+    ctx.font = font
+
+    val textWidth = ctx.measureText(text).width.toInt
+    drawText(ctx, text, x + (pieceWidth - textWidth) / 2, y, rotated, font, color)
+  }
 }

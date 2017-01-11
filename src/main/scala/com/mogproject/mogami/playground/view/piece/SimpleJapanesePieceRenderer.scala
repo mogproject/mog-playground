@@ -27,7 +27,6 @@ case class SimpleJapanesePieceRenderer(layout: Layout) extends PieceRenderer {
       val (x, y) = if (piece.owner.isBlack) {
         (layout.handBlack.left + layout.HAND_UNIT_WIDTH * (piece.ptype.sortId - 1) + 3,
           layout.handBlack.top + layout.PIECE_HEIGHT - 6)
-
       } else {
         (-layout.handWhite.right + layout.HAND_UNIT_WIDTH * (piece.ptype.sortId - 1) + 3,
           layout.handWhite.top - 11)

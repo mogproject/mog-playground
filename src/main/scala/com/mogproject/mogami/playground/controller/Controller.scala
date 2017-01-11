@@ -2,13 +2,10 @@ package com.mogproject.mogami.playground.controller
 
 import com.mogproject.mogami.core.MoveBuilderSfen
 import com.mogproject.mogami.core.State.PromotionFlag
-import com.mogproject.mogami.playground.view.piece.SimpleJapanesePieceRenderer
-import com.mogproject.mogami.playground.view.{Layout, Renderer}
-import com.mogproject.mogami.{Game, Hand, Piece, Square, State}
-import com.mogproject.mogami.util.Implicits._
+import com.mogproject.mogami.playground.view.Renderer
+import com.mogproject.mogami.Game
 import org.scalajs.dom.{Element, MouseEvent, TouchEvent}
 
-import scala.annotation.tailrec
 import scala.scalajs.js.URIUtils.encodeURIComponent
 
 
@@ -19,13 +16,16 @@ object Controller {
 
   // variables
   private[this] var baseUrl: String = ""
-  private[this] var currentMode: Mode = Playing
-  private[this] var currentLang: Language = Japanese
+  private[this] var config: Configuration = Configuration()
   private[this] var game: Game = Game()
   private[this] var currentMove: Int = 0
   private[this] var rendererVal: Option[Renderer] = None
   private[this] var activeCursor: Option[Cursor] = None
   private[this] var selectedCursor: Option[Cursor] = None
+
+  private[this] def currentMode: Mode = config.mode
+
+  private[this] def currentLang: Language = config.lang
 
   private[this] def renderer = rendererVal.get
 
@@ -39,32 +39,25 @@ object Controller {
     this.baseUrl = baseUrl
 
     // create game
-    args.sfen.foreach { s =>
-      val g = Game.parseSfenString(s)
-      if (g.isDefined)
-        game = g.get
-      else
-        println(s"Invalid parameter: sfen=${s}")
-    }
+    game = args.game
 
     // create renderer
-    val layout = Layout(args.canvasWidth, args.canvasHeight)
-    val pieceRenderer = args.lang match {
-      case Some("en") => SimpleJapanesePieceRenderer(layout) // todo
-      case Some("ja") => SimpleJapanesePieceRenderer(layout)
-      case _ => SimpleJapanesePieceRenderer(layout)
+    rendererVal = Some(Renderer(elem, args.config.layout))
+
+    // update mode
+    config = (args.config.mode, game.moves.nonEmpty) match {
+      case (Playing, true) => args.config.copy(mode = Viewing)
+      case _ => args.config
     }
-    rendererVal = Some(Renderer(elem, layout, pieceRenderer))
 
     // draw board and pieces
     renderer.drawBoard()
-    renderer.drawPieces(game.currentState)
+    renderer.setMode(config.mode)
+    renderer.setLang(config.lang)
+    renderer.drawPieces(config.pieceRenderer, game.currentState)
     renderer.drawIndicators(game)
-    updateUrls()
     updateLastMove()
-
-    // set mode
-    setMode(game.moves.isEmpty.fold(Playing, Viewing))
+    updateUrls()
 
     // register mouse event handlers
     if (renderer.hasTouchEvent) {
@@ -77,9 +70,11 @@ object Controller {
   }
 
   private[this] def updateUrls(): Unit = {
-    // todo: add lang setting
-    renderer.updateSnapshotUrl(baseUrl + "?sfen=" + encodeURIComponent(Game(game.currentState).toSfenString))
-    renderer.updateRecordUrl(baseUrl + "?sfen=" + encodeURIComponent(game.toSfenString))
+    val snapshot = encodeURIComponent(Game(game.currentState).toSfenString)
+    val record = encodeURIComponent(game.toSfenString)
+
+    renderer.updateSnapshotUrl(s"${baseUrl}?sfen=${snapshot}&${config.toQueryString}")
+    renderer.updateRecordUrl(s"${baseUrl}?sfen=${record}&${config.toQueryString}")
   }
 
   private[this] def updateLastMove(): Unit = lastMoveToCursors().foreach(renderer.drawLastMoveArea)
@@ -131,7 +126,7 @@ object Controller {
           case None => None
         }
         nextGame.foreach { g =>
-          renderer.drawPieces(g.currentState)
+          renderer.drawPieces(config.pieceRenderer, g.currentState)
           renderer.drawIndicators(g)
           clearLastMove()
           game = g
@@ -157,15 +152,28 @@ object Controller {
 
   def setMode(mode: Mode): Unit = {
     if (currentMode != mode) {
+      // config
+      config = config.copy(mode = mode)
+
+      // view
       renderer.setMode(mode)
-      currentMode = mode
+
+      // urls
+      updateUrls()
     }
   }
 
-  def setLanauge(lang: Language): Unit = {
+  def setLanguage(lang: Language): Unit = {
     if (currentLang != lang) {
+      // config
+      config = config.copy(lang = lang)
+
+      // view
       renderer.setLang(lang)
-      currentLang = lang
+      renderer.drawPieces(config.pieceRenderer, game.currentState)
+
+      // urls
+      updateUrls()
     }
   }
 }

@@ -24,6 +24,8 @@ case class Layout(canvasWidth: Int, canvasHeight: Int) {
   // fonts
   object font {
     val pieceJapanese = """22pt "游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "HG明朝E", "ＭＳ Ｐ明朝", "ＭＳ 明朝", serif"""
+    val mark = """24pt "游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "HG明朝E", "ＭＳ Ｐ明朝", "ＭＳ 明朝", serif"""
+    val pieceEnglish = "18pt Times, serif"
     val number = "13pt Times, serif"
   }
 

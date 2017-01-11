@@ -10,7 +10,9 @@ lazy val root = (project in file("."))
     name := "mog-playground",
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.1",
-      "com.lihaoyi" %%% "scalatags" % "0.6.2"
+      "com.lihaoyi" %%% "scalatags" % "0.6.2",
+      "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
+      "org.scalacheck" %%% "scalacheck" % "1.13.4" % Test
     ),
     scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation"),
     jsDependencies ++= Seq(

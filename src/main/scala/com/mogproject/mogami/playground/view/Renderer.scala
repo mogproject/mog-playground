@@ -7,16 +7,16 @@ import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
-import org.scalajs.dom.{CanvasRenderingContext2D, Element, MouseEvent, TouchEvent}
+import org.scalajs.dom.{CanvasRenderingContext2D, Element}
 import org.scalajs.dom.html.{Canvas, Div}
 
-import scala.scalajs.js
 import scalatags.JsDom.all._
 
 /**
   * controls canvas rendering
   */
-case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer) {
+case class Renderer(elem: Element, layout: Layout) {
+
   // main canvas
   private[this] val canvas0: Canvas = createCanvas(0)
   private[this] val canvas1: Canvas = createCanvas(1)
@@ -79,8 +79,8 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
               langLabel,
               ul(cls := "dropdown-menu",
                 li(cls := "dropdown-header", "Language"),
-                li(a(href := "#", "Japanese", onclick := (() => Controller.setLanauge(Japanese)))),
-                li(a(href := "#", "English", onclick := (() => Controller.setLanauge(English))))
+                li(a(href := "#", "Japanese", onclick := (() => Controller.setLanguage(Japanese)))),
+                li(a(href := "#", "English", onclick := (() => Controller.setLanguage(English))))
               )
             )
           )
@@ -173,7 +173,7 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
     }
   }
 
-  def drawPieces(state: State): Unit = {
+  def drawPieces(pieceRenderer: PieceRenderer, state: State): Unit = {
     clearPieces()
     state.board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, pc, sq) }
     state.hand.foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, pc, n) }
