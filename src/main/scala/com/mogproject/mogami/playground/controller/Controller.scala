@@ -1,9 +1,11 @@
 package com.mogproject.mogami.playground.controller
 
+import com.mogproject.mogami.core.Game.GameStatus
 import com.mogproject.mogami.core.MoveBuilderSfen
 import com.mogproject.mogami.core.State.PromotionFlag
+import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.view.Renderer
-import com.mogproject.mogami.Game
+import com.mogproject.mogami.{Game, Move, State}
 import org.scalajs.dom.{Element, MouseEvent, TouchEvent}
 
 import scala.scalajs.js.URIUtils.encodeURIComponent
@@ -18,10 +20,17 @@ object Controller {
   private[this] var baseUrl: String = ""
   private[this] var config: Configuration = Configuration()
   private[this] var game: Game = Game()
-  private[this] var currentMove: Int = 0
+
+  // -1: Latest
+  private[this] var currentMove: Int = -1
+
   private[this] var rendererVal: Option[Renderer] = None
   private[this] var activeCursor: Option[Cursor] = None
   private[this] var selectedCursor: Option[Cursor] = None
+
+  private[this] def isLatestState: Boolean = currentMove < 0 || currentMove == game.moves.length
+
+  private[this] def currentState: State = (currentMove < 0).fold(game.currentState, game.history(currentMove))
 
   private[this] def currentMode: Mode = config.mode
 
@@ -50,14 +59,17 @@ object Controller {
       case _ => args.config
     }
 
+    // current move
+    currentMove = math.min(game.moves.length, args.currentMove)
+
     // draw board and pieces
     renderer.drawBoard()
+    updateCurrentState()
+    updateUrls()
     renderer.setMode(config.mode)
     renderer.setLang(config.lang)
-    renderer.drawPieces(config.pieceRenderer, game.currentState)
-    renderer.drawIndicators(game)
-    updateLastMove()
-    updateUrls()
+    renderer.setRecord(game, config.lang)
+    renderer.selectRecord(currentMove)
 
     // register mouse event handlers
     if (renderer.hasTouchEvent) {
@@ -69,24 +81,26 @@ object Controller {
 
   }
 
-  private[this] def updateUrls(): Unit = {
-    val snapshot = encodeURIComponent(Game(game.currentState).toSfenString)
-    val record = encodeURIComponent(game.toSfenString)
+  private[this] def updateCurrentState(): Unit = {
+    // clear cursors
+    renderer.clearCursor()
+    clearSelection()
 
-    renderer.updateSnapshotUrl(s"${baseUrl}?sfen=${snapshot}&${config.toQueryString}")
-    renderer.updateRecordUrl(s"${baseUrl}?sfen=${record}&${config.toQueryString}")
+    // draw status
+    renderer.drawPieces(config.pieceRenderer, currentState)
+    renderer.drawIndicators(currentState.turn, isLatestState.fold(game.status, GameStatus.Playing))
+    renderer.drawLastMove((currentMove < 0).fold(game.lastMove, (0 < currentMove).option(game.moves(currentMove - 1))))
   }
 
-  private[this] def updateLastMove(): Unit = lastMoveToCursors().foreach(renderer.drawLastMoveArea)
+  private[this] def updateUrls(): Unit = {
+    val configParams = config.toQueryParameters
+    val moveParams = (0 <= currentMove && currentMove < game.moves.length).fold(List(s"move=${currentMove}"), List.empty)
 
-  private[this] def clearLastMove(): Unit = lastMoveToCursors().foreach(renderer.clearLastMoveArea)
+    val snapshot = ("sfen=" + encodeURIComponent(Game(game.currentState).toSfenString)) +: configParams
+    val record = (("sfen=" + encodeURIComponent(game.toSfenString)) +: configParams) ++ moveParams
 
-  private[this] def lastMoveToCursors(): Option[Seq[Cursor]] = game.lastMove.map { m =>
-    val fr = m.from match {
-      case None => Cursor(m.player, m.oldPtype)
-      case Some(sq) => Cursor(sq)
-    }
-    List(fr, Cursor(m.to))
+    renderer.updateSnapshotUrl(s"${baseUrl}?${snapshot.mkString("&")}")
+    renderer.updateRecordUrl(s"${baseUrl}?${record.mkString("&")}")
   }
 
   def mouseMove(evt: MouseEvent): Unit = currentMode match {
@@ -94,7 +108,6 @@ object Controller {
       val ret = renderer.getCursor(evt.clientX, evt.clientY)
 
       if (ret != activeCursor) {
-        activeCursor.foreach(renderer.clearCursor)
         ret.foreach(c => if (!c.isHand || game.currentState.hand.get(c.moveFrom.right.get).exists(_ > 0)) renderer.drawCursor(c))
         activeCursor = ret
       }
@@ -113,6 +126,12 @@ object Controller {
     case _ =>
   }
 
+  /**
+    * Move action in the play mode
+    *
+    * @param selected from
+    * @param moveTo   to
+    */
   private[this] def moveAction(selected: Cursor, moveTo: Cursor): Unit = {
     renderer.clearSelectedArea(selected)
     selectedCursor = None
@@ -126,12 +145,11 @@ object Controller {
           case None => None
         }
         nextGame.foreach { g =>
-          renderer.drawPieces(config.pieceRenderer, g.currentState)
-          renderer.drawIndicators(g)
-          clearLastMove()
           game = g
+          updateCurrentState()
+          renderer.setRecord(game, config.lang)
+          renderer.selectRecord(-1)
           updateUrls()
-          updateLastMove()
         }
       case _ => // do nothing
     }
@@ -148,18 +166,39 @@ object Controller {
     }
   }
 
+  private[this] def clearSelection(): Unit = {
+    selectedCursor.foreach(renderer.clearSelectedArea)
+    selectedCursor = None
+  }
+
   def touchStart(evt: TouchEvent): Unit = mouseDown(evt.changedTouches(0).clientX, evt.changedTouches(0).clientY)
 
   def setMode(mode: Mode): Unit = {
-    if (currentMode != mode) {
-      // config
-      config = config.copy(mode = mode)
+    def f() = {
+      renderer.setMode(mode) // view
+      config = config.copy(mode = mode) // config
+      updateUrls() // urls
+    }
 
-      // view
-      renderer.setMode(mode)
-
-      // urls
-      updateUrls()
+    (currentMode, mode) match {
+      case (Viewing, Viewing) => updateUrls()
+      case (Playing, Viewing) => f()
+      case (Viewing, Playing) =>
+        if (isLatestState || renderer.askConfirm()) {
+          if (!isLatestState) {
+            game = game.copy(moves = game.moves.take(currentMove), givenHistory = Some(game.history.take(currentMove + 1)))
+            renderer.setRecord(game, config.lang)
+          }
+          currentMove = -1
+          f()
+        }
+      case (Playing | Viewing, Editing) =>
+        if (game.moves.isEmpty || renderer.askConfirm()) {
+          f()
+        }
+      case (Editing, Playing | Viewing) =>
+      // check status
+      case _ => // do nothing
     }
   }
 
@@ -171,9 +210,16 @@ object Controller {
       // view
       renderer.setLang(lang)
       renderer.drawPieces(config.pieceRenderer, game.currentState)
+      renderer.setRecord(game, lang)
 
       // urls
       updateUrls()
     }
+  }
+
+  def setRecord(index: Int): Unit = {
+    currentMove = math.min(game.moves.length, index)
+    updateCurrentState()
+    setMode(Viewing)
   }
 }

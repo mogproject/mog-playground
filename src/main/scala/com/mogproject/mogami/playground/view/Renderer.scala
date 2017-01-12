@@ -1,14 +1,16 @@
 package com.mogproject.mogami.playground.view
 
-import com.mogproject.mogami.playground.controller._
+import com.mogproject.mogami.playground.controller.{Cursor, _}
 import com.mogproject.mogami._
 import com.mogproject.mogami.core.Game.GameStatus
+import com.mogproject.mogami.core.Game.GameStatus.GameStatus
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.{CanvasRenderingContext2D, Element}
 import org.scalajs.dom.html.{Canvas, Div}
+import org.scalajs.dom.raw.HTMLSelectElement
 
 import scalatags.JsDom.all._
 
@@ -16,6 +18,9 @@ import scalatags.JsDom.all._
   * controls canvas rendering
   */
 case class Renderer(elem: Element, layout: Layout) {
+
+  private[this] var lastMoveArea: Set[Cursor] = Set.empty
+  private[this] var lastCursor: Option[Cursor] = None
 
   // main canvas
   private[this] val canvas0: Canvas = createCanvas(0)
@@ -38,21 +43,14 @@ case class Renderer(elem: Element, layout: Layout) {
   ).render
 
   // forms
-  private[this] val recordSelector = select(cls := "form-control thin-select",
-    option("-"),
-    option("+7776FU"),
-    option("-3334FU")
+  private[this] val recordSelector: HTMLSelectElement = select(
+    cls := "form-control thin-select",
+    onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
   ).render
 
-  private[this] val modeLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false,
-    "Play",
-    span(cls := "caret")
-  ).render
+  private[this] val modeLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false).render
 
-  private[this] val langLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false,
-    "JP",
-    span(cls := "caret")
-  ).render
+  private[this] val langLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false).render
 
   private[this] val navigator = tag("nav")(cls := "navbar navbar-default navbar-fixed-top",
     div(cls := "container",
@@ -185,17 +183,17 @@ case class Renderer(elem: Element, layout: Layout) {
     layout.handBlack.clear(layer2)
   }
 
-  def drawIndicators(game: Game): Unit = {
-    game.status match {
+  def drawIndicators(turn: Player, status: GameStatus): Unit = {
+    status match {
       case GameStatus.Playing =>
-        (if (game.turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).clear(layer2)
-        (if (game.turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.active)
+        (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).clear(layer2)
+        (if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.active)
       case GameStatus.Mated =>
-        (if (game.turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).drawFill(layer2, layout.color.win)
-        (if (game.turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.lose)
-      case GameStatus.Illegal =>
-        (if (game.turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).drawFill(layer2, layout.color.lose)
-        (if (game.turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.win)
+        (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).drawFill(layer2, layout.color.win)
+        (if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.lose)
+      case GameStatus.PerpetualCheck | GameStatus.Uchifuzume =>
+        (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).drawFill(layer2, layout.color.lose)
+        (if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.win)
       case GameStatus.Drawn =>
         layout.indicatorWhite.drawFill(layer2, layout.color.draw)
         layout.indicatorBlack.drawFill(layer2, layout.color.draw)
@@ -205,6 +203,8 @@ case class Renderer(elem: Element, layout: Layout) {
   def askPromote(): Boolean = {
     dom.window.confirm("Do you want to promote?")
   }
+
+  def askConfirm(): Boolean = dom.window.confirm("The record will be discarded. Are you sure?")
 
   /**
     * Convert MouseEvent to Cursor
@@ -250,14 +250,17 @@ case class Renderer(elem: Element, layout: Layout) {
     * Draw a highlighted cursor.
     */
   def drawCursor(cursor: Cursor): Unit = {
+    clearCursor()
     cursorToRect(cursor).draw(layer3, layout.color.cursor, -2)
+    lastCursor = Some(cursor)
   }
 
   /**
     * Clear a cursor.
     */
-  def clearCursor(cursor: Cursor): Unit = {
-    cursorToRect(cursor).clear(layer3)
+  def clearCursor(): Unit = {
+    lastCursor.foreach(cursorToRect(_).clear(layer3))
+    lastCursor = None
   }
 
   /**
@@ -268,9 +271,21 @@ case class Renderer(elem: Element, layout: Layout) {
   /**
     * Draw the last move area.
     */
-  def drawLastMoveArea(cs: Seq[Cursor]): Unit = cs.foreach(cursorToRect(_).drawFill(layer0, layout.color.light, 1))
+  def drawLastMove(move: Option[Move]): Unit = {
+    val newArea: Set[Cursor] = move match {
+      case None => Set.empty
+      case Some(mv) =>
+        val fr = mv.from match {
+          case None => Cursor(mv.player, mv.oldPtype)
+          case Some(sq) => Cursor(sq)
+        }
+        Set(fr, Cursor(mv.to))
+    }
 
-  def clearLastMoveArea(cs: Seq[Cursor]): Unit = cs.foreach(cursorToRect(_).clear(layer0))
+    (lastMoveArea -- newArea).foreach(cursorToRect(_).clear(layer0))
+    (newArea -- lastMoveArea).foreach(cursorToRect(_).drawFill(layer0, layout.color.light, 1))
+    lastMoveArea = newArea
+  }
 
   /**
     * Clear a selected area.
@@ -281,11 +296,43 @@ case class Renderer(elem: Element, layout: Layout) {
 
   def updateRecordUrl(url: String): Unit = recordInput.value = url
 
-  def setMode(mode: Mode): Unit = {
-    modeLabel.innerHTML = mode.label + span(cls := "caret").toString()
+  def setMode(mode: Mode): Unit = modeLabel.innerHTML = mode.label + span(cls := "caret").toString()
+
+  def setLang(lang: Language): Unit = langLabel.innerHTML = lang.label + span(cls := "caret").toString()
+
+  def setRecord(game: Game, lng: Language): Unit = {
+    val f: Move => String = lng match {
+      case Japanese => _.toCsaString // todo: fix
+      case English => _.toSfenString
+    }
+
+    val xs = game.moves.zipWithIndex.map { case (m, i) =>
+      (Some(i + 1), game.history(i).turn.toSymbolString + f(m))
+    }
+    val additional = (game.status, lng) match {
+      case (GameStatus.Mated, Japanese) => List((None, "詰み"))
+      case (GameStatus.Drawn, Japanese) => List((None, "千日手"))
+      case (GameStatus.PerpetualCheck, Japanese) => List((None, "連続王手の千日手"))
+      case (GameStatus.Uchifuzume, Japanese) => List((None, "打ち歩詰め"))
+      case (GameStatus.Mated, English) => List((None, "Mated"))
+      case (GameStatus.Drawn, English) => List((None, "Drawn"))
+      case (GameStatus.PerpetualCheck, English) => List((None, "Perpetual Check"))
+      case (GameStatus.Uchifuzume, English) => List((None, "Uchifuzume"))
+      case (GameStatus.Playing, _) => List()
+    }
+    val ys = ((Some(0), "-") +: xs) ++ additional
+
+    val oldIndex = getRecordIndex()
+    recordSelector.innerHTML = ys.map { case (o, s) => option(o.map(n => s"${n}: ").getOrElse("") + s).toString() }.mkString
+    selectRecord(oldIndex)
   }
 
-  def setLang(lang: Language): Unit = {
-    langLabel.innerHTML = lang.label + span(cls := "caret").toString()
+  def selectRecord(index: Int): Unit = {
+    val maxValue = recordSelector.options.length - 1
+    recordSelector.selectedIndex = (index < 0).fold(maxValue, math.min(index, maxValue))
   }
+
+  def getRecordIndex(): Int = recordSelector.selectedIndex
+
+
 }

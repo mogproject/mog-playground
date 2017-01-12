@@ -4,11 +4,12 @@ import com.mogproject.mogami.Game
 
 import scala.annotation.tailrec
 import scala.scalajs.js.URIUtils.decodeURIComponent
+import scala.util.{Success, Try}
 
 /**
   * stores parameters
   */
-case class Arguments(game: Game = Game(), config: Configuration = Configuration()) {
+case class Arguments(game: Game = Game(), currentMove: Int = -1, config: Configuration = Configuration()) {
   def parseQueryString(query: String): Arguments = {
     @tailrec
     def f(sofar: Arguments, ls: List[List[String]]): Arguments = ls match {
@@ -31,6 +32,12 @@ case class Arguments(game: Game = Game(), config: Configuration = Configuration(
         case "edit" => f(sofar.copy(config = sofar.config.copy(mode = Editing)), xs)
         case _ =>
           println(s"Invalid parameter: mode=${s}")
+          f(sofar, xs)
+      }
+      case ("move" :: s :: Nil) :: xs => Try(s.toInt) match {
+        case Success(n) if n >= 0 => f(sofar.copy(currentMove = n), xs)
+        case _ =>
+          println(s"Invalid parameter: move=${s}")
           f(sofar, xs)
       }
       case _ :: xs => f(sofar, xs)
