@@ -64,6 +64,7 @@ object Controller {
 
     // draw board and pieces
     renderer.drawBoard()
+    renderer.drawIndexes(config.lang)
     updateCurrentState()
     updateUrls()
     renderer.setMode(config.mode)
@@ -208,6 +209,7 @@ object Controller {
       config = config.copy(lang = lang)
 
       // view
+      renderer.drawIndexes(lang)
       renderer.setLang(lang)
       renderer.drawPieces(config.pieceRenderer, game.currentState)
       renderer.setRecord(game, lang)

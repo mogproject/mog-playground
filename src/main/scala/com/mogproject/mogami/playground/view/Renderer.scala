@@ -171,6 +171,35 @@ case class Renderer(elem: Element, layout: Layout) {
     }
   }
 
+  def drawIndexes(lang: Language): Unit = {
+    val ctx = layer3
+    val rankIndex = lang match {
+      case Japanese => "一二三四五六七八九"
+      case English => "abcdefghi"
+    }
+
+    ctx.fillStyle = layout.color.fg
+
+    // clear
+    layout.fileIndex.clear(ctx)
+    layout.rankIndex.clear(ctx)
+
+    // file
+    ctx.font = layout.font.index
+    for (i <- 0 until 9) {
+      val x = layout.board.left + layout.PIECE_WIDTH * (8 - i) + 10
+      val y = layout.board.top - 2
+      ctx.fillText("１２３４５６７８９".charAt(i).toString, x, y)
+    }
+
+    //rank
+    for (i <- 0 until 9) {
+      val x = layout.board.right + (lang == Japanese).fold(1, 3)
+      val y = layout.board.top + layout.PIECE_HEIGHT * i + 24
+      ctx.fillText(rankIndex.charAt(i).toString, x, y)
+    }
+  }
+
   def drawPieces(pieceRenderer: PieceRenderer, state: State): Unit = {
     clearPieces()
     state.board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, pc, sq) }
@@ -200,9 +229,7 @@ case class Renderer(elem: Element, layout: Layout) {
     }
   }
 
-  def askPromote(): Boolean = {
-    dom.window.confirm("Do you want to promote?")
-  }
+  def askPromote(): Boolean = dom.window.confirm("Do you want to promote?")
 
   def askConfirm(): Boolean = dom.window.confirm("The record will be discarded. Are you sure?")
 
@@ -322,7 +349,7 @@ case class Renderer(elem: Element, layout: Layout) {
     }
     val ys = ((Some(0), "-") +: xs) ++ additional
 
-    val oldIndex = getRecordIndex()
+    val oldIndex = recordSelector.selectedIndex
     recordSelector.innerHTML = ys.map { case (o, s) => option(o.map(n => s"${n}: ").getOrElse("") + s).toString() }.mkString
     selectRecord(oldIndex)
   }
@@ -331,8 +358,5 @@ case class Renderer(elem: Element, layout: Layout) {
     val maxValue = recordSelector.options.length - 1
     recordSelector.selectedIndex = (index < 0).fold(maxValue, math.min(index, maxValue))
   }
-
-  def getRecordIndex(): Int = recordSelector.selectedIndex
-
 
 }
