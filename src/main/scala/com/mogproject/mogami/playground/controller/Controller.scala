@@ -97,7 +97,8 @@ object Controller {
     val configParams = config.toQueryParameters
     val moveParams = (0 <= currentMove && currentMove < game.moves.length).fold(List(s"move=${currentMove}"), List.empty)
 
-    val snapshot = ("sfen=" + encodeURIComponent(Game(game.currentState).toSfenString)) +: configParams
+    // todo: refactor
+    val snapshot = ("sfen=" + encodeURIComponent(Game(currentState).toSfenString)) +: (config.lang == English).fold(List("lang=en"), List.empty)
     val record = (("sfen=" + encodeURIComponent(game.toSfenString)) +: configParams) ++ moveParams
 
     renderer.updateSnapshotUrl(s"${baseUrl}?${snapshot.mkString("&")}")
@@ -141,7 +142,7 @@ object Controller {
       case (Cursor(from), Cursor(Left(to))) if game.currentState.canAttack(from, to) =>
         val nextGame: Option[Game] = game.currentState.getPromotionFlag(from, to) match {
           case Some(PromotionFlag.CannotPromote) => game.makeMove(MoveBuilderSfen(from, to, promote = false))
-          case Some(PromotionFlag.CanPromote) => game.makeMove(MoveBuilderSfen(from, to, renderer.askPromote()))
+          case Some(PromotionFlag.CanPromote) => game.makeMove(MoveBuilderSfen(from, to, renderer.askPromote(config.lang)))
           case Some(PromotionFlag.MustPromote) => game.makeMove(MoveBuilderSfen(from, to, promote = true))
           case None => None
         }
@@ -185,7 +186,7 @@ object Controller {
       case (Viewing, Viewing) => updateUrls()
       case (Playing, Viewing) => f()
       case (Viewing, Playing) =>
-        if (isLatestState || renderer.askConfirm()) {
+        if (isLatestState || renderer.askConfirm(config.lang)) {
           if (!isLatestState) {
             game = game.copy(moves = game.moves.take(currentMove), givenHistory = Some(game.history.take(currentMove + 1)))
             renderer.setRecord(game, config.lang)
@@ -194,7 +195,7 @@ object Controller {
           f()
         }
       case (Playing | Viewing, Editing) =>
-        if (game.moves.isEmpty || renderer.askConfirm()) {
+        if (game.moves.isEmpty || renderer.askConfirm(config.lang)) {
           f()
         }
       case (Editing, Playing | Viewing) =>

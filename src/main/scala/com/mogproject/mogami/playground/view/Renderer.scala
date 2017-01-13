@@ -126,7 +126,9 @@ case class Renderer(elem: Element, layout: Layout) {
       div(cls := "row",
         canvasContainer,
         div(cls := "col-md-6", footer)
-      )
+      ),
+      hr(),
+      small(p(textAlign := "right", "Shogi Playground © 2017 mogproject"))
     ).render)
 
     // initialize clipboard.js
@@ -229,9 +231,15 @@ case class Renderer(elem: Element, layout: Layout) {
     }
   }
 
-  def askPromote(): Boolean = dom.window.confirm("Do you want to promote?")
+  def askPromote(lang: Language): Boolean = dom.window.confirm(lang match {
+    case Japanese => "成りますか?"
+    case English => "Do you want to promote?"
+  })
 
-  def askConfirm(): Boolean = dom.window.confirm("The record will be discarded. Are you sure?")
+  def askConfirm(lang: Language): Boolean = dom.window.confirm(lang match {
+    case Japanese => "この局面以降の棋譜は失われます。よろしいですか?"
+    case English => "The record will be discarded. Are you sure?"
+  })
 
   /**
     * Convert MouseEvent to Cursor
@@ -329,7 +337,7 @@ case class Renderer(elem: Element, layout: Layout) {
 
   def setRecord(game: Game, lng: Language): Unit = {
     val f: Move => String = lng match {
-      case Japanese => _.toCsaString // todo: fix
+      case Japanese => _.toKifString
       case English => _.toSfenString
     }
 
