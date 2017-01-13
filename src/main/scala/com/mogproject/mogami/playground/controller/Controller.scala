@@ -20,6 +20,7 @@ object Controller {
   private[this] var baseUrl: String = ""
   private[this] var config: Configuration = Configuration()
   private[this] var game: Game = Game()
+  private[this] var currentMode: Mode = Playing
 
   // -1: Latest
   private[this] var currentMove: Int = -1
@@ -31,8 +32,6 @@ object Controller {
   private[this] def isLatestState: Boolean = currentMove < 0 || currentMove == game.moves.length
 
   private[this] def currentState: State = (currentMove < 0).fold(game.currentState, game.history(currentMove))
-
-  private[this] def currentMode: Mode = config.mode
 
   private[this] def currentLang: Language = config.lang
 
@@ -54,10 +53,7 @@ object Controller {
     rendererVal = Some(Renderer(elem, args.config.layout))
 
     // update mode
-    config = (args.config.mode, game.moves.nonEmpty) match {
-      case (Playing, true) => args.config.copy(mode = Viewing)
-      case _ => args.config
-    }
+    currentMode = game.moves.nonEmpty.fold(Viewing, Playing)
 
     // current move
     currentMove = math.min(game.moves.length, args.currentMove)
@@ -67,7 +63,7 @@ object Controller {
     renderer.drawIndexes(config.lang)
     updateCurrentState()
     updateUrls()
-    renderer.setMode(config.mode)
+    renderer.setMode(currentMode)
     renderer.setLang(config.lang)
     renderer.setRecord(game, config.lang)
     renderer.selectRecord(currentMove)
@@ -97,8 +93,7 @@ object Controller {
     val configParams = config.toQueryParameters
     val moveParams = (0 <= currentMove && currentMove < game.moves.length).fold(List(s"move=${currentMove}"), List.empty)
 
-    // todo: refactor
-    val snapshot = ("sfen=" + encodeURIComponent(Game(currentState).toSfenString)) +: (config.lang == English).fold(List("lang=en"), List.empty)
+    val snapshot = ("sfen=" + encodeURIComponent(Game(currentState).toSfenString)) +: configParams
     val record = (("sfen=" + encodeURIComponent(game.toSfenString)) +: configParams) ++ moveParams
 
     renderer.updateSnapshotUrl(s"${baseUrl}?${snapshot.mkString("&")}")
@@ -178,7 +173,7 @@ object Controller {
   def setMode(mode: Mode): Unit = {
     def f() = {
       renderer.setMode(mode) // view
-      config = config.copy(mode = mode) // config
+      currentMode = mode
       updateUrls() // urls
     }
 

@@ -26,14 +26,6 @@ case class Arguments(game: Game = Game(), currentMove: Int = -1, config: Configu
           println(s"Invalid parameter: lang=${s}")
           f(sofar, xs)
       }
-      case ("mode" :: s :: Nil) :: xs => s match {
-        case "play" => f(sofar.copy(config = sofar.config.copy(mode = Playing)), xs)
-        case "view" => f(sofar.copy(config = sofar.config.copy(mode = Viewing)), xs)
-        case "edit" => f(sofar.copy(config = sofar.config.copy(mode = Editing)), xs)
-        case _ =>
-          println(s"Invalid parameter: mode=${s}")
-          f(sofar, xs)
-      }
       case ("move" :: s :: Nil) :: xs => Try(s.toInt) match {
         case Success(n) if n >= 0 => f(sofar.copy(currentMove = n), xs)
         case _ =>
