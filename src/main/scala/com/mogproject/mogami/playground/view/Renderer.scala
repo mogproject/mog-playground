@@ -90,30 +90,48 @@ case class Renderer(elem: Element, layout: Layout) {
   private[this] val snapshotInput = createInput("snapshot")
   private[this] val recordInput = createInput("record")
 
+
   private[this] def createInput(ident: String) = input(
     tpe := "text", id := ident, cls := "form-control", aria.label := "...", readonly := "readonly"
   ).render
 
-  private[this] def createInputGroup(labelString: String, inputElem: Element, target: String) = div(cls := "row",
-    position := "relative",
-
-    div(cls := "col-md-1"),
-    div(cls := "col-md-10",
-      label(labelString),
-      div(cls := "input-group",
-        inputElem,
-        span(
-          cls := "input-group-btn",
-          button(cls := "btn btn-default", data("clipboard-target") := s"#${target}", tpe := "button", "Copy!")
-        )
-      ),
-      div(cls := "col-md-1")
+  private[this] def createInputGroup(labelString: String, inputElem: Element, target: String) = div(
+    label(labelString),
+    div(cls := "input-group",
+      inputElem,
+      span(
+        cls := "input-group-btn",
+        button(cls := "btn btn-default", data("clipboard-target") := s"#${target}", tpe := "button", "Copy!")
+      )
     )
   ).render
 
-  private[this] val footer: Div = div(
-    createInputGroup("Snapshot URL", snapshotInput, "snapshot"),
-    createInputGroup("Record URL", recordInput, "record")
+  private[this] def createControlInput(controlType: Int, glyph: String) = button(cls := "btn btn-default",
+    onclick := { () => Controller.setControl(controlType) },
+    span(cls := s"glyphicon glyphicon-${glyph}", aria.hidden := true)
+  ).render
+
+  private[this] val controlInput0 = createControlInput(0, "step-backward")
+  private[this] val controlInput1 = createControlInput(1, "backward")
+  private[this] val controlInput2 = createControlInput(2, "forward")
+  private[this] val controlInput3 = createControlInput(3, "step-forward")
+
+  private[this] val footer: Div = div(cls := "row",
+    div(cls := "col-md-10 col-md-offset-1",
+      div(
+        label("Control"),
+        div(cls := "btn-group btn-group-justified", role := "group", aria.label := "...",
+          div(cls := "btn-group", role := "group", controlInput0),
+          div(cls := "btn-group", role := "group", controlInput1),
+          div(cls := "btn-group", role := "group", controlInput2),
+          div(cls := "btn-group", role := "group", controlInput3)
+        )
+      ),
+      br(),
+      createInputGroup("Snapshot URL", snapshotInput, "snapshot"),
+      br(),
+      createInputGroup("Record URL", recordInput, "record")
+    )
   ).render
 
   initialize()
@@ -367,4 +385,17 @@ case class Renderer(elem: Element, layout: Layout) {
     recordSelector.selectedIndex = (index < 0).fold(maxValue, math.min(index, maxValue))
   }
 
+  def getSelectedIndex: Int = recordSelector.selectedIndex
+
+  def updateControlBar(): Unit = {
+    val maxValue = recordSelector.options.length - 1
+    val selected = getSelectedIndex
+
+    println(s"selected=${selected}, maxValue=${maxValue}")
+
+    controlInput0.disabled = selected == 0
+    controlInput1.disabled = selected == 0
+    controlInput2.disabled = selected == maxValue
+    controlInput3.disabled = selected == maxValue
+  }
 }

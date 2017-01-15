@@ -45,6 +45,7 @@ object Controller {
     */
   def initialize(elem: Element, args: Arguments, baseUrl: String): Unit = {
     this.baseUrl = baseUrl
+    this.config = args.config
 
     // create game
     game = args.game
@@ -61,12 +62,12 @@ object Controller {
     // draw board and pieces
     renderer.drawBoard()
     renderer.drawIndexes(config.lang)
-    updateCurrentState()
     updateUrls()
     renderer.setMode(currentMode)
     renderer.setLang(config.lang)
     renderer.setRecord(game, config.lang)
     renderer.selectRecord(currentMove)
+    updateCurrentState()
 
     // register mouse event handlers
     if (renderer.hasTouchEvent) {
@@ -87,6 +88,9 @@ object Controller {
     renderer.drawPieces(config.pieceRenderer, currentState)
     renderer.drawIndicators(currentState.turn, isLatestState.fold(game.status, GameStatus.Playing))
     renderer.drawLastMove((currentMove < 0).fold(game.lastMove, (0 < currentMove).option(game.moves(currentMove - 1))))
+
+    // update control bar
+    renderer.updateControlBar()
   }
 
   private[this] def updateUrls(): Unit = {
@@ -143,9 +147,9 @@ object Controller {
         }
         nextGame.foreach { g =>
           game = g
-          updateCurrentState()
           renderer.setRecord(game, config.lang)
           renderer.selectRecord(-1)
+          updateCurrentState()
           updateUrls()
         }
       case _ => // do nothing
@@ -219,5 +223,16 @@ object Controller {
     currentMove = math.min(game.moves.length, index)
     updateCurrentState()
     setMode(Viewing)
+  }
+
+  def setControl(controlType: Int): Unit = {
+    val index = controlType match {
+      case 0 => 0
+      case 1 => renderer.getSelectedIndex - 1
+      case 2 => renderer.getSelectedIndex + 1
+      case 3 => -1
+    }
+    renderer.selectRecord(index)
+    setRecord(index)
   }
 }
