@@ -142,16 +142,18 @@ object Controller {
     case Playing =>
       (selectedCursor, renderer.getCursor(x, y)) match {
         case (Some(selected), Some(Cursor(Some(moveTo), None, None))) => moveAction(selected.moveFrom, moveTo)
+        case (Some(_), _) => clearSelection()
         case (None, Some(selected)) => selectAction(selected)
         case _ => // do nothing
       }
     case Editing =>
       (selectedCursor, renderer.getCursor(x, y)) match {
         case (Some(selected), Some(exchangeTo)) => exchangeAction(selected, exchangeTo)
+        case (Some(_), _) => clearSelection()
         case (None, Some(selected)) => selectAction(selected)
         case _ => // do nothing
       }
-    case _ =>
+    case Viewing => // do nothing
   }
 
   /**
@@ -220,7 +222,7 @@ object Controller {
       case (Cursor(Some(s), None, None), Cursor(None, Some(h), None)) if editingBoard(s).ptype != KING =>
         val pt = editingBoard(s).ptype.demoted
         editingBoard -= s
-        editingHand = MapUtil.incrementMap(editingHand,Hand(h.owner, pt))
+        editingHand = MapUtil.incrementMap(editingHand, Hand(h.owner, pt))
       case (Cursor(Some(s), None, None), Cursor(None, None, Some(_))) =>
         val pt = editingBoard(s).ptype.demoted
         editingBoard -= s
