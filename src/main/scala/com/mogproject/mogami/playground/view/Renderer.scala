@@ -135,8 +135,56 @@ case class Renderer(elem: Element, layout: Layout) {
     createInputGroup("Record URL", recordInput, "record")
   ).render
 
+  object EditTurn {
+    private[this] var value: Player = BLACK
+
+    private[this] val anchors: Map[Player, Element] = Map(
+      BLACK -> a(cls := "btn btn-primary active", onclick := { () => Controller.setEditTurn(BLACK) }).render,
+      WHITE -> a(cls := "btn btn-primary notActive", onclick := { () => Controller.setEditTurn(WHITE) }).render
+    )
+
+    val turnInput = div(cls := "form-group",
+      label("Turn"),
+      div(cls := "row",
+        div(cls := "col-sm-8 col-md-8",
+          div(cls := "input-group",
+            div(id := "radioBtn", cls := "btn-group btn-group-justified",
+              anchors(BLACK),
+              anchors(WHITE)
+            )
+          )
+        )
+      )
+    ).render
+
+    def setEditLabel(lang: Language): Unit = lang match {
+      case Japanese =>
+        anchors(BLACK).innerHTML = "先手"
+        anchors(WHITE).innerHTML = "後手"
+      case English =>
+        anchors(BLACK).innerHTML = "Black"
+        anchors(WHITE).innerHTML = "White"
+    }
+
+    def change(newValue: Player): Unit = {
+      anchors(newValue).classList.remove("notActive")
+      anchors(newValue).classList.add("active")
+      anchors(!newValue).classList.remove("active")
+      anchors(!newValue).classList.add("notActive")
+      value = newValue
+    }
+
+    def getValue(): Player = value
+  }
+
+
+  private[this] val editSection = div(display := "none",
+    EditTurn.turnInput
+  ).render
+
   private[this] val footer: Div = div(cls := "row",
     div(cls := "col-md-10 col-md-offset-1",
+      editSection,
       controlSection
     )
   ).render
@@ -247,7 +295,7 @@ case class Renderer(elem: Element, layout: Layout) {
     box.filter(_._2 > 0).foreach { case (pt, _) => pieceRenderer.drawInBox(layer2, pt) }
   }
 
-  def clearPiecesInBox(): Unit ={
+  def clearPiecesInBox(): Unit = {
     layout.pieceBox.clear(layer2)
   }
 
@@ -276,6 +324,10 @@ case class Renderer(elem: Element, layout: Layout) {
     layout.pieceBox.clear(layer1, -3)
     clearPiecesInBox()
   }
+
+  def showEditSection(): Unit = editSection.style.display = "block"
+
+  def hideEditSection(): Unit = editSection.style.display = "none"
 
   def showControlSection(): Unit = controlSection.style.display = "block"
 

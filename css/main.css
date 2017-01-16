@@ -39,6 +39,11 @@
     height: 24px !important;
 }
 
+#radioBtn .notActive{
+    color: #3276b1;
+    background-color: #fff;
+}
+
 div {
     position: relative;
 }

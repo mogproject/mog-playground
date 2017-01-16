@@ -25,7 +25,6 @@ object Controller {
   private[this] var currentMode: Mode = Playing
 
   // saved state for Edit Mode
-  private[this] var editingTurn: Player = Player.BLACK
   private[this] var editingBoard: BoardType = Map.empty
   private[this] var editingHand: HandType = Map.empty
   private[this] var editingBox: Map[Ptype, Int] = Map.empty
@@ -282,8 +281,10 @@ object Controller {
       case (Playing | Viewing, Editing) =>
         if (game.moves.isEmpty || renderer.askConfirm(config.lang)) {
           renderer.hideControlSection()
+          renderer.showEditSection()
+          renderer.EditTurn.setEditLabel(config.lang)
+          renderer.EditTurn.change(currentState.turn)
 
-          editingTurn = currentState.turn
           editingBoard = currentState.board
           editingHand = currentState.hand
           editingBox = currentState.getUnusedPtypeCount
@@ -293,19 +294,20 @@ object Controller {
           renderer.clearLastMove()
 
           renderer.setRecord(Game(), config.lang)
-          renderer.drawIndicators(editingTurn, GameStatus.Playing)
+          renderer.drawIndicators(renderer.EditTurn.getValue(), GameStatus.Playing)
           renderer.drawPieceBox()
           renderer.drawEditingPieces(config.pieceRenderer, editingBoard, editingHand, editingBox)
           f()
         }
       case (Editing, Playing | Viewing) =>
         // check status
-        Try(State(editingTurn, editingBoard, editingHand, None)) match {
+        Try(State(renderer.EditTurn.getValue(), editingBoard, editingHand, None)) match {
           case Success(st) =>
             game = Game(st)
             renderer.hidePieceBox()
             renderer.showControlSection()
             renderer.updateControlBar()
+            renderer.hideEditSection()
             updateCurrentState()
             f()
           case Failure(e) =>
@@ -334,6 +336,7 @@ object Controller {
           renderer.drawIndexes(lang)
           renderer.setLang(lang)
           renderer.drawEditingPieces(config.pieceRenderer, editingBoard, editingHand, editingBox)
+          renderer.EditTurn.setEditLabel(lang)
       }
     }
   }
@@ -353,5 +356,12 @@ object Controller {
     }
     renderer.selectRecord(index)
     setRecord(index)
+  }
+
+  def setEditTurn(player: Player): Unit = {
+    if (player != renderer.EditTurn.getValue()) {
+      renderer.EditTurn.change(player)
+      renderer.drawIndicators(player, GameStatus.Playing)
+    }
   }
 }
