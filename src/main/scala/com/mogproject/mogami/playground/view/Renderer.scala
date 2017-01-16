@@ -48,7 +48,7 @@ case class Renderer(elem: Element, layout: Layout) {
   // forms
   private[this] val recordSelector: HTMLSelectElement = select(
     cls := "form-control thin-select",
-    onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
+    onchange := (() => Controller.setRecord(recordSelector.selectedIndex, Viewing))
   ).render
 
   private[this] val modeLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false).render

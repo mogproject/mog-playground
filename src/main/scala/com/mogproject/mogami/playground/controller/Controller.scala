@@ -274,7 +274,7 @@ object Controller {
       case (Viewing, Playing) =>
         if (isLatestState || renderer.askConfirm(config.lang)) {
           if (!isLatestState) {
-            game = game.copy(moves = game.moves.take(currentMove), givenHistory = Some(game.history.take(currentMove + 1)))
+            game = game.copy(moves = game.moves.take(currentMove), givenHistory = Some(game.history.take(currentMove + 1))) // todo: to a function
             renderer.setRecord(game, config.lang)
           }
           currentMove = -1
@@ -349,21 +349,27 @@ object Controller {
     }
   }
 
-  def setRecord(index: Int): Unit = {
+  def setRecord(index: Int, mode: Mode): Unit = {
     currentMove = index
     updateCurrentState()
-    setMode(Viewing)
+    setMode(mode)
   }
 
   def setControl(controlType: Int): Unit = {
-    val index = controlType match {
-      case 0 => 0
-      case 1 => renderer.getSelectedIndex - 1
-      case 2 => renderer.getSelectedIndex + 1
-      case 3 => -1
+    val (mode, index) = (currentMode, controlType) match {
+      case (_, 0) => (Viewing, 0)
+      case (Viewing, 1) => (Viewing, renderer.getSelectedIndex - 1)
+      case (Playing, 1) =>
+        val mv = renderer.getSelectedIndex - 1
+        game = game.copy(moves = game.moves.take(mv), givenHistory = Some(game.history.take(mv + 1)))
+        renderer.setRecord(game, config.lang)
+        (Playing, -1)
+      case (Viewing, 2) => (Viewing, renderer.getSelectedIndex + 1)
+      case (Viewing, 3) => (Viewing, -1)
+      case _ => throw new IllegalArgumentException(s"Unexpected control: mode=${currentMode} controlType=${controlType}")
     }
     renderer.selectRecord(index)
-    setRecord(index)
+    setRecord(index, mode)
   }
 
   def setEditTurn(player: Player): Unit = {
