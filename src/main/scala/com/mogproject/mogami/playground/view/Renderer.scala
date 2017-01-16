@@ -487,7 +487,7 @@ case class Renderer(elem: Element, layout: Layout) {
   def setRecord(game: Game, lng: Language): Unit = {
     val f: Move => String = lng match {
       case Japanese => _.toKifString
-      case English => _.toSfenString
+      case English => _.toWesternNotationString
     }
 
     val xs = game.moves.zipWithIndex.map { case (m, i) =>
