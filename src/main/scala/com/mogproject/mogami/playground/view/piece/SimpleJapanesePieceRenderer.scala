@@ -1,6 +1,6 @@
 package com.mogproject.mogami.playground.view.piece
 
-import com.mogproject.mogami.{Piece, Square, Hand}
+import com.mogproject.mogami.{Hand, Piece, Ptype, Square}
 import com.mogproject.mogami.playground.view.Layout
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom.CanvasRenderingContext2D
@@ -39,5 +39,11 @@ case class SimpleJapanesePieceRenderer(layout: Layout) extends PieceRenderer {
         drawText(ctx, numPieces.toString, xx, y + 2, piece.owner.isWhite, layout.font.number, layout.color.fg)
       }
     }
+  }
+
+  override def drawInBox(ctx: CanvasRenderingContext2D, ptype: Ptype): Unit = {
+    val x = layout.pieceBox.left + layout.PIECE_BOX_UNIT_WIDTH * ptype.sortId + 3
+    val y = layout.pieceBox.top + layout.PIECE_HEIGHT - 6
+    drawText(ctx, ptype.toJapaneseSimpleName, x, y, rotated = false, layout.font.pieceJapanese, layout.color.fg)
   }
 }

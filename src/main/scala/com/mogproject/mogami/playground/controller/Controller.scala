@@ -5,10 +5,12 @@ import com.mogproject.mogami.core.MoveBuilderSfen
 import com.mogproject.mogami.core.State.PromotionFlag
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.view.Renderer
-import com.mogproject.mogami.{Game, Move, State}
+import com.mogproject.mogami._
+import com.mogproject.mogami.util.MapUtil
 import org.scalajs.dom.{Element, MouseEvent, TouchEvent}
 
 import scala.scalajs.js.URIUtils.encodeURIComponent
+import scala.util.{Failure, Success, Try}
 
 
 /**
@@ -21,6 +23,12 @@ object Controller {
   private[this] var config: Configuration = Configuration()
   private[this] var game: Game = Game()
   private[this] var currentMode: Mode = Playing
+
+  // saved state for Edit Mode
+  private[this] var editingTurn: Player = Player.BLACK
+  private[this] var editingBoard: BoardType = Map.empty
+  private[this] var editingHand: HandType = Map.empty
+  private[this] var editingBox: Map[Ptype, Int] = Map.empty
 
   // -1: Latest
   private[this] var currentMove: Int = -1
@@ -109,10 +117,24 @@ object Controller {
       val ret = renderer.getCursor(evt.clientX, evt.clientY)
 
       if (ret != activeCursor) {
-        ret.foreach(c => if (!c.isHand || game.currentState.hand.get(c.moveFrom.right.get).exists(_ > 0)) renderer.drawCursor(c))
+        ret match {
+          case Some(c@Cursor(Some(_), None, None)) => renderer.drawCursor(c)
+          case Some(c@Cursor(None, Some(h), None)) if currentState.hasHand(h) => renderer.drawCursor(c)
+          case None => renderer.clearCursor()
+        }
         activeCursor = ret
       }
-    case _ =>
+    case Editing =>
+      val ret = renderer.getCursor(evt.clientX, evt.clientY)
+
+      if (ret != activeCursor) {
+        ret match {
+          case Some(c) => renderer.drawCursor(c)
+          case None => renderer.clearCursor()
+        }
+        activeCursor = ret
+      }
+    case Viewing => // do nothing
   }
 
   def mouseDown(evt: MouseEvent): Unit = mouseDown(evt.clientX, evt.clientY)
@@ -120,7 +142,13 @@ object Controller {
   private[this] def mouseDown(x: Double, y: Double): Unit = currentMode match {
     case Playing =>
       (selectedCursor, renderer.getCursor(x, y)) match {
-        case (Some(selected), Some(moveTo)) => moveAction(selected, moveTo)
+        case (Some(selected), Some(Cursor(Some(moveTo), None, None))) => moveAction(selected.moveFrom, moveTo)
+        case (None, Some(selected)) => selectAction(selected)
+        case _ => // do nothing
+      }
+    case Editing =>
+      (selectedCursor, renderer.getCursor(x, y)) match {
+        case (Some(selected), Some(exchangeTo)) => exchangeAction(selected, exchangeTo)
         case (None, Some(selected)) => selectAction(selected)
         case _ => // do nothing
       }
@@ -130,41 +158,99 @@ object Controller {
   /**
     * Move action in the play mode
     *
-    * @param selected from
-    * @param moveTo   to
+    * @param from from
+    * @param to   to
     */
-  private[this] def moveAction(selected: Cursor, moveTo: Cursor): Unit = {
-    renderer.clearSelectedArea(selected)
-    selectedCursor = None
+  private[this] def moveAction(from: MoveFrom, to: Square): Unit = {
+    clearSelection()
 
-    (selected, moveTo) match {
-      case (Cursor(from), Cursor(Left(to))) if game.currentState.canAttack(from, to) =>
-        val nextGame: Option[Game] = game.currentState.getPromotionFlag(from, to) match {
-          case Some(PromotionFlag.CannotPromote) => game.makeMove(MoveBuilderSfen(from, to, promote = false))
-          case Some(PromotionFlag.CanPromote) => game.makeMove(MoveBuilderSfen(from, to, renderer.askPromote(config.lang)))
-          case Some(PromotionFlag.MustPromote) => game.makeMove(MoveBuilderSfen(from, to, promote = true))
-          case None => None
-        }
-        nextGame.foreach { g =>
-          game = g
-          renderer.setRecord(game, config.lang)
-          renderer.selectRecord(-1)
-          updateCurrentState()
-          updateUrls()
-        }
-      case _ => // do nothing
+    if (currentState.canAttack(from, to)) {
+      val nextGame: Option[Game] = game.currentState.getPromotionFlag(from, to) match {
+        case Some(PromotionFlag.CannotPromote) => game.makeMove(MoveBuilderSfen(from, to, promote = false))
+        case Some(PromotionFlag.CanPromote) => game.makeMove(MoveBuilderSfen(from, to, renderer.askPromote(config.lang)))
+        case Some(PromotionFlag.MustPromote) => game.makeMove(MoveBuilderSfen(from, to, promote = true))
+        case None => None
+      }
+      nextGame.foreach { g =>
+        game = g
+        renderer.setRecord(game, config.lang)
+        renderer.selectRecord(-1)
+        updateCurrentState()
+        updateUrls()
+      }
     }
   }
 
   private[this] def selectAction(selected: Cursor): Unit = {
-    val canSelect = selected match {
-      case Cursor(Left(sq)) => game.currentState.board.get(sq).exists(game.currentState.turn == _.owner)
-      case Cursor(Right(h)) => h.owner == game.currentState.turn && game.currentState.hand.get(h).exists(_ > 0)
+    val canSelect = (currentMode, selected) match {
+      case (Playing, Cursor(Some(sq), None, None)) => game.currentState.board.get(sq).exists(game.currentState.turn == _.owner)
+      case (Playing, Cursor(None, Some(h), None)) => h.owner == game.currentState.turn && game.currentState.hand.get(h).exists(_ > 0)
+      case (Editing, Cursor(Some(sq), None, None)) => editingBoard.contains(sq)
+      case (Editing, Cursor(None, Some(h), None)) => editingHand(h) > 0
+      case (Editing, Cursor(None, None, Some(pt))) => editingBox(pt) > 0
+      case _ => false
     }
     if (canSelect) {
       selectedCursor = Some(selected)
       renderer.drawSelectedArea(selected)
     }
+  }
+
+  /**
+    * Exchange action in the edit mode
+    *
+    * @param selected   from
+    * @param exchangeTo to
+    */
+  private[this] def exchangeAction(selected: Cursor, exchangeTo: Cursor): Unit = {
+    clearSelection()
+
+    (selected, exchangeTo) match {
+      // square is selected
+      case (Cursor(Some(s1), None, None), Cursor(Some(s2), None, None)) =>
+        (editingBoard(s1), editingBoard.get(s2)) match {
+          case (p1, Some(p2)) if p1 == p2 =>
+            // change piece attributes
+            editingBoard = editingBoard.updated(s1, p1.canPromote.fold(p1.promoted, !p1.demoted))
+          case (p1, Some(p2)) =>
+            // change pieces
+            editingBoard = editingBoard.updated(s1, p2).updated(s2, p1)
+          case (p1, None) =>
+            editingBoard = editingBoard.updated(s2, p1) - s1
+        }
+      case (Cursor(Some(s), None, None), Cursor(None, Some(h), None)) if editingBoard(s).ptype != KING =>
+        val pt = editingBoard(s).ptype.demoted
+        editingBoard -= s
+        editingHand = MapUtil.incrementMap(editingHand,Hand(h.owner, pt))
+      case (Cursor(Some(s), None, None), Cursor(None, None, Some(_))) =>
+        val pt = editingBoard(s).ptype.demoted
+        editingBoard -= s
+        editingBox = MapUtil.incrementMap(editingBox, pt)
+
+      // hand is selected
+      case (Cursor(None, Some(h), None), Cursor(Some(s), None, None)) if !editingBoard.get(s).exists(_.ptype == KING) =>
+        editingHand = MapUtil.decrementMap(editingHand, h)
+        editingBoard.get(s).foreach { p => editingHand = MapUtil.incrementMap(editingHand, Hand(h.owner, p.ptype.demoted)) }
+        editingBoard = editingBoard.updated(s, h.toPiece)
+      case (Cursor(None, Some(h1), None), Cursor(None, Some(h2), None)) if h1.owner != h2.owner =>
+        editingHand = MapUtil.decrementMap(editingHand, h1)
+        editingHand = MapUtil.incrementMap(editingHand, Hand(!h1.owner, h1.ptype))
+      case (Cursor(None, Some(h), None), Cursor(None, None, Some(_))) =>
+        editingHand = MapUtil.decrementMap(editingHand, h)
+        editingBox = MapUtil.incrementMap(editingBox, h.ptype)
+
+      // box is selected
+      case (Cursor(None, None, Some(pt)), Cursor(Some(s), None, None)) =>
+        editingBox = MapUtil.decrementMap(editingBox, pt)
+        editingBoard.get(s).foreach { p => editingBox = MapUtil.incrementMap(editingBox, p.ptype.demoted) }
+        editingBoard = editingBoard.updated(s, Piece(Player.BLACK, pt))
+      case (Cursor(None, None, Some(pt)), Cursor(None, Some(h), None)) if pt != KING =>
+        editingBox = MapUtil.decrementMap(editingBox, pt)
+        editingHand = MapUtil.incrementMap(editingHand, Hand(h.owner, pt))
+      case _ => // do nothing
+    }
+
+    renderer.drawEditingPieces(config.pieceRenderer, editingBoard, editingHand, editingBox)
   }
 
   private[this] def clearSelection(): Unit = {
@@ -195,10 +281,36 @@ object Controller {
         }
       case (Playing | Viewing, Editing) =>
         if (game.moves.isEmpty || renderer.askConfirm(config.lang)) {
+          renderer.hideControlSection()
+
+          editingTurn = currentState.turn
+          editingBoard = currentState.board
+          editingHand = currentState.hand
+          editingBox = currentState.getUnusedPtypeCount
+
+          renderer.clearCursor()
+          clearSelection()
+          renderer.clearLastMove()
+
+          renderer.setRecord(Game(), config.lang)
+          renderer.drawIndicators(editingTurn, GameStatus.Playing)
+          renderer.drawPieceBox()
+          renderer.drawEditingPieces(config.pieceRenderer, editingBoard, editingHand, editingBox)
           f()
         }
       case (Editing, Playing | Viewing) =>
-      // check status
+        // check status
+        Try(State(editingTurn, editingBoard, editingHand, None)) match {
+          case Success(st) =>
+            game = Game(st)
+            renderer.hidePieceBox()
+            renderer.showControlSection()
+            renderer.updateControlBar()
+            updateCurrentState()
+            f()
+          case Failure(e) =>
+            renderer.alertEditedState(e.getMessage, config.lang)
+        }
       case _ => // do nothing
     }
   }
@@ -208,14 +320,21 @@ object Controller {
       // config
       config = config.copy(lang = lang)
 
-      // view
-      renderer.drawIndexes(lang)
-      renderer.setLang(lang)
-      renderer.drawPieces(config.pieceRenderer, game.currentState)
-      renderer.setRecord(game, lang)
+      currentMode match {
+        case Playing | Viewing =>
+          // view
+          renderer.drawIndexes(lang)
+          renderer.setLang(lang)
+          renderer.drawPieces(config.pieceRenderer, game.currentState)
+          renderer.setRecord(game, lang)
 
-      // urls
-      updateUrls()
+          // urls
+          updateUrls()
+        case Editing =>
+          renderer.drawIndexes(lang)
+          renderer.setLang(lang)
+          renderer.drawEditingPieces(config.pieceRenderer, editingBoard, editingHand, editingBox)
+      }
     }
   }
 

@@ -18,9 +18,12 @@ import scalatags.JsDom.all._
   * controls canvas rendering
   */
 case class Renderer(elem: Element, layout: Layout) {
-
+  // variables
   private[this] var lastMoveArea: Set[Cursor] = Set.empty
   private[this] var lastCursor: Option[Cursor] = None
+
+  // constants
+  private[this] val boxPtypes: Seq[Ptype] = Ptype.KING +: Ptype.inHand
 
   // main canvas
   private[this] val canvas0: Canvas = createCanvas(0)
@@ -116,21 +119,25 @@ case class Renderer(elem: Element, layout: Layout) {
   private[this] val controlInput2 = createControlInput(2, "forward")
   private[this] val controlInput3 = createControlInput(3, "step-forward")
 
+  private[this] val controlSection = div(
+    div(
+      label("Control"),
+      div(cls := "btn-group btn-group-justified", role := "group", aria.label := "...",
+        div(cls := "btn-group", role := "group", controlInput0),
+        div(cls := "btn-group", role := "group", controlInput1),
+        div(cls := "btn-group", role := "group", controlInput2),
+        div(cls := "btn-group", role := "group", controlInput3)
+      )
+    ),
+    br(),
+    createInputGroup("Snapshot URL", snapshotInput, "snapshot"),
+    br(),
+    createInputGroup("Record URL", recordInput, "record")
+  ).render
+
   private[this] val footer: Div = div(cls := "row",
     div(cls := "col-md-10 col-md-offset-1",
-      div(
-        label("Control"),
-        div(cls := "btn-group btn-group-justified", role := "group", aria.label := "...",
-          div(cls := "btn-group", role := "group", controlInput0),
-          div(cls := "btn-group", role := "group", controlInput1),
-          div(cls := "btn-group", role := "group", controlInput2),
-          div(cls := "btn-group", role := "group", controlInput3)
-        )
-      ),
-      br(),
-      createInputGroup("Snapshot URL", snapshotInput, "snapshot"),
-      br(),
-      createInputGroup("Record URL", recordInput, "record")
+      controlSection
     )
   ).render
 
@@ -232,6 +239,18 @@ case class Renderer(elem: Element, layout: Layout) {
     layout.handBlack.clear(layer2)
   }
 
+  def drawEditingPieces(pieceRenderer: PieceRenderer, board: BoardType, hand: HandType, box: Map[Ptype, Int]): Unit = {
+    clearPieces()
+    clearPiecesInBox()
+    board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, pc, sq) }
+    hand.foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, pc, n) }
+    box.filter(_._2 > 0).foreach { case (pt, _) => pieceRenderer.drawInBox(layer2, pt) }
+  }
+
+  def clearPiecesInBox(): Unit ={
+    layout.pieceBox.clear(layer2)
+  }
+
   def drawIndicators(turn: Player, status: GameStatus): Unit = {
     status match {
       case GameStatus.Playing =>
@@ -249,14 +268,32 @@ case class Renderer(elem: Element, layout: Layout) {
     }
   }
 
+  def drawPieceBox(): Unit = {
+    layout.pieceBox.draw(layer1, layout.color.pieceBox, 3)
+  }
+
+  def hidePieceBox(): Unit = {
+    layout.pieceBox.clear(layer1, -3)
+    clearPiecesInBox()
+  }
+
+  def showControlSection(): Unit = controlSection.style.display = "block"
+
+  def hideControlSection(): Unit = controlSection.style.display = "none"
+
   def askPromote(lang: Language): Boolean = dom.window.confirm(lang match {
     case Japanese => "成りますか?"
     case English => "Do you want to promote?"
   })
 
   def askConfirm(lang: Language): Boolean = dom.window.confirm(lang match {
-    case Japanese => "この局面以降の棋譜は失われます。よろしいですか?"
+    case Japanese => "棋譜の情報が失われますが、よろしいですか?"
     case English => "The record will be discarded. Are you sure?"
+  })
+
+  def alertEditedState(msg: String, lang: Language): Unit = dom.window.alert(lang match {
+    case Japanese => s"不正な局面です。\n(${msg})"
+    case English => s"Invalid state.\n(${msg})"
   })
 
   /**
@@ -268,18 +305,22 @@ case class Renderer(elem: Element, layout: Layout) {
     val rect = canvas2.getBoundingClientRect()
     val (x, y) = (clientX - rect.left, clientY - rect.top)
 
-    (layout.board.isInside(x, y), layout.handBlack.isInside(x, y), layout.handWhite.isInside(x, y)) match {
-      case (true, _, _) =>
+    (layout.board.isInside(x, y), layout.handBlack.isInside(x, y), layout.handWhite.isInside(x, y), layout.pieceBox.isInside(x, y)) match {
+      case (true, _, _, _) =>
         val file = 9 - ((x - layout.board.left) / layout.PIECE_WIDTH).toInt
         val rank = 1 + ((y - layout.board.top) / layout.PIECE_HEIGHT).toInt
-        Some(Cursor(Left(Square(file, rank))))
-      case (false, false, false) =>
+        Some(Cursor(Square(file, rank)))
+      case (false, false, false, false) =>
         None
-      case (false, isBlack, _) =>
+      case (false, false, false, true) =>
+        val offset = x - layout.pieceBox.left
+        val i = (offset / layout.PIECE_BOX_UNIT_WIDTH).toInt
+        (i <= 7 && offset % layout.PIECE_BOX_UNIT_WIDTH <= layout.PIECE_WIDTH).option(Cursor(boxPtypes(i)))
+      case (false, isBlack, _, _) =>
         val offset = isBlack.fold(x - layout.handBlack.left, layout.handWhite.right - x)
         val i = (offset / layout.HAND_UNIT_WIDTH).toInt
         (i <= 6 && offset % layout.HAND_UNIT_WIDTH <= layout.PIECE_WIDTH).option {
-          Cursor(Right(Hand(Piece(isBlack.fold(Player.BLACK, Player.WHITE), Ptype.inHand(i)))))
+          Cursor(Piece(isBlack.fold(Player.BLACK, Player.WHITE), Ptype.inHand(i)))
         }
     }
   }
@@ -289,12 +330,15 @@ case class Renderer(elem: Element, layout: Layout) {
     */
   private[this] def cursorToRect(cursor: Cursor): Rectangle = {
     val (x, y) = cursor match {
-      case Cursor(Right(Hand(Player.BLACK, pt))) =>
+      case Cursor(None, Some(Hand(Player.BLACK, pt)), None) =>
         (layout.handBlack.left + (pt.sortId - 1) * layout.HAND_UNIT_WIDTH, layout.handBlack.top)
-      case Cursor(Right(Hand(Player.WHITE, pt))) =>
+      case Cursor(None, Some(Hand(Player.WHITE, pt)), None) =>
         (layout.handWhite.right - (pt.sortId - 1) * layout.HAND_UNIT_WIDTH - layout.PIECE_WIDTH, layout.handWhite.top)
-      case Cursor(Left(sq)) =>
+      case Cursor(Some(sq), None, None) =>
         (layout.board.left + (9 - sq.file) * layout.PIECE_WIDTH, layout.board.top + (sq.rank - 1) * layout.PIECE_HEIGHT)
+      case Cursor(None, None, Some(pt)) =>
+        (layout.pieceBox.left + pt.sortId * layout.PIECE_BOX_UNIT_WIDTH, layout.pieceBox.top)
+      case _ => (0, 0) // never happens
     }
     Rectangle(x, y, layout.PIECE_WIDTH, layout.PIECE_HEIGHT)
   }
@@ -322,6 +366,11 @@ case class Renderer(elem: Element, layout: Layout) {
   def drawSelectedArea(cursor: Cursor): Unit = cursorToRect(cursor).drawFill(layer0, layout.color.cursor, 2)
 
   /**
+    * Clear a selected area.
+    */
+  def clearSelectedArea(cursor: Cursor): Unit = cursorToRect(cursor).clear(layer0)
+
+  /**
     * Draw the last move area.
     */
   def drawLastMove(move: Option[Move]): Unit = {
@@ -340,10 +389,7 @@ case class Renderer(elem: Element, layout: Layout) {
     lastMoveArea = newArea
   }
 
-  /**
-    * Clear a selected area.
-    */
-  def clearSelectedArea(cursor: Cursor): Unit = cursorToRect(cursor).clear(layer0)
+  def clearLastMove(): Unit = drawLastMove(None)
 
   def updateSnapshotUrl(url: String): Unit = snapshotInput.value = url
 
@@ -390,8 +436,6 @@ case class Renderer(elem: Element, layout: Layout) {
   def updateControlBar(): Unit = {
     val maxValue = recordSelector.options.length - 1
     val selected = getSelectedIndex
-
-    println(s"selected=${selected}, maxValue=${maxValue}")
 
     controlInput0.disabled = selected == 0
     controlInput1.disabled = selected == 0

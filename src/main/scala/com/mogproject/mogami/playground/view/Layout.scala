@@ -13,6 +13,7 @@ case class Layout(canvasWidth: Int, canvasHeight: Int) {
   val BOARD_LEFT: Int = 2
   val BOARD_WIDTH: Int = PIECE_WIDTH * 9
   val BOARD_HEIGHT: Int = PIECE_HEIGHT * 9
+  val PIECE_BOX_UNIT_WIDTH = 38
 
   // rectangles
   val handWhite = Rectangle(BOARD_LEFT, 2, BOARD_WIDTH, PIECE_HEIGHT)
@@ -22,6 +23,7 @@ case class Layout(canvasWidth: Int, canvasHeight: Int) {
   val handBlack = Rectangle(BOARD_LEFT, indicatorBlack.bottom + 2, BOARD_WIDTH, PIECE_HEIGHT)
   val fileIndex: Rectangle = indicatorWhite
   val rankIndex = Rectangle(board.right + 1, board.top, 12, BOARD_HEIGHT)
+  val pieceBox = Rectangle(BOARD_LEFT, handBlack.bottom + 10, BOARD_WIDTH, PIECE_HEIGHT)
 
   // fonts
   object font {
@@ -44,5 +46,6 @@ case class Layout(canvasWidth: Int, canvasHeight: Int) {
     val cursor = "#E1B265"
     val dark = "#353535"
     val light = "#E0FFFF"
+    val pieceBox = "#cccccc" // background of the piece box
   }
 }
