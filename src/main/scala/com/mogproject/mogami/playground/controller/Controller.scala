@@ -119,7 +119,7 @@ object Controller {
         ret match {
           case Some(c@Cursor(Some(_), None, None)) => renderer.drawCursor(c)
           case Some(c@Cursor(None, Some(h), None)) if currentState.hasHand(h) => renderer.drawCursor(c)
-          case None => renderer.clearCursor()
+          case _ => renderer.clearCursor()
         }
         activeCursor = ret
       }
@@ -284,6 +284,7 @@ object Controller {
           renderer.showEditSection()
           renderer.EditTurn.setEditLabel(config.lang)
           renderer.EditTurn.change(currentState.turn)
+          renderer.EditReset.updateLabel(config.lang)
 
           editingBoard = currentState.board
           editingHand = currentState.hand
@@ -337,6 +338,7 @@ object Controller {
           renderer.setLang(lang)
           renderer.drawEditingPieces(config.pieceRenderer, editingBoard, editingHand, editingBox)
           renderer.EditTurn.setEditLabel(lang)
+          renderer.EditReset.updateLabel(lang)
       }
     }
   }
@@ -363,5 +365,18 @@ object Controller {
       renderer.EditTurn.change(player)
       renderer.drawIndicators(player, GameStatus.Playing)
     }
+  }
+
+  def setEditInitialState(initialState: State): Unit = {
+    setEditTurn(initialState.turn)
+    editingBoard = initialState.board
+    editingHand = initialState.hand
+    editingBox = initialState.getUnusedPtypeCount
+
+    renderer.clearCursor()
+    clearSelection()
+
+    renderer.drawIndicators(renderer.EditTurn.getValue(), GameStatus.Playing)
+    renderer.drawEditingPieces(config.pieceRenderer, editingBoard, editingHand, editingBox)
   }
 }

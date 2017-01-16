@@ -143,7 +143,7 @@ case class Renderer(elem: Element, layout: Layout) {
       WHITE -> a(cls := "btn btn-primary notActive", onclick := { () => Controller.setEditTurn(WHITE) }).render
     )
 
-    val turnInput = div(cls := "form-group",
+    val element: Div = div(cls := "form-group",
       label("Turn"),
       div(cls := "row",
         div(cls := "col-sm-8 col-md-8",
@@ -177,9 +177,27 @@ case class Renderer(elem: Element, layout: Layout) {
     def getValue(): Player = value
   }
 
+  object EditReset {
+    private[this] val states = Seq(State.HIRATE, State.MATING_BLACK, State.MATING_WHITE)
+
+    private[this] val labels: Map[Language, Seq[String]] = Map(
+      Japanese -> Seq("平手", "詰将棋 (先手)", "詰将棋 (後手)"),
+      English -> Seq("Even", "Mating (Black)", "Mating (White)")
+    )
+
+    private[this] val buttons = states.map(st => button(cls := "btn btn-default col-sm-3 col-sm-offset-1", onclick := { () => Controller.setEditInitialState(st) }, "").render)
+
+    val element: Div = div(
+      label("Reset"),
+      div(cls := "row", buttons)
+    ).render
+
+    def updateLabel(lang: Language): Unit = buttons.zipWithIndex.foreach { case (b, i) => b.innerHTML = labels(lang)(i) }
+  }
 
   private[this] val editSection = div(display := "none",
-    EditTurn.turnInput
+    EditTurn.element,
+    EditReset.element
   ).render
 
   private[this] val footer: Div = div(cls := "row",
