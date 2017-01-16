@@ -159,8 +159,8 @@ case class Renderer(elem: Element, layout: Layout) {
 
     def setEditLabel(lang: Language): Unit = lang match {
       case Japanese =>
-        anchors(BLACK).innerHTML = "先手"
-        anchors(WHITE).innerHTML = "後手"
+        anchors(BLACK).innerHTML = "先手番"
+        anchors(WHITE).innerHTML = "後手番"
       case English =>
         anchors(BLACK).innerHTML = "Black"
         anchors(WHITE).innerHTML = "White"
