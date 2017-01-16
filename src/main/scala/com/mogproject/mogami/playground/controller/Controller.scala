@@ -310,6 +310,9 @@ object Controller {
 
             game = Game(st)
             currentMove = -1
+
+            renderer.clearCursor()
+            clearSelection()
             renderer.updateControlBar()
             f()
           case Failure(e) =>
@@ -329,7 +332,7 @@ object Controller {
           // view
           renderer.drawIndexes(lang)
           renderer.setLang(lang)
-          renderer.drawPieces(config.pieceRenderer, game.currentState)
+          renderer.drawPieces(config.pieceRenderer, currentState)
           renderer.setRecord(game, lang)
 
           // urls
@@ -345,7 +348,7 @@ object Controller {
   }
 
   def setRecord(index: Int): Unit = {
-    currentMove = math.min(game.moves.length, index)
+    currentMove = index
     updateCurrentState()
     setMode(Viewing)
   }
