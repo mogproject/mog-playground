@@ -304,12 +304,13 @@ object Controller {
         // check status
         Try(State(renderer.EditTurn.getValue(), editingBoard, editingHand, None)) match {
           case Success(st) =>
-            game = Game(st)
             renderer.hidePieceBox()
-            renderer.showControlSection()
-            renderer.updateControlBar()
             renderer.hideEditSection()
-            updateCurrentState()
+            renderer.showControlSection()
+
+            game = Game(st)
+            currentMove = -1
+            renderer.updateControlBar()
             f()
           case Failure(e) =>
             renderer.alertEditedState(e.getMessage, config.lang)
