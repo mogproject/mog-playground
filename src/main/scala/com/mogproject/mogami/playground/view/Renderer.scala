@@ -234,7 +234,7 @@ case class Renderer(elem: Element, layout: Layout) {
         div(cls := "col-md-6", footer)
       ),
       hr(),
-      small(p(textAlign := "right", "Shogi Playground © 2017 mogproject"))
+      small(p(textAlign := "right", "Shogi Playground © 2017 ", a(href:="http://mogproject.com", "mogproject")))
     ).render)
 
     // initialize clipboard.js
