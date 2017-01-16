@@ -1,21 +1,30 @@
 package com.mogproject.mogami.playground.view
 
-import com.mogproject.mogami.playground.controller.{Controller, Cursor, Editing, English, Japanese, Language, Mode, Playing, Viewing}
-import com.mogproject.mogami.{Hand, Piece, Player, Ptype, Square, State}
+import com.mogproject.mogami.playground.controller.{Cursor, _}
+import com.mogproject.mogami._
+import com.mogproject.mogami.core.Game.GameStatus
+import com.mogproject.mogami.core.Game.GameStatus.GameStatus
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
-import org.scalajs.dom.{CanvasRenderingContext2D, Element, MouseEvent, TouchEvent}
+import org.scalajs.dom.{CanvasRenderingContext2D, Element}
 import org.scalajs.dom.html.{Canvas, Div}
+import org.scalajs.dom.raw.HTMLSelectElement
 
-import scala.scalajs.js
 import scalatags.JsDom.all._
 
 /**
   * controls canvas rendering
   */
-case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer) {
+case class Renderer(elem: Element, layout: Layout) {
+  // variables
+  private[this] var lastMoveArea: Set[Cursor] = Set.empty
+  private[this] var lastCursor: Option[Cursor] = None
+
+  // constants
+  private[this] val boxPtypes: Seq[Ptype] = Ptype.KING +: Ptype.inHand
+
   // main canvas
   private[this] val canvas0: Canvas = createCanvas(0)
   private[this] val canvas1: Canvas = createCanvas(1)
@@ -37,21 +46,14 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
   ).render
 
   // forms
-  private[this] val recordSelector = select(cls := "form-control thin-select",
-    option("-"),
-    option("+7776FU"),
-    option("-3334FU")
+  private[this] val recordSelector: HTMLSelectElement = select(
+    cls := "form-control thin-select",
+    onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
   ).render
 
-  private[this] val modeLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false,
-    "Play",
-    span(cls := "caret")
-  ).render
+  private[this] val modeLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false).render
 
-  private[this] val langLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false,
-    "JP",
-    span(cls := "caret")
-  ).render
+  private[this] val langLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false).render
 
   private[this] val navigator = tag("nav")(cls := "navbar navbar-default navbar-fixed-top",
     div(cls := "container",
@@ -78,8 +80,8 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
               langLabel,
               ul(cls := "dropdown-menu",
                 li(cls := "dropdown-header", "Language"),
-                li(a(href := "#", "Japanese", onclick := (() => Controller.setLanauge(Japanese)))),
-                li(a(href := "#", "English", onclick := (() => Controller.setLanauge(English))))
+                li(a(href := "#", "Japanese", onclick := (() => Controller.setLanguage(Japanese)))),
+                li(a(href := "#", "English", onclick := (() => Controller.setLanguage(English))))
               )
             )
           )
@@ -91,30 +93,133 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
   private[this] val snapshotInput = createInput("snapshot")
   private[this] val recordInput = createInput("record")
 
+
   private[this] def createInput(ident: String) = input(
     tpe := "text", id := ident, cls := "form-control", aria.label := "...", readonly := "readonly"
   ).render
 
-  private[this] def createInputGroup(labelString: String, inputElem: Element, target: String) = div(cls := "row",
-    position := "relative",
-
-    div(cls := "col-md-1"),
-    div(cls := "col-md-10",
-      label(labelString),
-      div(cls := "input-group",
-        inputElem,
-        span(
-          cls := "input-group-btn",
-          button(cls := "btn btn-default", data("clipboard-target") := s"#${target}", tpe := "button", "Copy!")
-        )
-      ),
-      div(cls := "col-md-1")
+  private[this] def createInputGroup(labelString: String, inputElem: Element, target: String) = div(
+    label(labelString),
+    div(cls := "input-group",
+      inputElem,
+      span(
+        cls := "input-group-btn",
+        button(cls := "btn btn-default", data("clipboard-target") := s"#${target}", tpe := "button", "Copy!")
+      )
     )
   ).render
 
-  private[this] val footer: Div = div(
+  private[this] def createControlInput(controlType: Int, glyph: String) = button(cls := "btn btn-default",
+    onclick := { () => Controller.setControl(controlType) },
+    span(cls := s"glyphicon glyphicon-${glyph}", aria.hidden := true)
+  ).render
+
+  private[this] val controlInput0 = createControlInput(0, "step-backward")
+  private[this] val controlInput1 = createControlInput(1, "backward")
+  private[this] val controlInput2 = createControlInput(2, "forward")
+  private[this] val controlInput3 = createControlInput(3, "step-forward")
+
+  private[this] val controlSection = div(
+    div(
+      label("Control"),
+      div(cls := "btn-group btn-group-justified", role := "group", aria.label := "...",
+        div(cls := "btn-group", role := "group", controlInput0),
+        div(cls := "btn-group", role := "group", controlInput1),
+        div(cls := "btn-group", role := "group", controlInput2),
+        div(cls := "btn-group", role := "group", controlInput3)
+      )
+    ),
+    br(),
     createInputGroup("Snapshot URL", snapshotInput, "snapshot"),
+    br(),
     createInputGroup("Record URL", recordInput, "record")
+  ).render
+
+  object EditTurn {
+    private[this] var value: Player = BLACK
+
+    private[this] val anchors: Map[Player, Element] = Map(
+      BLACK -> a(cls := "btn btn-primary active", onclick := { () => Controller.setEditTurn(BLACK) }).render,
+      WHITE -> a(cls := "btn btn-primary notActive", onclick := { () => Controller.setEditTurn(WHITE) }).render
+    )
+
+    val element: Div = div(cls := "form-group",
+      label("Turn"),
+      div(cls := "row",
+        div(cls := "col-sm-8 col-md-8",
+          div(cls := "input-group",
+            div(id := "radioBtn", cls := "btn-group btn-group-justified",
+              anchors(BLACK),
+              anchors(WHITE)
+            )
+          )
+        )
+      )
+    ).render
+
+    def setEditLabel(lang: Language): Unit = lang match {
+      case Japanese =>
+        anchors(BLACK).innerHTML = "先手番"
+        anchors(WHITE).innerHTML = "後手番"
+      case English =>
+        anchors(BLACK).innerHTML = "Black"
+        anchors(WHITE).innerHTML = "White"
+    }
+
+    def change(newValue: Player): Unit = {
+      anchors(newValue).classList.remove("notActive")
+      anchors(newValue).classList.add("active")
+      anchors(!newValue).classList.remove("active")
+      anchors(!newValue).classList.add("notActive")
+      value = newValue
+    }
+
+    def getValue(): Player = value
+  }
+
+  object EditReset {
+    private[this] val states = Seq(
+      State.HIRATE, State.MATING_BLACK, State.MATING_WHITE,
+      State.HANDICAP_LANCE, State.HANDICAP_BISHOP, State.HANDICAP_ROOK, State.HANDICAP_ROOK_LANCE,
+      State.HANDICAP_2_PIECE, State.HANDICAP_3_PIECE, State.HANDICAP_4_PIECE, State.HANDICAP_5_PIECE,
+      State.HANDICAP_6_PIECE, State.HANDICAP_8_PIECE, State.HANDICAP_10_PIECE,
+      State.HANDICAP_THREE_PAWNS, State.HANDICAP_NAKED_KING
+    )
+
+    private[this] val labels: Map[Language, Seq[String]] = Map(
+      Japanese -> Seq(
+        "平手", "詰将棋 (先手)", "詰将棋 (後手)",
+        "香落ち", "角落ち", "飛車落ち", "飛香落ち",
+        "二枚落ち", "三枚落ち", "四枚落ち", "五枚落ち",
+        "六枚落ち", "八枚落ち", "十枚落ち",
+        "歩三兵", "裸玉"),
+      English -> Seq("Even", "Mating (Black)", "Mating (White)",
+        "Lance", "Bishop", "Rook", "Rook-Lance",
+        "2-Piece", "3-Piece", "4-Piece", "5-Piece",
+        "6-Piece", "8-Piece", "10-Piece",
+        "Three Pawns", "Naked King")
+    )
+
+    private[this] val buttons = states.map(st => button(cls := "btn btn-default col-sm-3 col-sm-offset-1", onclick := { () => Controller.setEditInitialState(st) }, "").render)
+
+    val element: Div = div(
+      label("Reset"),
+      div(cls := "row", buttons)
+    ).render
+
+    def updateLabel(lang: Language): Unit = buttons.zipWithIndex.foreach { case (b, i) => b.innerHTML = labels(lang)(i) }
+  }
+
+  private[this] val editSection = div(display := "none",
+    EditTurn.element,
+    EditReset.element
+  ).render
+
+  private[this] val footer: Div = div(cls := "row",
+    div(cls := "col-md-10 col-md-offset-1",
+      editSection,
+      controlSection
+    )
   ).render
 
   initialize()
@@ -127,7 +232,9 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
       div(cls := "row",
         canvasContainer,
         div(cls := "col-md-6", footer)
-      )
+      ),
+      hr(),
+      small(p(textAlign := "right", "Shogi Playground © 2017 mogproject"))
     ).render)
 
     // initialize clipboard.js
@@ -172,7 +279,36 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
     }
   }
 
-  def drawPieces(state: State): Unit = {
+  def drawIndexes(lang: Language): Unit = {
+    val ctx = layer3
+    val rankIndex = lang match {
+      case Japanese => "一二三四五六七八九"
+      case English => "abcdefghi"
+    }
+
+    ctx.fillStyle = layout.color.fg
+
+    // clear
+    layout.fileIndex.clear(ctx)
+    layout.rankIndex.clear(ctx)
+
+    // file
+    ctx.font = layout.font.index
+    for (i <- 0 until 9) {
+      val x = layout.board.left + layout.PIECE_WIDTH * (8 - i) + 10
+      val y = layout.board.top - 2
+      ctx.fillText("１２３４５６７８９".charAt(i).toString, x, y)
+    }
+
+    //rank
+    for (i <- 0 until 9) {
+      val x = layout.board.right + (lang == Japanese).fold(1, 3)
+      val y = layout.board.top + layout.PIECE_HEIGHT * i + 24
+      ctx.fillText(rankIndex.charAt(i).toString, x, y)
+    }
+  }
+
+  def drawPieces(pieceRenderer: PieceRenderer, state: State): Unit = {
     clearPieces()
     state.board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, pc, sq) }
     state.hand.foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, pc, n) }
@@ -184,14 +320,66 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
     layout.handBlack.clear(layer2)
   }
 
-  def drawTurn(turn: Player): Unit = {
-    (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).clear(layer2)
-    (if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.active)
+  def drawEditingPieces(pieceRenderer: PieceRenderer, board: BoardType, hand: HandType, box: Map[Ptype, Int]): Unit = {
+    clearPieces()
+    clearPiecesInBox()
+    board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, pc, sq) }
+    hand.foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, pc, n) }
+    box.filter(_._2 > 0).foreach { case (pt, _) => pieceRenderer.drawInBox(layer2, pt) }
   }
 
-  def askPromote(): Boolean = {
-    dom.window.confirm("Do you want to promote?")
+  def clearPiecesInBox(): Unit = {
+    layout.pieceBox.clear(layer2)
   }
+
+  def drawIndicators(turn: Player, status: GameStatus): Unit = {
+    status match {
+      case GameStatus.Playing =>
+        (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).clear(layer2)
+        (if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.active)
+      case GameStatus.Mated =>
+        (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).drawFill(layer2, layout.color.win)
+        (if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.lose)
+      case GameStatus.PerpetualCheck | GameStatus.Uchifuzume =>
+        (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).drawFill(layer2, layout.color.lose)
+        (if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.win)
+      case GameStatus.Drawn =>
+        layout.indicatorWhite.drawFill(layer2, layout.color.draw)
+        layout.indicatorBlack.drawFill(layer2, layout.color.draw)
+    }
+  }
+
+  def drawPieceBox(): Unit = {
+    layout.pieceBox.draw(layer1, layout.color.pieceBox, 3)
+  }
+
+  def hidePieceBox(): Unit = {
+    layout.pieceBox.clear(layer1, -3)
+    clearPiecesInBox()
+  }
+
+  def showEditSection(): Unit = editSection.style.display = "block"
+
+  def hideEditSection(): Unit = editSection.style.display = "none"
+
+  def showControlSection(): Unit = controlSection.style.display = "block"
+
+  def hideControlSection(): Unit = controlSection.style.display = "none"
+
+  def askPromote(lang: Language): Boolean = dom.window.confirm(lang match {
+    case Japanese => "成りますか?"
+    case English => "Do you want to promote?"
+  })
+
+  def askConfirm(lang: Language): Boolean = dom.window.confirm(lang match {
+    case Japanese => "棋譜の情報が失われますが、よろしいですか?"
+    case English => "The record will be discarded. Are you sure?"
+  })
+
+  def alertEditedState(msg: String, lang: Language): Unit = dom.window.alert(lang match {
+    case Japanese => s"不正な局面です。\n(${msg})"
+    case English => s"Invalid state.\n(${msg})"
+  })
 
   /**
     * Convert MouseEvent to Cursor
@@ -202,18 +390,22 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
     val rect = canvas2.getBoundingClientRect()
     val (x, y) = (clientX - rect.left, clientY - rect.top)
 
-    (layout.board.isInside(x, y), layout.handBlack.isInside(x, y), layout.handWhite.isInside(x, y)) match {
-      case (true, _, _) =>
+    (layout.board.isInside(x, y), layout.handBlack.isInside(x, y), layout.handWhite.isInside(x, y), layout.pieceBox.isInside(x, y)) match {
+      case (true, _, _, _) =>
         val file = 9 - ((x - layout.board.left) / layout.PIECE_WIDTH).toInt
         val rank = 1 + ((y - layout.board.top) / layout.PIECE_HEIGHT).toInt
-        Some(Cursor(Left(Square(file, rank))))
-      case (false, false, false) =>
+        Some(Cursor(Square(file, rank)))
+      case (false, false, false, false) =>
         None
-      case (false, isBlack, _) =>
+      case (false, false, false, true) =>
+        val offset = x - layout.pieceBox.left
+        val i = (offset / layout.PIECE_BOX_UNIT_WIDTH).toInt
+        (i <= 7 && offset % layout.PIECE_BOX_UNIT_WIDTH <= layout.PIECE_WIDTH).option(Cursor(boxPtypes(i)))
+      case (false, isBlack, _, _) =>
         val offset = isBlack.fold(x - layout.handBlack.left, layout.handWhite.right - x)
         val i = (offset / layout.HAND_UNIT_WIDTH).toInt
         (i <= 6 && offset % layout.HAND_UNIT_WIDTH <= layout.PIECE_WIDTH).option {
-          Cursor(Right(Hand(Piece(isBlack.fold(Player.BLACK, Player.WHITE), Ptype.inHand(i)))))
+          Cursor(Piece(isBlack.fold(Player.BLACK, Player.WHITE), Ptype.inHand(i)))
         }
     }
   }
@@ -223,12 +415,15 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
     */
   private[this] def cursorToRect(cursor: Cursor): Rectangle = {
     val (x, y) = cursor match {
-      case Cursor(Right(Hand(Player.BLACK, pt))) =>
+      case Cursor(None, Some(Hand(Player.BLACK, pt)), None) =>
         (layout.handBlack.left + (pt.sortId - 1) * layout.HAND_UNIT_WIDTH, layout.handBlack.top)
-      case Cursor(Right(Hand(Player.WHITE, pt))) =>
+      case Cursor(None, Some(Hand(Player.WHITE, pt)), None) =>
         (layout.handWhite.right - (pt.sortId - 1) * layout.HAND_UNIT_WIDTH - layout.PIECE_WIDTH, layout.handWhite.top)
-      case Cursor(Left(sq)) =>
+      case Cursor(Some(sq), None, None) =>
         (layout.board.left + (9 - sq.file) * layout.PIECE_WIDTH, layout.board.top + (sq.rank - 1) * layout.PIECE_HEIGHT)
+      case Cursor(None, None, Some(pt)) =>
+        (layout.pieceBox.left + pt.sortId * layout.PIECE_BOX_UNIT_WIDTH, layout.pieceBox.top)
+      case _ => (0, 0) // never happens
     }
     Rectangle(x, y, layout.PIECE_WIDTH, layout.PIECE_HEIGHT)
   }
@@ -237,14 +432,17 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
     * Draw a highlighted cursor.
     */
   def drawCursor(cursor: Cursor): Unit = {
+    clearCursor()
     cursorToRect(cursor).draw(layer3, layout.color.cursor, -2)
+    lastCursor = Some(cursor)
   }
 
   /**
     * Clear a cursor.
     */
-  def clearCursor(cursor: Cursor): Unit = {
-    cursorToRect(cursor).clear(layer3)
+  def clearCursor(): Unit = {
+    lastCursor.foreach(cursorToRect(_).clear(layer3))
+    lastCursor = None
   }
 
   /**
@@ -253,26 +451,80 @@ case class Renderer(elem: Element, layout: Layout, pieceRenderer: PieceRenderer)
   def drawSelectedArea(cursor: Cursor): Unit = cursorToRect(cursor).drawFill(layer0, layout.color.cursor, 2)
 
   /**
-    * Draw the last move area.
-    */
-  def drawLastMoveArea(cs: Seq[Cursor]): Unit = cs.foreach(cursorToRect(_).drawFill(layer0, layout.color.light, 1))
-
-  def clearLastMoveArea(cs: Seq[Cursor]): Unit = cs.foreach(cursorToRect(_).clear(layer0))
-
-  /**
     * Clear a selected area.
     */
   def clearSelectedArea(cursor: Cursor): Unit = cursorToRect(cursor).clear(layer0)
+
+  /**
+    * Draw the last move area.
+    */
+  def drawLastMove(move: Option[Move]): Unit = {
+    val newArea: Set[Cursor] = move match {
+      case None => Set.empty
+      case Some(mv) =>
+        val fr = mv.from match {
+          case None => Cursor(mv.player, mv.oldPtype)
+          case Some(sq) => Cursor(sq)
+        }
+        Set(fr, Cursor(mv.to))
+    }
+
+    (lastMoveArea -- newArea).foreach(cursorToRect(_).clear(layer0))
+    (newArea -- lastMoveArea).foreach(cursorToRect(_).drawFill(layer0, layout.color.light, 1))
+    lastMoveArea = newArea
+  }
+
+  def clearLastMove(): Unit = drawLastMove(None)
 
   def updateSnapshotUrl(url: String): Unit = snapshotInput.value = url
 
   def updateRecordUrl(url: String): Unit = recordInput.value = url
 
-  def setMode(mode: Mode): Unit = {
-    modeLabel.innerHTML = mode.label + span(cls := "caret").toString()
+  def setMode(mode: Mode): Unit = modeLabel.innerHTML = mode.label + span(cls := "caret").toString()
+
+  def setLang(lang: Language): Unit = langLabel.innerHTML = lang.label + span(cls := "caret").toString()
+
+  def setRecord(game: Game, lng: Language): Unit = {
+    val f: Move => String = lng match {
+      case Japanese => _.toKifString
+      case English => _.toSfenString
+    }
+
+    val xs = game.moves.zipWithIndex.map { case (m, i) =>
+      (Some(i + 1), game.history(i).turn.toSymbolString + f(m))
+    }
+    val additional = (game.status, lng) match {
+      case (GameStatus.Mated, Japanese) => List((None, "詰み"))
+      case (GameStatus.Drawn, Japanese) => List((None, "千日手"))
+      case (GameStatus.PerpetualCheck, Japanese) => List((None, "連続王手の千日手"))
+      case (GameStatus.Uchifuzume, Japanese) => List((None, "打ち歩詰め"))
+      case (GameStatus.Mated, English) => List((None, "Mated"))
+      case (GameStatus.Drawn, English) => List((None, "Drawn"))
+      case (GameStatus.PerpetualCheck, English) => List((None, "Perpetual Check"))
+      case (GameStatus.Uchifuzume, English) => List((None, "Uchifuzume"))
+      case (GameStatus.Playing, _) => List()
+    }
+    val ys = ((Some(0), "-") +: xs) ++ additional
+
+    val oldIndex = recordSelector.selectedIndex
+    recordSelector.innerHTML = ys.map { case (o, s) => option(o.map(n => s"${n}: ").getOrElse("") + s).toString() }.mkString
+    selectRecord(oldIndex)
   }
 
-  def setLang(lang: Language): Unit = {
-    langLabel.innerHTML = lang.label + span(cls := "caret").toString()
+  def selectRecord(index: Int): Unit = {
+    val maxValue = recordSelector.options.length - 1
+    recordSelector.selectedIndex = (index < 0).fold(maxValue, math.min(index, maxValue))
+  }
+
+  def getSelectedIndex: Int = recordSelector.selectedIndex
+
+  def updateControlBar(): Unit = {
+    val maxValue = recordSelector.options.length - 1
+    val selected = getSelectedIndex
+
+    controlInput0.disabled = selected == 0
+    controlInput1.disabled = selected == 0
+    controlInput2.disabled = selected == maxValue
+    controlInput3.disabled = selected == maxValue
   }
 }
