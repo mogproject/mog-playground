@@ -360,7 +360,7 @@ object Controller {
       case (_, 0) => (Viewing, 0)
       case (Viewing, 1) => (Viewing, renderer.getSelectedIndex - 1)
       case (Playing, 1) =>
-        val mv = renderer.getSelectedIndex - 1
+        val mv = math.min(renderer.getSelectedIndex, game.moves.length) - 1
         game = game.copy(moves = game.moves.take(mv), givenHistory = Some(game.history.take(mv + 1)))
         renderer.setRecord(game, config.lang)
         (Playing, -1)
