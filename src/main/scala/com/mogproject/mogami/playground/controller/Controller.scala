@@ -168,7 +168,10 @@ object Controller {
     if (currentState.canAttack(from, to)) {
       val nextGame: Option[Game] = game.currentState.getPromotionFlag(from, to) match {
         case Some(PromotionFlag.CannotPromote) => game.makeMove(MoveBuilderSfen(from, to, promote = false))
-        case Some(PromotionFlag.CanPromote) => game.makeMove(MoveBuilderSfen(from, to, renderer.askPromote(config.lang)))
+        case Some(PromotionFlag.CanPromote) =>
+          val tempMv = MoveBuilderSfen(from, to, promote=false).toMove(game.currentState)
+          renderer.drawLastMove(tempMv)
+          game.makeMove(MoveBuilderSfen(from, to, renderer.askPromote(config.lang)))
         case Some(PromotionFlag.MustPromote) => game.makeMove(MoveBuilderSfen(from, to, promote = true))
         case None => None
       }
