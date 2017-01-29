@@ -6,9 +6,10 @@ import com.mogproject.mogami.core.Game.GameStatus
 import com.mogproject.mogami.core.Game.GameStatus.GameStatus
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.playground.api.Clipboard
+import com.mogproject.mogami.playground.controller.mode.{Editing, Mode, Playing, Viewing}
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
-import org.scalajs.dom.{CanvasRenderingContext2D, Element}
+import org.scalajs.dom.{CanvasRenderingContext2D, Element, MouseEvent, TouchEvent}
 import org.scalajs.dom.html.{Canvas, Div}
 import org.scalajs.dom.raw.HTMLSelectElement
 
@@ -19,8 +20,9 @@ import scalatags.JsDom.all._
   */
 case class Renderer(elem: Element, layout: Layout) {
   // variables
+  private[this] var activeCursor: Option[Cursor] = None
+  private[this] var selectedCursor: Option[Cursor] = None
   private[this] var lastMoveArea: Set[Cursor] = Set.empty
-  private[this] var lastCursor: Option[Cursor] = None
 
   // constants
   private[this] val boxPtypes: Seq[Ptype] = Ptype.KING +: Ptype.inHand
@@ -48,7 +50,7 @@ case class Renderer(elem: Element, layout: Layout) {
   // forms
   private[this] val recordSelector: HTMLSelectElement = select(
     cls := "form-control thin-select",
-    onchange := (() => Controller.setRecord(recordSelector.selectedIndex, Viewing))
+    onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
   ).render
 
   private[this] val modeLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false).render
@@ -136,8 +138,6 @@ case class Renderer(elem: Element, layout: Layout) {
   ).render
 
   object EditTurn {
-    private[this] var value: Player = BLACK
-
     private[this] val anchors: Map[Player, Element] = Map(
       BLACK -> a(cls := "btn btn-primary active", onclick := { () => Controller.setEditTurn(BLACK) }).render,
       WHITE -> a(cls := "btn btn-primary notActive", onclick := { () => Controller.setEditTurn(WHITE) }).render
@@ -157,7 +157,7 @@ case class Renderer(elem: Element, layout: Layout) {
       )
     ).render
 
-    def setEditLabel(lang: Language): Unit = lang match {
+    def updateEditTurnLabel(lang: Language): Unit = lang match {
       case Japanese =>
         anchors(BLACK).innerHTML = "先手番"
         anchors(WHITE).innerHTML = "後手番"
@@ -166,15 +166,12 @@ case class Renderer(elem: Element, layout: Layout) {
         anchors(WHITE).innerHTML = "White"
     }
 
-    def change(newValue: Player): Unit = {
+    def updateEditTurnValue(newValue: Player): Unit = {
       anchors(newValue).classList.remove("notActive")
       anchors(newValue).classList.add("active")
       anchors(!newValue).classList.remove("active")
       anchors(!newValue).classList.add("notActive")
-      value = newValue
     }
-
-    def getValue(): Player = value
   }
 
   object EditReset {
@@ -234,13 +231,44 @@ case class Renderer(elem: Element, layout: Layout) {
         div(cls := "col-md-6", footer)
       ),
       hr(),
-      small(p(textAlign := "right", "Shogi Playground © 2017 ", a(href:="http://mogproject.com", "mogproject")))
+      small(p(textAlign := "right", "Shogi Playground © 2017 ", a(href := "http://mogproject.com", "mogproject")))
     ).render)
+
+    // register events
+    if (hasTouchEvent) {
+      setEventListener("touchstart", touchStart)
+    } else {
+      setEventListener("mousemove", mouseMove)
+      setEventListener("mousedown", mouseDown)
+    }
 
     // initialize clipboard.js
     val cp = new Clipboard(".btn")
 
     // todo: show tooptip @see http://stackoverflow.com/questions/37381640/tooltips-highlight-animation-with-clipboard-js-click/37395225
+  }
+
+  //
+  // mouseDown
+  //
+  private[this] def touchStart(evt: TouchEvent): Unit = mouseDown(evt.changedTouches(0).clientX, evt.changedTouches(0).clientY)
+
+  def mouseDown(evt: MouseEvent): Unit = mouseDown(evt.clientX, evt.clientY)
+
+  private[this] def mouseDown(x: Double, y: Double): Unit = (selectedCursor, getCursor(x, y)) match {
+    case (Some(sel), Some(invoked)) => clearSelectedArea(); Controller.invokeCursor(sel, invoked)
+    case (Some(sel), None) => clearSelectedArea()
+    case (None, Some(sel)) if Controller.canSelect(sel) => drawSelectedArea(sel)
+    case _ => // do nothing
+  }
+
+  //
+  // mouseMove
+  //
+  def mouseMove(evt: MouseEvent): Unit = getCursor(evt.clientX, evt.clientY) match {
+    case x if x == activeCursor => // do nothing
+    case x@Some(cursor) if Controller.canActivate(cursor) => drawActiveCursor(cursor)
+    case _ => clearActiveCursor()
   }
 
   private[this] def createCanvas(zIndexVal: Int): Canvas = {
@@ -431,29 +459,35 @@ case class Renderer(elem: Element, layout: Layout) {
   /**
     * Draw a highlighted cursor.
     */
-  def drawCursor(cursor: Cursor): Unit = {
-    clearCursor()
+  def drawActiveCursor(cursor: Cursor): Unit = {
+    clearActiveCursor()
     cursorToRect(cursor).draw(layer3, layout.color.cursor, -2)
-    lastCursor = Some(cursor)
+    activeCursor = Some(cursor)
   }
 
   /**
-    * Clear a cursor.
+    * Clear an active cursor.
     */
-  def clearCursor(): Unit = {
-    lastCursor.foreach(cursorToRect(_).clear(layer3))
-    lastCursor = None
+  def clearActiveCursor(): Unit = {
+    activeCursor.foreach(cursorToRect(_).clear(layer3))
+    activeCursor = None
   }
 
   /**
     * Draw the selected area.
     */
-  def drawSelectedArea(cursor: Cursor): Unit = cursorToRect(cursor).drawFill(layer0, layout.color.cursor, 2)
+  def drawSelectedArea(cursor: Cursor): Unit = {
+    cursorToRect(cursor).drawFill(layer0, layout.color.cursor, 2)
+    selectedCursor = Some(cursor)
+  }
 
   /**
     * Clear a selected area.
     */
-  def clearSelectedArea(cursor: Cursor): Unit = cursorToRect(cursor).clear(layer0)
+  def clearSelectedArea(): Unit = {
+    selectedCursor.foreach(cursorToRect(_).clear(layer0))
+    selectedCursor = None
+  }
 
   /**
     * Draw the last move area.
@@ -480,11 +514,11 @@ case class Renderer(elem: Element, layout: Layout) {
 
   def updateRecordUrl(url: String): Unit = recordInput.value = url
 
-  def setMode(mode: Mode): Unit = modeLabel.innerHTML = mode.label + span(cls := "caret").toString()
+  def updateMode(mode: Mode): Unit = modeLabel.innerHTML = mode.label + span(cls := "caret").toString()
 
-  def setLang(lang: Language): Unit = langLabel.innerHTML = lang.label + span(cls := "caret").toString()
+  def updateLang(lang: Language): Unit = langLabel.innerHTML = lang.label + span(cls := "caret").toString()
 
-  def setRecord(game: Game, lng: Language): Unit = {
+  def updateRecordContent(game: Game, lng: Language): Unit = {
     val f: Move => String = lng match {
       case Japanese => _.toKifString
       case English => _.toWesternNotationString
@@ -506,25 +540,23 @@ case class Renderer(elem: Element, layout: Layout) {
     }
     val ys = ((Some(0), "-") +: xs) ++ additional
 
-    val oldIndex = recordSelector.selectedIndex
     recordSelector.innerHTML = ys.map { case (o, s) => option(o.map(n => s"${n}: ").getOrElse("") + s).toString() }.mkString
-    selectRecord(oldIndex)
+    updateRecordIndex(-1)
   }
 
-  def selectRecord(index: Int): Unit = {
+  def updateRecordIndex(index: Int): Unit = {
     val maxValue = recordSelector.options.length - 1
     recordSelector.selectedIndex = (index < 0).fold(maxValue, math.min(index, maxValue))
   }
 
+  def getMaxRecordIndex: Int = recordSelector.options.length - 1
+
   def getSelectedIndex: Int = recordSelector.selectedIndex
 
-  def updateControlBar(): Unit = {
-    val maxValue = recordSelector.options.length - 1
-    val selected = getSelectedIndex
-
-    controlInput0.disabled = selected == 0
-    controlInput1.disabled = selected == 0
-    controlInput2.disabled = selected == maxValue
-    controlInput3.disabled = selected == maxValue
+  def updateControlBar(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean): Unit = {
+    controlInput0.disabled = !stepBackwardEnabled
+    controlInput1.disabled = !backwardEnabled
+    controlInput2.disabled = !forwardEnabled
+    controlInput3.disabled = !stepForwardEnabled
   }
 }

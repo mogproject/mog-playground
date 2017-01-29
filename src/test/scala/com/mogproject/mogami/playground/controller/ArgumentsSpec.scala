@@ -1,6 +1,7 @@
 package com.mogproject.mogami.playground.controller
 
 import com.mogproject.mogami.core.{Game, MoveBuilderSfen, Square, State}
+import com.mogproject.mogami.playground.controller.mode.Viewing
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FlatSpec, MustMatchers}
 
