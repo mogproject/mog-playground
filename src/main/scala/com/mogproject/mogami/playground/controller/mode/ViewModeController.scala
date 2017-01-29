@@ -1,12 +1,10 @@
 package com.mogproject.mogami.playground.controller.mode
 
 import com.mogproject.mogami.core.Game.GameStatus
-import com.mogproject.mogami.playground.controller.{Configuration, Cursor, Language}
+import com.mogproject.mogami.playground.controller.{Configuration, Language}
 import com.mogproject.mogami.playground.view.Renderer
 import com.mogproject.mogami.{Game, Move, State}
 import com.mogproject.mogami.util.Implicits._
-
-import scala.scalajs.js.URIUtils.encodeURIComponent
 
 /**
   * View mode
@@ -21,8 +19,6 @@ case class ViewModeController(override val renderer: Renderer,
 
   override def initialize(): Unit = {
     super.initialize()
-
-    renderer.updateRecordContent(game, config.lang)
     renderAll()
   }
 
@@ -39,6 +35,7 @@ case class ViewModeController(override val renderer: Renderer,
     renderer.drawLastMove(getLastMove)
 
     // update menu bar
+    renderer.updateRecordContent(game, config.lang)
     renderer.updateRecordIndex(position)
 
     // update control bar
@@ -47,18 +44,7 @@ case class ViewModeController(override val renderer: Renderer,
     renderer.updateControlBar(canMoveBackward, canMoveBackward, canMoveForward, canMoveForward)
 
     // render URLs
-    renderUrls()
-  }
-
-  private[this] def renderUrls(): Unit = {
-    val configParams = config.toQueryParameters
-    val moveParams = isLatestState.fold(List.empty, List(s"move=${realPosition}"))
-
-    val snapshot = ("sfen=" + encodeURIComponent(Game(selectedState).toSfenString)) +: configParams
-    val record = (("sfen=" + encodeURIComponent(game.toSfenString)) +: configParams) ++ moveParams
-
-    renderer.updateSnapshotUrl(s"${config.baseUrl}?${snapshot.mkString("&")}")
-    renderer.updateRecordUrl(s"${config.baseUrl}?${record.mkString("&")}")
+    renderUrls(game, realPosition)
   }
 
   private[this] def getLastMove: Option[Move] = (realPosition > 0).option(game.moves(realPosition - 1))

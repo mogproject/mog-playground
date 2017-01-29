@@ -6,8 +6,6 @@ import com.mogproject.mogami.Game
 import com.mogproject.mogami.playground.controller.{Configuration, Cursor, Language}
 import com.mogproject.mogami.playground.view.Renderer
 
-import scala.scalajs.js.URIUtils.encodeURIComponent
-
 /**
   * Play mode
   */
@@ -48,18 +46,7 @@ case class PlayModeController(override val renderer: Renderer,
     renderer.updateControlBar(game.moves.nonEmpty, game.moves.nonEmpty, forwardEnabled = false, stepForwardEnabled = false)
 
     // render URLs
-    renderUrls()
-  }
-
-  private[this] def renderUrls(): Unit = {
-    val configParams = config.toQueryParameters
-    val moveParams = List.empty
-
-    val snapshot = ("sfen=" + encodeURIComponent(Game(game.currentState).toSfenString)) +: configParams
-    val record = (("sfen=" + encodeURIComponent(game.toSfenString)) +: configParams) ++ moveParams
-
-    renderer.updateSnapshotUrl(s"${config.baseUrl}?${snapshot.mkString("&")}")
-    renderer.updateRecordUrl(s"${config.baseUrl}?${record.mkString("&")}")
+    renderUrls(game)
   }
 
   /**
