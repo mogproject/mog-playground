@@ -191,11 +191,16 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
         "Three Pawns", "Naked King")
     )
 
-    private[this] val buttons = states.map(st => button(cls := "btn btn-default col-sm-3 col-sm-offset-1", onclick := { () => Controller.setEditInitialState(st) }, "").render)
+    private[this] val buttons = states.map(st =>
+      button(
+        tpe := "button",
+        cls := "btn btn-default btn-block",
+        onclick := { () => Controller.setEditInitialState(st) }, ""
+      ).render)
 
     val element: Div = div(
       label("Reset"),
-      div(cls := "row", buttons)
+      div(cls := "row", buttons.map(b => div(cls := "col-md-4 col-xs-6", b)))
     ).render
 
     def updateLabel(lang: Language): Unit = buttons.zipWithIndex.foreach { case (b, i) => b.innerHTML = labels(lang)(i) }
