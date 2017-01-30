@@ -57,6 +57,23 @@ object Controller {
     }
   }
 
+  /**
+    * Update mode controller and render all components
+    *
+    * @param mc Option of the mode controller
+    */
+  def update(mc: Option[ModeController], callback: ModeController => Unit = _.renderAll()): Unit = {
+    mc.foreach { m =>
+      if (modeController.exists(_.mode != m.mode)) {
+        // mode change
+        modeController.foreach(_.terminate())
+        m.initialize()
+      } else {
+        callback(m)
+      }
+      modeController = Some(m)
+    }
+  }
 
   // events
   def canActivate(cursor: Cursor): Boolean = modeController.get.canActivate(cursor)
@@ -72,7 +89,7 @@ object Controller {
 
   def setRecord(index: Int): Unit = doAction(_.setRecord(index), _.renderAll())
 
-  def setControl(controlType: Int): Unit = doAction(_.setControl(controlType), _.renderAll())
+  def setControl(controlType: Int): Unit = update(modeController.flatMap(_.setControl(controlType)))
 
   def setEditTurn(player: Player): Unit = doAction(_.setEditTurn(player), _.renderAll())
 

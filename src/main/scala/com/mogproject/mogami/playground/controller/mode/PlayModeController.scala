@@ -3,7 +3,7 @@ package com.mogproject.mogami.playground.controller.mode
 import com.mogproject.mogami.core.MoveBuilderSfen
 import com.mogproject.mogami.core.State.PromotionFlag
 import com.mogproject.mogami.Game
-import com.mogproject.mogami.playground.controller.{Configuration, Cursor, Language}
+import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor, Language}
 import com.mogproject.mogami.playground.view.Renderer
 
 /**
@@ -80,17 +80,24 @@ case class PlayModeController(override val renderer: Renderer,
   override def setMode(nextMode: Mode): Option[ModeController] = nextMode match {
     case Playing => None
     case Viewing => Some(ViewModeController(renderer, config, game, -1))
-    case Editing if game.moves.isEmpty || renderer.askConfirm(config.lang) =>
+    case Editing if game.moves.isEmpty =>
       val st = game.currentState
       Some(EditModeController(renderer, config, st.turn, st.board, st.hand, st.getUnusedPtypeCount))
+    case Editing =>
+      val st = game.currentState
+      val mc = Some(EditModeController(renderer, config, st.turn, st.board, st.hand, st.getUnusedPtypeCount))
+      renderer.askConfirm(config.lang, () => Controller.update(mc))
+      None
   }
 
   override def setLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(lang = lang)))
 
   override def setControl(controlType: Int): Option[ModeController] = {
     controlType match {
-      case 0 if renderer.askConfirm(config.lang) => Some(this.copy(game = Game(game.initialState)))
-      case 0 => None
+      case 0 =>
+        val mc = Some(this.copy(game = Game(game.initialState)))
+        renderer.askConfirm(config.lang, () => Controller.update(mc))
+        None
       case 1 =>
         val mv = math.min(renderer.getSelectedIndex, game.moves.length) - 1
         Some(this.copy(game = game.copy(moves = game.moves.take(mv), givenHistory = Some(game.history.take(mv + 1)))))

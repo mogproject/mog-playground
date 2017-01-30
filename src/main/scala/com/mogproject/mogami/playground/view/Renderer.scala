@@ -7,9 +7,10 @@ import com.mogproject.mogami.core.Game.GameStatus.GameStatus
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.controller.mode.{Editing, Mode, Playing, Viewing}
+import com.mogproject.mogami.playground.view.modal.YesNoDialog
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
-import org.scalajs.dom.{CanvasRenderingContext2D, Element, MouseEvent, TouchEvent}
+import org.scalajs.dom.{CanvasRenderingContext2D, Element}
 import org.scalajs.dom.html.{Canvas, Div}
 import org.scalajs.dom.raw.HTMLSelectElement
 
@@ -369,10 +370,18 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     case English => "Do you want to promote?"
   })
 
-  def askConfirm(lang: Language): Boolean = dom.window.confirm(lang match {
-    case Japanese => "棋譜の情報が失われますが、よろしいですか?"
-    case English => "The record will be discarded. Are you sure?"
-  })
+  def askConfirm(lang: Language, callback: () => Unit): Unit = {
+    val msg = lang match {
+      case Japanese => "棋譜の情報が失われますが、よろしいですか?"
+      case English => "The record will be discarded. Are you sure?"
+    }
+    YesNoDialog(lang, msg, callback).show()
+  }
+//
+//  def askConfirm(lang: Language): Boolean = dom.window.confirm(lang match {
+//    case Japanese => "棋譜の情報が失われますが、よろしいですか?"
+//    case English => "The record will be discarded. Are you sure?"
+//  })
 
   def alertEditedState(msg: String, lang: Language): Unit = dom.window.alert(lang match {
     case Japanese => s"不正な局面です。\n(${msg})"

@@ -1,7 +1,7 @@
 package com.mogproject.mogami.playground.controller.mode
 
 import com.mogproject.mogami.core.Game.GameStatus
-import com.mogproject.mogami.playground.controller.{Configuration, Language}
+import com.mogproject.mogami.playground.controller.{Configuration, Controller, Language}
 import com.mogproject.mogami.playground.view.Renderer
 import com.mogproject.mogami.{Game, Move, State}
 import com.mogproject.mogami.util.Implicits._
@@ -62,12 +62,21 @@ case class ViewModeController(override val renderer: Renderer,
   // Actions
   //
   override def setMode(nextMode: Mode): Option[ModeController] = nextMode match {
-    case Playing if isLatestState || renderer.askConfirm(config.lang) =>
+    case Playing if isLatestState =>
       Some(PlayModeController(renderer, config, isLatestState.fold(game, getTruncatedGame)))
+    case Playing =>
+      val mc = Some(PlayModeController(renderer, config, isLatestState.fold(game, getTruncatedGame)))
+      renderer.askConfirm(config.lang, () => Controller.update(mc))
+      None
     case Viewing => None
-    case Editing if game.moves.isEmpty || renderer.askConfirm(config.lang) =>
+    case Editing if game.moves.isEmpty =>
       val st = selectedState
       Some(EditModeController(renderer, config, st.turn, st.board, st.hand, st.getUnusedPtypeCount))
+    case Editing =>
+      val st = selectedState
+      val mc = Some(EditModeController(renderer, config, st.turn, st.board, st.hand, st.getUnusedPtypeCount))
+      renderer.askConfirm(config.lang, () => Controller.update(mc))
+      None
   }
 
   override def setLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(lang = lang)))
