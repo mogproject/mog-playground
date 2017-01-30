@@ -2,34 +2,28 @@ package com.mogproject.mogami.playground.view.modal
 
 import com.mogproject.mogami.playground.controller.{English, Japanese, Language}
 import org.scalajs.dom.html.{Div, Element}
-
-import scalatags.JsDom.all._
 import org.scalajs.jquery.jQuery
 
 import scalatags.JsDom.TypedTag
+import scalatags.JsDom.all._
 
 /**
-  * Yes-no dialog
+  * Alert dialog
   */
-case class YesNoDialog(lang: Language, message: TypedTag[Element], callback: () => Unit) {
+case class AlertDialog(lang: Language, message: TypedTag[Element]) {
 
   private[this] val title = lang match {
     case Japanese => "確認"
     case English => "Confirmation"
   }
 
-  private[this] val yes = lang match {
-    case Japanese => "はい"
-    case English => "Yes"
-  }
-
-  private[this] val no = lang match {
-    case Japanese => "いいえ"
-    case English => "No"
+  private[this] val ok = lang match {
+    case Japanese => "OK"
+    case English => "OK"
   }
 
   private[this] val elem: Div =
-    div(cls := "modal face", tabindex := "-1", role := "dialog", data("backdrop") := "static",
+    div(cls := "modal face", tabindex := "-1", role := "dialog",
       div(cls := "modal-dialog", role := "document",
         div(cls := "modal-content",
           // header
@@ -43,11 +37,8 @@ case class YesNoDialog(lang: Language, message: TypedTag[Element], callback: () 
           // footer
           div(cls := "modal-footer",
             div(cls := "row",
-              div(cls := "col-xs-4 col-xs-offset-4 col-md-3 col-md-offset-6",
-                button(tpe := "button", cls := "btn btn-default btn-block", data("dismiss") := "modal", no)
-              ),
-              div(cls := "col-xs-4 col-md-3",
-                button(tpe := "button", cls := "btn btn-primary btn-block", data("dismiss") := "modal", onclick := callback, yes)
+              div(cls := "col-xs-4 col-xs-offset-8 col-md-3 col-md-offset-9",
+                button(tpe := "button", cls := "btn btn-default btn-block", data("dismiss") := "modal", ok)
               )
             )
           )

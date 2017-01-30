@@ -7,7 +7,7 @@ import com.mogproject.mogami.core.Game.GameStatus.GameStatus
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.controller.mode.{Editing, Mode, Playing, Viewing}
-import com.mogproject.mogami.playground.view.modal.YesNoDialog
+import com.mogproject.mogami.playground.view.modal.{AlertDialog, YesNoDialog}
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.{CanvasRenderingContext2D, Element}
@@ -191,11 +191,16 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
         "Three Pawns", "Naked King")
     )
 
-    private[this] val buttons = states.map(st => button(cls := "btn btn-default col-sm-3 col-sm-offset-1", onclick := { () => Controller.setEditInitialState(st) }, "").render)
+    private[this] val buttons = states.map(st =>
+      button(
+        tpe := "button",
+        cls := "btn btn-default btn-block",
+        onclick := { () => Controller.setEditInitialState(st) }, ""
+      ).render)
 
     val element: Div = div(
       label("Reset"),
-      div(cls := "row", buttons)
+      div(cls := "row", buttons.map(b => div(cls := "col-md-4 col-xs-6", b)))
     ).render
 
     def updateLabel(lang: Language): Unit = buttons.zipWithIndex.foreach { case (b, i) => b.innerHTML = labels(lang)(i) }
@@ -371,22 +376,20 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
   })
 
   def askConfirm(lang: Language, callback: () => Unit): Unit = {
-    val msg = lang match {
-      case Japanese => "棋譜の情報が失われますが、よろしいですか?"
-      case English => "The record will be discarded. Are you sure?"
+    val s = lang match {
+      case Japanese => p("棋譜の情報が失われますが、よろしいですか?")
+      case English => p("The record will be discarded. Are you sure?")
     }
-    YesNoDialog(lang, msg, callback).show()
+    YesNoDialog(lang, s, callback).show()
   }
-//
-//  def askConfirm(lang: Language): Boolean = dom.window.confirm(lang match {
-//    case Japanese => "棋譜の情報が失われますが、よろしいですか?"
-//    case English => "The record will be discarded. Are you sure?"
-//  })
 
-  def alertEditedState(msg: String, lang: Language): Unit = dom.window.alert(lang match {
-    case Japanese => s"不正な局面です。\n(${msg})"
-    case English => s"Invalid state.\n(${msg})"
-  })
+  def alertEditedState(msg: String, lang: Language): Unit = {
+    val s = lang match {
+      case Japanese => p("不正な局面です。", br, s"(${msg})")
+      case English => p("Invalid state.", br, s"(${msg})")
+    }
+    AlertDialog(lang, s).show()
+  }
 
   def updateSnapshotUrl(url: String): Unit = snapshotInput.value = url
 
