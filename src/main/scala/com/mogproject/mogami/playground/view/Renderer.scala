@@ -6,6 +6,8 @@ import com.mogproject.mogami.core.Game.GameStatus
 import com.mogproject.mogami.core.Game.GameStatus.GameStatus
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.playground.api.Clipboard
+import com.mogproject.mogami.playground.controller.mode.{Editing, Mode, Playing, Viewing}
+import com.mogproject.mogami.playground.view.modal.YesNoDialog
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.{CanvasRenderingContext2D, Element}
@@ -17,24 +19,18 @@ import scalatags.JsDom.all._
 /**
   * controls canvas rendering
   */
-case class Renderer(elem: Element, layout: Layout) {
-  // variables
-  private[this] var lastMoveArea: Set[Cursor] = Set.empty
-  private[this] var lastCursor: Option[Cursor] = None
-
-  // constants
-  private[this] val boxPtypes: Seq[Ptype] = Ptype.KING +: Ptype.inHand
+case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   // main canvas
-  private[this] val canvas0: Canvas = createCanvas(0)
-  private[this] val canvas1: Canvas = createCanvas(1)
-  private[this] val canvas2: Canvas = createCanvas(2)
-  private[this] val canvas3: Canvas = createCanvas(3)
+  protected val canvas0: Canvas = createCanvas(0)
+  protected val canvas1: Canvas = createCanvas(1)
+  protected val canvas2: Canvas = createCanvas(2)
+  protected val canvas3: Canvas = createCanvas(3)
 
-  private[this] val layer0: CanvasRenderingContext2D = canvas0.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
-  private[this] val layer1: CanvasRenderingContext2D = canvas1.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
-  private[this] val layer2: CanvasRenderingContext2D = canvas2.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
-  private[this] val layer3: CanvasRenderingContext2D = canvas3.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+  protected val layer0: CanvasRenderingContext2D = canvas0.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+  protected val layer1: CanvasRenderingContext2D = canvas1.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+  protected val layer2: CanvasRenderingContext2D = canvas2.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+  protected val layer3: CanvasRenderingContext2D = canvas3.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
 
   private[this] val canvasContainer: Div = div(cls := "col-md-6",
     padding := 0,
@@ -48,7 +44,7 @@ case class Renderer(elem: Element, layout: Layout) {
   // forms
   private[this] val recordSelector: HTMLSelectElement = select(
     cls := "form-control thin-select",
-    onchange := (() => Controller.setRecord(recordSelector.selectedIndex, Viewing))
+    onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
   ).render
 
   private[this] val modeLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false).render
@@ -136,8 +132,6 @@ case class Renderer(elem: Element, layout: Layout) {
   ).render
 
   object EditTurn {
-    private[this] var value: Player = BLACK
-
     private[this] val anchors: Map[Player, Element] = Map(
       BLACK -> a(cls := "btn btn-primary active", onclick := { () => Controller.setEditTurn(BLACK) }).render,
       WHITE -> a(cls := "btn btn-primary notActive", onclick := { () => Controller.setEditTurn(WHITE) }).render
@@ -157,7 +151,7 @@ case class Renderer(elem: Element, layout: Layout) {
       )
     ).render
 
-    def setEditLabel(lang: Language): Unit = lang match {
+    def updateEditTurnLabel(lang: Language): Unit = lang match {
       case Japanese =>
         anchors(BLACK).innerHTML = "先手番"
         anchors(WHITE).innerHTML = "後手番"
@@ -166,15 +160,12 @@ case class Renderer(elem: Element, layout: Layout) {
         anchors(WHITE).innerHTML = "White"
     }
 
-    def change(newValue: Player): Unit = {
+    def updateEditTurnValue(newValue: Player): Unit = {
       anchors(newValue).classList.remove("notActive")
       anchors(newValue).classList.add("active")
       anchors(!newValue).classList.remove("active")
       anchors(!newValue).classList.add("notActive")
-      value = newValue
     }
-
-    def getValue(): Player = value
   }
 
   object EditReset {
@@ -234,8 +225,16 @@ case class Renderer(elem: Element, layout: Layout) {
         div(cls := "col-md-6", footer)
       ),
       hr(),
-      small(p(textAlign := "right", "Shogi Playground © 2017 ", a(href:="http://mogproject.com", "mogproject")))
+      small(p(textAlign := "right", "Shogi Playground © 2017 ", a(href := "http://mogproject.com", "mogproject")))
     ).render)
+
+    // register events
+    if (hasTouchEvent) {
+      setEventListener("touchstart", touchStart)
+    } else {
+      setEventListener("mousemove", mouseMove)
+      setEventListener("mousedown", mouseDown)
+    }
 
     // initialize clipboard.js
     val cp = new Clipboard(".btn")
@@ -371,120 +370,33 @@ case class Renderer(elem: Element, layout: Layout) {
     case English => "Do you want to promote?"
   })
 
-  def askConfirm(lang: Language): Boolean = dom.window.confirm(lang match {
-    case Japanese => "棋譜の情報が失われますが、よろしいですか?"
-    case English => "The record will be discarded. Are you sure?"
-  })
+  def askConfirm(lang: Language, callback: () => Unit): Unit = {
+    val msg = lang match {
+      case Japanese => "棋譜の情報が失われますが、よろしいですか?"
+      case English => "The record will be discarded. Are you sure?"
+    }
+    YesNoDialog(lang, msg, callback).show()
+  }
+//
+//  def askConfirm(lang: Language): Boolean = dom.window.confirm(lang match {
+//    case Japanese => "棋譜の情報が失われますが、よろしいですか?"
+//    case English => "The record will be discarded. Are you sure?"
+//  })
 
   def alertEditedState(msg: String, lang: Language): Unit = dom.window.alert(lang match {
     case Japanese => s"不正な局面です。\n(${msg})"
     case English => s"Invalid state.\n(${msg})"
   })
 
-  /**
-    * Convert MouseEvent to Cursor
-    *
-    * @return Cursor if the mouse position is inside the specific area
-    */
-  def getCursor(clientX: Double, clientY: Double): Option[Cursor] = {
-    val rect = canvas2.getBoundingClientRect()
-    val (x, y) = (clientX - rect.left, clientY - rect.top)
-
-    (layout.board.isInside(x, y), layout.handBlack.isInside(x, y), layout.handWhite.isInside(x, y), layout.pieceBox.isInside(x, y)) match {
-      case (true, _, _, _) =>
-        val file = 9 - ((x - layout.board.left) / layout.PIECE_WIDTH).toInt
-        val rank = 1 + ((y - layout.board.top) / layout.PIECE_HEIGHT).toInt
-        Some(Cursor(Square(file, rank)))
-      case (false, false, false, false) =>
-        None
-      case (false, false, false, true) =>
-        val offset = x - layout.pieceBox.left
-        val i = (offset / layout.PIECE_BOX_UNIT_WIDTH).toInt
-        (i <= 7 && offset % layout.PIECE_BOX_UNIT_WIDTH <= layout.PIECE_WIDTH).option(Cursor(boxPtypes(i)))
-      case (false, isBlack, _, _) =>
-        val offset = isBlack.fold(x - layout.handBlack.left, layout.handWhite.right - x)
-        val i = (offset / layout.HAND_UNIT_WIDTH).toInt
-        (i <= 6 && offset % layout.HAND_UNIT_WIDTH <= layout.PIECE_WIDTH).option {
-          Cursor(Piece(isBlack.fold(Player.BLACK, Player.WHITE), Ptype.inHand(i)))
-        }
-    }
-  }
-
-  /**
-    * Convert Cursor object to Rectangle.
-    */
-  private[this] def cursorToRect(cursor: Cursor): Rectangle = {
-    val (x, y) = cursor match {
-      case Cursor(None, Some(Hand(Player.BLACK, pt)), None) =>
-        (layout.handBlack.left + (pt.sortId - 1) * layout.HAND_UNIT_WIDTH, layout.handBlack.top)
-      case Cursor(None, Some(Hand(Player.WHITE, pt)), None) =>
-        (layout.handWhite.right - (pt.sortId - 1) * layout.HAND_UNIT_WIDTH - layout.PIECE_WIDTH, layout.handWhite.top)
-      case Cursor(Some(sq), None, None) =>
-        (layout.board.left + (9 - sq.file) * layout.PIECE_WIDTH, layout.board.top + (sq.rank - 1) * layout.PIECE_HEIGHT)
-      case Cursor(None, None, Some(pt)) =>
-        (layout.pieceBox.left + pt.sortId * layout.PIECE_BOX_UNIT_WIDTH, layout.pieceBox.top)
-      case _ => (0, 0) // never happens
-    }
-    Rectangle(x, y, layout.PIECE_WIDTH, layout.PIECE_HEIGHT)
-  }
-
-  /**
-    * Draw a highlighted cursor.
-    */
-  def drawCursor(cursor: Cursor): Unit = {
-    clearCursor()
-    cursorToRect(cursor).draw(layer3, layout.color.cursor, -2)
-    lastCursor = Some(cursor)
-  }
-
-  /**
-    * Clear a cursor.
-    */
-  def clearCursor(): Unit = {
-    lastCursor.foreach(cursorToRect(_).clear(layer3))
-    lastCursor = None
-  }
-
-  /**
-    * Draw the selected area.
-    */
-  def drawSelectedArea(cursor: Cursor): Unit = cursorToRect(cursor).drawFill(layer0, layout.color.cursor, 2)
-
-  /**
-    * Clear a selected area.
-    */
-  def clearSelectedArea(cursor: Cursor): Unit = cursorToRect(cursor).clear(layer0)
-
-  /**
-    * Draw the last move area.
-    */
-  def drawLastMove(move: Option[Move]): Unit = {
-    val newArea: Set[Cursor] = move match {
-      case None => Set.empty
-      case Some(mv) =>
-        val fr = mv.from match {
-          case None => Cursor(mv.player, mv.oldPtype)
-          case Some(sq) => Cursor(sq)
-        }
-        Set(fr, Cursor(mv.to))
-    }
-
-    (lastMoveArea -- newArea).foreach(cursorToRect(_).clear(layer0))
-    (newArea -- lastMoveArea).foreach(cursorToRect(_).drawFill(layer0, layout.color.light, 1))
-    lastMoveArea = newArea
-  }
-
-  def clearLastMove(): Unit = drawLastMove(None)
-
   def updateSnapshotUrl(url: String): Unit = snapshotInput.value = url
 
   def updateRecordUrl(url: String): Unit = recordInput.value = url
 
-  def setMode(mode: Mode): Unit = modeLabel.innerHTML = mode.label + span(cls := "caret").toString()
+  def updateMode(mode: Mode): Unit = modeLabel.innerHTML = mode.label + span(cls := "caret").toString()
 
-  def setLang(lang: Language): Unit = langLabel.innerHTML = lang.label + span(cls := "caret").toString()
+  def updateLang(lang: Language): Unit = langLabel.innerHTML = lang.label + span(cls := "caret").toString()
 
-  def setRecord(game: Game, lng: Language): Unit = {
+  def updateRecordContent(game: Game, lng: Language): Unit = {
     val f: Move => String = lng match {
       case Japanese => _.toKifString
       case English => _.toWesternNotationString
@@ -506,25 +418,23 @@ case class Renderer(elem: Element, layout: Layout) {
     }
     val ys = ((Some(0), "-") +: xs) ++ additional
 
-    val oldIndex = recordSelector.selectedIndex
     recordSelector.innerHTML = ys.map { case (o, s) => option(o.map(n => s"${n}: ").getOrElse("") + s).toString() }.mkString
-    selectRecord(oldIndex)
+    updateRecordIndex(-1)
   }
 
-  def selectRecord(index: Int): Unit = {
+  def updateRecordIndex(index: Int): Unit = {
     val maxValue = recordSelector.options.length - 1
     recordSelector.selectedIndex = (index < 0).fold(maxValue, math.min(index, maxValue))
   }
 
+  def getMaxRecordIndex: Int = recordSelector.options.length - 1
+
   def getSelectedIndex: Int = recordSelector.selectedIndex
 
-  def updateControlBar(): Unit = {
-    val maxValue = recordSelector.options.length - 1
-    val selected = getSelectedIndex
-
-    controlInput0.disabled = selected == 0
-    controlInput1.disabled = selected == 0
-    controlInput2.disabled = selected == maxValue
-    controlInput3.disabled = selected == maxValue
+  def updateControlBar(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean): Unit = {
+    controlInput0.disabled = !stepBackwardEnabled
+    controlInput1.disabled = !backwardEnabled
+    controlInput2.disabled = !forwardEnabled
+    controlInput3.disabled = !stepForwardEnabled
   }
 }

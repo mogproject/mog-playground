@@ -1,4 +1,4 @@
-package com.mogproject.mogami.playground.controller
+package com.mogproject.mogami.playground.controller.mode
 
 abstract sealed class Mode(val label: String)
 

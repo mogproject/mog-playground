@@ -7,7 +7,8 @@ import com.mogproject.mogami.playground.view.piece.{EnglishPieceRenderer, PieceR
   *
   */
 case class Configuration(layout: Layout = Layout(320, 480),
-                         lang: Language = Japanese
+                         lang: Language = Japanese,
+                         baseUrl: String = ""
                         ) {
   lazy val pieceRenderer: PieceRenderer = lang match {
     case Japanese => SimpleJapanesePieceRenderer(layout)
