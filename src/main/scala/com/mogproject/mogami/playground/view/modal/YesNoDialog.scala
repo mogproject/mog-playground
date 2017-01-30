@@ -41,10 +41,10 @@ case class YesNoDialog(lang: Language, message: String, callback: () => Unit) {
           // footer
           div(cls := "modal-footer",
             div(cls := "row",
-              div(cls := "col-xs-2 col-xs-offset-8",
+              div(cls := "col-xs-3 col-xs-offset-6",
                 button(tpe := "button", cls := "btn btn-default btn-block", data("dismiss") := "modal", no)
               ),
-              div(cls := "col-xs-2",
+              div(cls := "col-xs-3",
                 button(tpe := "button", cls := "btn btn-primary btn-block", data("dismiss") := "modal", onclick := callback, yes)
               )
             )
