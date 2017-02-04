@@ -65,4 +65,8 @@ div {
 
 canvas {
     position: absolute;
+    user-select: none; /* CSS3 */
+    -moz-user-select: none; /* Firefox */
+    -webkit-user-select: none; /* Safari/Chrome */
+    -ms-user-select: none; /* IE10 */
 }
