@@ -1,33 +1,44 @@
 package com.mogproject.mogami.playground.view.piece
 
+import com.mogproject.mogami.core.Player.BLACK
+import com.mogproject.mogami.playground.view.TextRenderer
 import com.mogproject.mogami.{Hand, Piece, Ptype, Square}
 import org.scalajs.dom.CanvasRenderingContext2D
 
-trait PieceRenderer {
-  def drawOnBoard(ctx: CanvasRenderingContext2D, piece: Piece, square: Square): Unit
+trait PieceRenderer extends TextRenderer {
 
-  def drawInHand(ctx: CanvasRenderingContext2D, piece: Hand, numPieces: Int): Unit
+  def drawPiece(ctx: CanvasRenderingContext2D, piece: Piece, left: Int, top: Int, scale: Int = 1): Unit
 
-  def drawInBox(ctx: CanvasRenderingContext2D, ptype: Ptype): Unit
+  def drawOnBoard(ctx: CanvasRenderingContext2D, piece: Piece, square: Square): Unit = {
+    val left = layout.board.left + layout.PIECE_WIDTH * (9 - square.file)
+    val top = layout.board.top + layout.PIECE_HEIGHT * (square.rank - 1)
+    drawPiece(ctx, piece, left, top)
+  }
 
-  protected def drawText(ctx: CanvasRenderingContext2D, text: String, x: Int, y: Int, rotated: Boolean, font: String, color: String): Unit = {
-    ctx.font = font
-    ctx.fillStyle = color
-
-    if (rotated) {
-      ctx.save()
-      ctx.rotate(math.Pi)
-      ctx.fillText(text, x, y)
-      ctx.restore()
-    } else {
-      ctx.fillText(text, x, y)
+  private[this] def drawNumbers(ctx: CanvasRenderingContext2D, n: Int, left: Int, top: Int, rotated: Boolean): Unit = {
+    if (n > 1) {
+      drawTextBottomRight(ctx, n.toString, left, top, layout.PIECE_WIDTH, layout.PIECE_HEIGHT,
+        layout.font.numberOfPieces, layout.color.red, rotated, -2, -2)
     }
   }
 
-  protected def drawPieceText(ctx: CanvasRenderingContext2D, text: String, x: Int, y: Int, rotated: Boolean, font: String, color: String, pieceWidth: Int): Unit = {
-    ctx.font = font
+  def drawInHand(ctx: CanvasRenderingContext2D, piece: Hand, numPieces: Int): Unit = {
+    // piece type
+    val (left, top) = if (piece.owner.isBlack) {
+      (layout.handBlack.left + layout.PIECE_WIDTH * (piece.ptype.sortId - 1), layout.handBlack.top)
+    } else {
+      (layout.handWhite.left + layout.PIECE_WIDTH * (7 - piece.ptype.sortId), layout.handWhite.top)
+    }
+    drawPiece(ctx, piece.toPiece, left, top)
 
-    val textWidth = ctx.measureText(text).width.toInt
-    drawText(ctx, text, x + (pieceWidth - textWidth) / 2, y, rotated, font, color)
+    // number of pieces
+    drawNumbers(ctx, numPieces, left, top, piece.owner.isWhite)
+  }
+
+  def drawInBox(ctx: CanvasRenderingContext2D, ptype: Ptype, numPieces: Int): Unit = {
+    val left = layout.pieceBox.left + layout.PIECE_WIDTH * ptype.sortId
+    val top = layout.pieceBox.top
+    drawPiece(ctx, Piece(BLACK, ptype), left, top)
+    drawNumbers(ctx, numPieces, left, top, rotated = false)
   }
 }

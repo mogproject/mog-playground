@@ -43,12 +43,12 @@ trait CursorManageable {
         None
       case (false, false, false, true) =>
         val offset = x - layout.pieceBox.left
-        val i = (offset / layout.PIECE_BOX_UNIT_WIDTH).toInt
-        (i <= 7 && offset % layout.PIECE_BOX_UNIT_WIDTH <= layout.PIECE_WIDTH).option(Cursor(boxPtypes(i)))
+        val i = (offset / layout.PIECE_WIDTH).toInt
+        (i <= 7 && offset % layout.PIECE_WIDTH <= layout.PIECE_WIDTH).option(Cursor(boxPtypes(i)))
       case (false, isBlack, _, _) =>
         val offset = isBlack.fold(x - layout.handBlack.left, layout.handWhite.right - x)
-        val i = (offset / layout.HAND_UNIT_WIDTH).toInt
-        (i <= 6 && offset % layout.HAND_UNIT_WIDTH <= layout.PIECE_WIDTH).option {
+        val i = (offset / layout.PIECE_WIDTH).toInt
+        (i <= 6 && offset % layout.PIECE_WIDTH <= layout.PIECE_WIDTH).option {
           Cursor(Piece(isBlack.fold(Player.BLACK, Player.WHITE), Ptype.inHand(i)))
         }
     }
@@ -60,13 +60,13 @@ trait CursorManageable {
   private[this] def cursorToRect(cursor: Cursor): Rectangle = {
     val (x, y) = cursor match {
       case Cursor(None, Some(Hand(Player.BLACK, pt)), None) =>
-        (layout.handBlack.left + (pt.sortId - 1) * layout.HAND_UNIT_WIDTH, layout.handBlack.top)
+        (layout.handBlack.left + (pt.sortId - 1) * layout.PIECE_WIDTH, layout.handBlack.top)
       case Cursor(None, Some(Hand(Player.WHITE, pt)), None) =>
-        (layout.handWhite.right - (pt.sortId - 1) * layout.HAND_UNIT_WIDTH - layout.PIECE_WIDTH, layout.handWhite.top)
+        (layout.handWhite.right - (pt.sortId - 1) * layout.PIECE_WIDTH - layout.PIECE_WIDTH, layout.handWhite.top)
       case Cursor(Some(sq), None, None) =>
         (layout.board.left + (9 - sq.file) * layout.PIECE_WIDTH, layout.board.top + (sq.rank - 1) * layout.PIECE_HEIGHT)
       case Cursor(None, None, Some(pt)) =>
-        (layout.pieceBox.left + pt.sortId * layout.PIECE_BOX_UNIT_WIDTH, layout.pieceBox.top)
+        (layout.pieceBox.left + pt.sortId * layout.PIECE_WIDTH, layout.pieceBox.top)
       case _ => (0, 0) // never happens
     }
     Rectangle(x, y, layout.PIECE_WIDTH, layout.PIECE_HEIGHT)

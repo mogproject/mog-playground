@@ -3,49 +3,97 @@ package com.mogproject.mogami.playground.view
 /**
   * layout constants
   */
-case class Layout(canvasWidth: Int, canvasHeight: Int) {
+case class Layout(canvasWidth: Int) {
+
+  lazy val canvasHeight: Int = pieceBox.bottom + MARGIN_BOTTOM
+
+  def scaleByCanvas(x: Int): Int = canvasWidth * x / 1000
+
+  def scaleByPiece(pieceWidth: Int, x: Int): Int = pieceWidth * x / 1000
 
   // constants
-  val PIECE_WIDTH = 34
-  val PIECE_HEIGHT = 36
-  val INDICATOR_HEIGHT = 10
-  val HAND_UNIT_WIDTH = 43
-  val BOARD_LEFT: Int = 2
-  val BOARD_WIDTH: Int = PIECE_WIDTH * 9
-  val BOARD_HEIGHT: Int = PIECE_HEIGHT * 9
-  val PIECE_BOX_UNIT_WIDTH = 38
+  lazy val PIECE_WIDTH: Int = scaleByCanvas(107)
+  lazy val PIECE_HEIGHT: Int = scaleByCanvas(113)
+  lazy val MARGIN_BLOCK: Int = scaleByCanvas(32)
+  lazy val MARGIN_TOP: Int = scaleByCanvas(7)
+  val MARGIN_BOTTOM: Int = 2
+  lazy val MARGIN_LEFT: Int = scaleByCanvas(7)
+  lazy val MARGIN_RIGHT: Int = canvasWidth - board.right
+  lazy val BOARD_WIDTH: Int = PIECE_WIDTH * 9
+  lazy val BOARD_HEIGHT: Int = PIECE_HEIGHT * 9
+  lazy val INDICATOR_HEIGHT: Int = scaleByCanvas(40)
+
+  // sizes
+  val playerAreaWidth: Int = PIECE_WIDTH * 2 - 4
+  lazy val playerIconWidth: Int = scaleByCanvas(64)
+  lazy val playerIconHeight: Int = PIECE_HEIGHT - INDICATOR_HEIGHT - 3
+  lazy val playerNameWidth: Int = playerAreaWidth - playerIconWidth - 2
 
   // rectangles
-  val handWhite = Rectangle(BOARD_LEFT, 2, BOARD_WIDTH, PIECE_HEIGHT)
-  val indicatorWhite = Rectangle(BOARD_LEFT, handWhite.bottom + 2, BOARD_WIDTH, INDICATOR_HEIGHT)
-  val board = Rectangle(BOARD_LEFT, indicatorWhite.bottom + 2, BOARD_WIDTH, BOARD_HEIGHT)
-  val indicatorBlack = Rectangle(BOARD_LEFT, board.bottom + 2, BOARD_WIDTH, INDICATOR_HEIGHT)
-  val handBlack = Rectangle(BOARD_LEFT, indicatorBlack.bottom + 2, BOARD_WIDTH, PIECE_HEIGHT)
-  val fileIndex: Rectangle = indicatorWhite
-  val rankIndex = Rectangle(board.right + 1, board.top, 12, BOARD_HEIGHT)
-  val pieceBox = Rectangle(BOARD_LEFT, handBlack.bottom + 10, BOARD_WIDTH, PIECE_HEIGHT)
+  val playerWhite = Rectangle(MARGIN_LEFT + BOARD_WIDTH - PIECE_WIDTH * 2 + 4, MARGIN_TOP, playerAreaWidth, PIECE_HEIGHT)
+  val indicatorWhite = Rectangle(playerWhite.left + 1, playerWhite.top + 1, playerWhite.width - 2, INDICATOR_HEIGHT)
+  val playerIconWhite = Rectangle(playerWhite.right - playerIconWidth, indicatorWhite.bottom + 1, playerIconWidth, playerIconHeight)
+  val playerNameWhite = Rectangle(playerWhite.left + 1, playerIconWhite.top, playerNameWidth, playerIconWhite.height)
+
+  val handWhite = Rectangle(MARGIN_LEFT, MARGIN_TOP, BOARD_WIDTH - PIECE_WIDTH * 2, PIECE_HEIGHT)
+
+  val fileIndex: Rectangle = Rectangle(MARGIN_LEFT, handWhite.bottom + 2, BOARD_WIDTH, MARGIN_BLOCK)
+
+  val board = Rectangle(MARGIN_LEFT, handWhite.bottom + MARGIN_BLOCK + 2, BOARD_WIDTH, BOARD_HEIGHT)
+
+  val playerBlack = Rectangle(MARGIN_LEFT, board.bottom + MARGIN_BLOCK + 2, playerAreaWidth, PIECE_HEIGHT)
+  val indicatorBlack = Rectangle(playerBlack.left + 1, playerBlack.bottom - INDICATOR_HEIGHT - 1, playerBlack.width - 2, INDICATOR_HEIGHT)
+  val playerIconBlack = Rectangle(playerBlack.left + 1, playerBlack.top + 1, playerIconWidth, playerIconHeight)
+  val playerNameBlack = Rectangle(playerIconBlack.right + 1, playerIconBlack.top, playerNameWidth, playerIconBlack.height)
+
+  val handBlack = Rectangle(MARGIN_LEFT + PIECE_WIDTH * 2, playerBlack.top, BOARD_WIDTH - PIECE_WIDTH * 2, PIECE_HEIGHT)
+
+  val rankIndex = Rectangle(board.right + 1, board.top, MARGIN_RIGHT, BOARD_HEIGHT)
+  val pieceBox = Rectangle(MARGIN_LEFT + PIECE_WIDTH, handBlack.bottom + MARGIN_BLOCK + 2, BOARD_WIDTH - PIECE_WIDTH, PIECE_HEIGHT)
 
   // fonts
   object font {
-    val pieceJapanese = """22pt "游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "HG明朝E", "ＭＳ Ｐ明朝", "ＭＳ 明朝", serif"""
-    val mark = """24pt "游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "HG明朝E", "ＭＳ Ｐ明朝", "ＭＳ 明朝", serif"""
-    val pieceEnglish = "18pt Times, serif"
-    val number = "13pt Times, serif"
-    val index = """8pt "游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "HG明朝E", "ＭＳ Ｐ明朝", "ＭＳ 明朝", serif"""
+    private[this] val japanese = """"游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "HG明朝E", "ＭＳ Ｐ明朝", "ＭＳ 明朝", serif"""
+    private[this] val english = "Times, serif"
+
+    def pentagon(pieceWidth: Int = PIECE_WIDTH): String = s"${scaleByPiece(pieceWidth, 706)}pt ${japanese}"
+
+    def pieceJapanese(pieceWidth: Int = PIECE_WIDTH): String = s"${scaleByPiece(pieceWidth, 648)}pt ${japanese}"
+
+    def pieceEnglish(pieceWidth: Int = PIECE_WIDTH): String = s"${scaleByPiece(pieceWidth, 530)}pt ${english}"
+
+    lazy val numberOfPieces = s"${scaleByPiece(PIECE_WIDTH, 383)}pt ${english}"
+    lazy val numberIndex = s"${scaleByPiece(PIECE_WIDTH, 236)}pt ${japanese}"
+    lazy val indicator = s"${scaleByCanvas(28)}pt ${english}"
+    lazy val playerIcon = s"${scaleByCanvas(40)}pt ${japanese}"
+    lazy val playerNameJapanese = s"${scaleByCanvas(32)}pt ${japanese}"
+    lazy val playerNameEnglish = s"${scaleByCanvas(32)}pt ${english}"
   }
 
   // colors
   object color {
-    val fg = "black"  // foreground
-    val bg = "#fefdfa"  // background
-    val red = "#b22222"  // promoted pieces
-    val win = "#83ff9d"
+    // foreground
+    val fg = "black"
+
+    // background
+    val bg = "#fefdfa"
+
+    // promoted pieces
+    val red = "#b22222"
+
+    // indicators
+    val active = "#3276b1"
+    val win = "#339933"
     val lose = "#ff5843"
     val draw = "#99877a"
-    val active = "#45A1CF"
+
     val cursor = "#E1B265"
     val dark = "#353535"
     val light = "#E0FFFF"
+
+    // indicator text
+    val white = "#ffffff"
     val pieceBox = "#cccccc" // background of the piece box
   }
+
 }

@@ -31,7 +31,7 @@
     padding-bottom: 4px !important;
 }
 
-.thin-select {
+.thin-btn {
     margin-top: 2px !important;
     margin-bottom: 2px !important;
     padding-top: 2px !important;
@@ -39,7 +39,22 @@
     height: 24px !important;
 }
 
+.btn-control {
+    width: 48px !important;
+}
+
+.rect-select {
+    width: 140px !important;
+    border-radius: 0 !important;
+    -webkit-appearance:none;
+}
+
 #radioBtn .notActive{
+    color: #3276b1;
+    background-color: #fff;
+}
+
+#radioBtnMode .notActive {
     color: #3276b1;
     background-color: #fff;
 }

@@ -1,13 +1,13 @@
 package com.mogproject.mogami.playground.view
 
-import com.mogproject.mogami.playground.controller.{Cursor, _}
+import com.mogproject.mogami.playground.controller.{Cursor, Controller, Japanese, English, Language}
 import com.mogproject.mogami._
 import com.mogproject.mogami.core.Game.GameStatus
 import com.mogproject.mogami.core.Game.GameStatus.GameStatus
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.controller.mode.{Editing, Mode, Playing, Viewing}
-import com.mogproject.mogami.playground.view.modal.{AlertDialog, YesNoDialog}
+import com.mogproject.mogami.playground.view.modal.{AlertDialog, PromotionDialog, YesNoDialog}
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.{CanvasRenderingContext2D, Element}
@@ -19,7 +19,7 @@ import scalatags.JsDom.all._
 /**
   * controls canvas rendering
   */
-case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
+case class Renderer(elem: Element, layout: Layout) extends CursorManageable with TextRenderer {
 
   // main canvas
   protected val canvas0: Canvas = createCanvas(0)
@@ -43,11 +43,9 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   // forms
   private[this] val recordSelector: HTMLSelectElement = select(
-    cls := "form-control thin-select",
+    cls := "form-control rect-select",
     onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
   ).render
-
-  private[this] val modeLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false).render
 
   private[this] val langLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false).render
 
@@ -56,21 +54,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
       div(cls := "row")(
         div(cls := "navbar-header col-md-10 col-md-offset-1",
           ul(cls := "nav navbar-nav",
-            li(cls := "dropdown",
-              widthA := "60px",
-              modeLabel,
-              ul(cls := "dropdown-menu",
-                li(cls := "dropdown-header", "Mode"),
-                li(a(href := "#", "Play", onclick := (() => Controller.setMode(Playing)))),
-                li(a(href := "#", "View", onclick := (() => Controller.setMode(Viewing)))),
-                li(a(href := "#", "Edit", onclick := (() => Controller.setMode(Editing))))
-              )
-            ),
-            li(cls := "navbar-form",
-              div(cls := "form-group",
-                recordSelector
-              )
-            ),
+            li(ModeChanger.element),
             li(cls := "dropdown pull-right",
               textAlign := "right",
               langLabel,
@@ -105,7 +89,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     )
   ).render
 
-  private[this] def createControlInput(controlType: Int, glyph: String) = button(cls := "btn btn-default",
+  private[this] def createControlInput(controlType: Int, glyph: String) = button(cls := "btn btn-default btn-control",
     onclick := { () => Controller.setControl(controlType) },
     span(cls := s"glyphicon glyphicon-${glyph}", aria.hidden := true)
   ).render
@@ -118,11 +102,14 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
   private[this] val controlSection = div(
     div(
       label("Control"),
-      div(cls := "btn-group btn-group-justified", role := "group", aria.label := "...",
-        div(cls := "btn-group", role := "group", controlInput0),
-        div(cls := "btn-group", role := "group", controlInput1),
-        div(cls := "btn-group", role := "group", controlInput2),
-        div(cls := "btn-group", role := "group", controlInput3)
+      div(cls := "btn-toolbar", role := "toolbar",
+        div(cls := "btn-group", role := "group", aria.label := "...",
+          div(cls := "btn-group", role := "group", controlInput0),
+          div(cls := "btn-group", role := "group", controlInput1),
+          div(cls := "btn-group", role := "group", recordSelector),
+          div(cls := "btn-group", role := "group", controlInput2),
+          div(cls := "btn-group", role := "group", controlInput3)
+        )
       )
     ),
     br(),
@@ -130,6 +117,34 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     br(),
     createInputGroup("Record URL", recordInput, "record")
   ).render
+
+  object ModeChanger {
+    private[this] val anchors: Map[Mode, Element] = Map(
+      Playing -> a(cls := "btn btn-primary thin-btn active", onclick := { () => Controller.setMode(Playing) }, "Play").render,
+      Viewing -> a(cls := "btn btn-primary thin-btn notActive", onclick := { () => Controller.setMode(Viewing) }, "View").render,
+      Editing -> a(cls := "btn btn-primary thin-btn notActive", onclick := { () => Controller.setMode(Editing) }, "Edit").render
+    )
+
+    val element: Div = div(cls := "input-group",
+      div(id := "radioBtn", cls := "btn-group",
+        anchors(Playing),
+        anchors(Viewing),
+        anchors(Editing)
+      )
+    ).render
+
+    def updateModeChangerValue(newValue: Mode): Unit = {
+      anchors.foreach { case (mode, elem) =>
+        if (mode == newValue) {
+          elem.classList.remove("notActive")
+          elem.classList.add("active")
+        } else {
+          elem.classList.remove("active")
+          elem.classList.add("notActive")
+        }
+      }
+    }
+  }
 
   object EditTurn {
     private[this] val anchors: Map[Player, Element] = Map(
@@ -268,6 +283,10 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     layout.board.draw(layer1)
     layout.handWhite.draw(layer1)
     layout.handBlack.draw(layer1)
+    layout.playerBlack.draw(layer1)
+    layout.playerWhite.draw(layer1)
+
+    drawPlayerIcon()
 
     for (i <- 1 to 8) {
       val x = layout.board.left + layout.PIECE_WIDTH * i
@@ -283,6 +302,35 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     }
   }
 
+  def drawPlayerIcon(): Unit = {
+    val ctx = layer0
+    List(("☖", layout.playerIconWhite, true), ("☗", layout.playerIconBlack, false)).foreach { case (t, r, rot) =>
+      drawTextCenter(ctx, t, r.left, r.top, r.width, r.height, layout.font.playerIcon, layout.color.fg, rot)
+    }
+  }
+
+  def clearPlayerIcon(): Unit = {
+    val ctx = layer0
+    List(layout.playerIconWhite, layout.playerIconBlack).foreach(_.clear(ctx))
+  }
+
+  def drawPlayerNames(lang: Language): Unit = {
+    val ctx = layer0
+    val (b, w, font) = lang match {
+      case Japanese => ("先手", "後手", layout.font.playerNameJapanese)
+      case English => ("Black", "White", layout.font.playerNameEnglish)
+    }
+
+    // clear
+    layout.playerNameWhite.clear(ctx)
+    layout.playerNameBlack.clear(ctx)
+
+    // draw
+    List((b, layout.playerNameBlack, false), (w, layout.playerNameWhite, true)).foreach { case (t, r, rot) =>
+      drawTextCenter(ctx, t, r.left, r.top, r.width, r.height, font, layout.color.fg, rot)
+    }
+  }
+
   def drawIndexes(lang: Language): Unit = {
     val ctx = layer3
     val rankIndex = lang match {
@@ -290,32 +338,31 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
       case English => "abcdefghi"
     }
 
-    ctx.fillStyle = layout.color.fg
-
     // clear
     layout.fileIndex.clear(ctx)
     layout.rankIndex.clear(ctx)
 
     // file
-    ctx.font = layout.font.index
     for (i <- 0 until 9) {
-      val x = layout.board.left + layout.PIECE_WIDTH * (8 - i) + 10
-      val y = layout.board.top - 2
-      ctx.fillText("１２３４５６７８９".charAt(i).toString, x, y)
+      val text = "１２３４５６７８９".charAt(i).toString
+      val left = layout.fileIndex.left + layout.PIECE_WIDTH * (8 - i)
+      val top = layout.fileIndex.top
+      drawTextCenter(ctx, text, left, top, layout.PIECE_WIDTH, layout.fileIndex.height, layout.font.numberIndex, layout.color.fg, rotated = false)
     }
 
     //rank
     for (i <- 0 until 9) {
-      val x = layout.board.right + (lang == Japanese).fold(1, 3)
-      val y = layout.board.top + layout.PIECE_HEIGHT * i + 24
-      ctx.fillText(rankIndex.charAt(i).toString, x, y)
+      val text = rankIndex.charAt(i).toString
+      val left = layout.rankIndex.left
+      val top = layout.rankIndex.top + layout.PIECE_HEIGHT * i
+      drawTextCenter(ctx, text, left, top, layout.rankIndex.width, layout.PIECE_HEIGHT, layout.font.numberIndex, layout.color.fg, rotated = false)
     }
   }
 
   def drawPieces(pieceRenderer: PieceRenderer, state: State): Unit = {
     clearPieces()
     state.board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, pc, sq) }
-    state.hand.foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, pc, n) }
+    state.hand.withFilter(_._2 > 0).foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, pc, n) }
   }
 
   def clearPieces(): Unit = {
@@ -328,8 +375,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     clearPieces()
     clearPiecesInBox()
     board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, pc, sq) }
-    hand.foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, pc, n) }
-    box.filter(_._2 > 0).foreach { case (pt, _) => pieceRenderer.drawInBox(layer2, pt) }
+    hand.withFilter(_._2 > 0).foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, pc, n) }
+    box.withFilter(_._2 > 0).foreach { case (pt, n) => pieceRenderer.drawInBox(layer2, pt, n) }
   }
 
   def clearPiecesInBox(): Unit = {
@@ -337,19 +384,35 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
   }
 
   def drawIndicators(turn: Player, status: GameStatus): Unit = {
+    def f(rect: Rectangle, text: String, rotated: Boolean): Unit = {
+      drawTextCenter(layer0, text, rect.left, rect.top, rect.width, rect.height, layout.font.indicator, layout.color.white, rotated)
+    }
+
     status match {
       case GameStatus.Playing =>
-        (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).clear(layer2)
-        (if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.active)
+        (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).clear(layer0)
+        val r = if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite
+        r.drawFill(layer0, layout.color.active)
+        f(r, "TURN", turn.isWhite)
       case GameStatus.Mated =>
-        (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).drawFill(layer2, layout.color.win)
-        (if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.lose)
+        val winner = turn.isBlack.fold(layout.indicatorWhite, layout.indicatorBlack)
+        val loser = turn.isBlack.fold(layout.indicatorBlack, layout.indicatorWhite)
+        winner.drawFill(layer0, layout.color.win)
+        f(winner, "WIN", turn.isBlack)
+        loser.drawFill(layer0, layout.color.lose)
+        f(loser, "LOSE", turn.isWhite)
       case GameStatus.PerpetualCheck | GameStatus.Uchifuzume =>
-        (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).drawFill(layer2, layout.color.lose)
-        (if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.win)
+        val winner = turn.isBlack.fold(layout.indicatorBlack, layout.indicatorWhite)
+        val loser = turn.isBlack.fold(layout.indicatorWhite, layout.indicatorBlack)
+        winner.drawFill(layer0, layout.color.win)
+        f(winner, "WIN", turn.isWhite)
+        loser.drawFill(layer0, layout.color.lose)
+        f(loser, "LOSE", turn.isBlack)
       case GameStatus.Drawn =>
-        layout.indicatorWhite.drawFill(layer2, layout.color.draw)
-        layout.indicatorBlack.drawFill(layer2, layout.color.draw)
+        layout.indicatorWhite.drawFill(layer0, layout.color.draw)
+        layout.indicatorBlack.drawFill(layer0, layout.color.draw)
+        f(layout.indicatorBlack, "DRAW", rotated = false)
+        f(layout.indicatorWhite, "DRAW", rotated = true)
     }
   }
 
@@ -370,10 +433,9 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def hideControlSection(): Unit = controlSection.style.display = "none"
 
-  def askPromote(lang: Language): Boolean = dom.window.confirm(lang match {
-    case Japanese => "成りますか?"
-    case English => "Do you want to promote?"
-  })
+  def askPromote(pieceRenderer: PieceRenderer, lang: Language, piece: Piece, callbackUnpromote: () => Unit, callbackPromote: () => Unit): Unit = {
+    PromotionDialog(lang, piece, pieceRenderer, callbackUnpromote, callbackPromote).show()
+  }
 
   def askConfirm(lang: Language, callback: () => Unit): Unit = {
     val s = lang match {
@@ -395,7 +457,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def updateRecordUrl(url: String): Unit = recordInput.value = url
 
-  def updateMode(mode: Mode): Unit = modeLabel.innerHTML = mode.label + span(cls := "caret").toString()
+  def updateMode(mode: Mode): Unit = ModeChanger.updateModeChangerValue(mode)
 
   def updateLang(lang: Language): Unit = langLabel.innerHTML = lang.label + span(cls := "caret").toString()
 
