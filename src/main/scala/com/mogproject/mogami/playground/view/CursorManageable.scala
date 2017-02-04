@@ -131,7 +131,6 @@ trait CursorManageable {
   //
   def touchStart(evt: TouchEvent): Unit = {
     if (evt.changedTouches.length == 1) {
-      evt.preventDefault()
       mouseDown(evt.changedTouches(0).clientX, evt.changedTouches(0).clientY)
     }
   }
