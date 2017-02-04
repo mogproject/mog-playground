@@ -31,7 +31,7 @@
     padding-bottom: 4px !important;
 }
 
-.thin-select {
+.thin-btn {
     margin-top: 2px !important;
     margin-bottom: 2px !important;
     padding-top: 2px !important;
@@ -50,6 +50,11 @@
 }
 
 #radioBtn .notActive{
+    color: #3276b1;
+    background-color: #fff;
+}
+
+#radioBtnMode .notActive {
     color: #3276b1;
     background-color: #fff;
 }

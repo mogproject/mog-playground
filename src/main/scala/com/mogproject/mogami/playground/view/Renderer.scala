@@ -47,8 +47,6 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
   ).render
 
-  private[this] val modeLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false).render
-
   private[this] val langLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false).render
 
   private[this] val navigator = tag("nav")(cls := "navbar navbar-default navbar-fixed-top",
@@ -56,16 +54,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       div(cls := "row")(
         div(cls := "navbar-header col-md-10 col-md-offset-1",
           ul(cls := "nav navbar-nav",
-            li(cls := "dropdown",
-              widthA := "60px",
-              modeLabel,
-              ul(cls := "dropdown-menu",
-                li(cls := "dropdown-header", "Mode"),
-                li(a(href := "#", "Play", onclick := (() => Controller.setMode(Playing)))),
-                li(a(href := "#", "View", onclick := (() => Controller.setMode(Viewing)))),
-                li(a(href := "#", "Edit", onclick := (() => Controller.setMode(Editing))))
-              )
-            ),
+            li(ModeChanger.element),
             li(cls := "dropdown pull-right",
               textAlign := "right",
               langLabel,
@@ -128,6 +117,34 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     br(),
     createInputGroup("Record URL", recordInput, "record")
   ).render
+
+  object ModeChanger {
+    private[this] val anchors: Map[Mode, Element] = Map(
+      Playing -> a(cls := "btn btn-primary thin-btn active", onclick := { () => Controller.setMode(Playing) }, "Play").render,
+      Viewing -> a(cls := "btn btn-primary thin-btn notActive", onclick := { () => Controller.setMode(Viewing) }, "View").render,
+      Editing -> a(cls := "btn btn-primary thin-btn notActive", onclick := { () => Controller.setMode(Editing) }, "Edit").render
+    )
+
+    val element: Div = div(cls := "input-group",
+      div(id := "radioBtn", cls := "btn-group",
+        anchors(Playing),
+        anchors(Viewing),
+        anchors(Editing)
+      )
+    ).render
+
+    def updateModeChangerValue(newValue: Mode): Unit = {
+      anchors.foreach { case (mode, elem) =>
+        if (mode == newValue) {
+          elem.classList.remove("notActive")
+          elem.classList.add("active")
+        } else {
+          elem.classList.remove("active")
+          elem.classList.add("notActive")
+        }
+      }
+    }
+  }
 
   object EditTurn {
     private[this] val anchors: Map[Player, Element] = Map(
@@ -440,7 +457,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   def updateRecordUrl(url: String): Unit = recordInput.value = url
 
-  def updateMode(mode: Mode): Unit = modeLabel.innerHTML = mode.label + span(cls := "caret").toString()
+  def updateMode(mode: Mode): Unit = ModeChanger.updateModeChangerValue(mode)
 
   def updateLang(lang: Language): Unit = langLabel.innerHTML = lang.label + span(cls := "caret").toString()
 
