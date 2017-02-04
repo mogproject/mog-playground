@@ -268,6 +268,10 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     layout.board.draw(layer1)
     layout.handWhite.draw(layer1)
     layout.handBlack.draw(layer1)
+    layout.playerBlack.draw(layer1)
+    layout.playerWhite.draw(layer1)
+
+    drawPlayerIcon()
 
     for (i <- 1 to 8) {
       val x = layout.board.left + layout.PIECE_WIDTH * i
@@ -280,6 +284,35 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
         Circle(x, layout.board.top + layout.PIECE_HEIGHT * 3, 3).draw(layer1)
         Circle(x, layout.board.top + layout.PIECE_HEIGHT * 6, 3).draw(layer1)
       }
+    }
+  }
+
+  def drawPlayerIcon(): Unit = {
+    val ctx = layer0
+    List(("☖", layout.playerIconWhite, true), ("☗", layout.playerIconBlack, false)).foreach { case (t, r, rot) =>
+      drawTextCenter(ctx, t, r.left, r.top, r.width, r.height, layout.font.playerIcon, layout.color.fg, rot)
+    }
+  }
+
+  def clearPlayerIcon(): Unit = {
+    val ctx = layer0
+    List(layout.playerIconWhite, layout.playerIconBlack).foreach(_.clear(ctx))
+  }
+
+  def drawPlayerNames(lang: Language): Unit = {
+    val ctx = layer0
+    val (b, w, font) = lang match {
+      case Japanese => ("先手", "後手", layout.font.playerNameJapanese)
+      case English => ("Black", "White", layout.font.playerNameEnglish)
+    }
+
+    // clear
+    layout.playerNameWhite.clear(ctx)
+    layout.playerNameBlack.clear(ctx)
+
+    // draw
+    List((b, layout.playerNameBlack, false), (w, layout.playerNameWhite, true)).foreach { case (t, r, rot) =>
+      drawTextCenter(ctx, t, r.left, r.top, r.width, r.height, font, layout.color.fg, rot)
     }
   }
 
@@ -299,7 +332,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       val text = "１２３４５６７８９".charAt(i).toString
       val left = layout.fileIndex.left + layout.PIECE_WIDTH * (8 - i)
       val top = layout.fileIndex.top
-      drawTextCenter(ctx, text, left, top, layout.PIECE_WIDTH, layout.fileIndex.height, layout.font.numberIndex, layout.color.fg, rotated=false)
+      drawTextCenter(ctx, text, left, top, layout.PIECE_WIDTH, layout.fileIndex.height, layout.font.numberIndex, layout.color.fg, rotated = false)
     }
 
     //rank
@@ -307,7 +340,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       val text = rankIndex.charAt(i).toString
       val left = layout.rankIndex.left
       val top = layout.rankIndex.top + layout.PIECE_HEIGHT * i
-      drawTextCenter(ctx, text, left, top, layout.rankIndex.width, layout.PIECE_HEIGHT, layout.font.numberIndex, layout.color.fg, rotated=false)
+      drawTextCenter(ctx, text, left, top, layout.rankIndex.width, layout.PIECE_HEIGHT, layout.font.numberIndex, layout.color.fg, rotated = false)
     }
   }
 
@@ -336,19 +369,35 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   }
 
   def drawIndicators(turn: Player, status: GameStatus): Unit = {
+    def f(rect: Rectangle, text: String, rotated: Boolean): Unit = {
+      drawTextCenter(layer0, text, rect.left, rect.top, rect.width, rect.height, layout.font.indicator, layout.color.white, rotated)
+    }
+
     status match {
       case GameStatus.Playing =>
-        (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).clear(layer2)
-        (if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.active)
+        (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).clear(layer0)
+        val r = if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite
+        r.drawFill(layer0, layout.color.active)
+        f(r, "TURN", turn.isWhite)
       case GameStatus.Mated =>
-        (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).drawFill(layer2, layout.color.win)
-        (if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.lose)
+        val winner = turn.isBlack.fold(layout.indicatorWhite, layout.indicatorBlack)
+        val loser = turn.isBlack.fold(layout.indicatorBlack, layout.indicatorWhite)
+        winner.drawFill(layer0, layout.color.win)
+        f(winner, "WIN", turn.isBlack)
+        loser.drawFill(layer0, layout.color.lose)
+        f(loser, "LOSE", turn.isWhite)
       case GameStatus.PerpetualCheck | GameStatus.Uchifuzume =>
-        (if (turn.isBlack) layout.indicatorWhite else layout.indicatorBlack).drawFill(layer2, layout.color.lose)
-        (if (turn.isBlack) layout.indicatorBlack else layout.indicatorWhite).drawFill(layer2, layout.color.win)
+        val winner = turn.isBlack.fold(layout.indicatorBlack, layout.indicatorWhite)
+        val loser = turn.isBlack.fold(layout.indicatorWhite, layout.indicatorBlack)
+        winner.drawFill(layer0, layout.color.win)
+        f(winner, "WIN", turn.isWhite)
+        loser.drawFill(layer0, layout.color.lose)
+        f(loser, "LOSE", turn.isBlack)
       case GameStatus.Drawn =>
-        layout.indicatorWhite.drawFill(layer2, layout.color.draw)
-        layout.indicatorBlack.drawFill(layer2, layout.color.draw)
+        layout.indicatorWhite.drawFill(layer0, layout.color.draw)
+        layout.indicatorBlack.drawFill(layer0, layout.color.draw)
+        f(layout.indicatorBlack, "DRAW", rotated = false)
+        f(layout.indicatorWhite, "DRAW", rotated = true)
     }
   }
 
@@ -369,7 +418,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   def hideControlSection(): Unit = controlSection.style.display = "none"
 
-  def askPromote(pieceRenderer: PieceRenderer, lang: Language, piece: Piece, callbackUnpromote: () => Unit, callbackPromote: ()=>Unit): Unit = {
+  def askPromote(pieceRenderer: PieceRenderer, lang: Language, piece: Piece, callbackUnpromote: () => Unit, callbackPromote: () => Unit): Unit = {
     PromotionDialog(lang, piece, pieceRenderer, callbackUnpromote, callbackPromote).show()
   }
 

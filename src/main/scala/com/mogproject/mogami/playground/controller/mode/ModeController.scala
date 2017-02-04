@@ -34,6 +34,9 @@ abstract class ModeController(val mode: Mode, val renderer: Renderer, val config
     // clear selection
     renderer.clearSelectedArea()
 
+    // player names
+    renderer.drawPlayerNames(config.lang)
+
     // draw indexes
     renderer.drawIndexes(config.lang)
 

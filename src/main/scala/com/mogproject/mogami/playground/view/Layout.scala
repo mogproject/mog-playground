@@ -14,23 +14,42 @@ case class Layout(canvasWidth: Int) {
   // constants
   lazy val PIECE_WIDTH: Int = scaleByCanvas(107)
   lazy val PIECE_HEIGHT: Int = scaleByCanvas(113)
-  lazy val INDICATOR_HEIGHT: Int = scaleByCanvas(32)
+  lazy val MARGIN_BLOCK: Int = scaleByCanvas(32)
   lazy val MARGIN_TOP: Int = scaleByCanvas(7)
   val MARGIN_BOTTOM: Int = 2
   lazy val MARGIN_LEFT: Int = scaleByCanvas(7)
   lazy val MARGIN_RIGHT: Int = canvasWidth - board.right
   lazy val BOARD_WIDTH: Int = PIECE_WIDTH * 9
   lazy val BOARD_HEIGHT: Int = PIECE_HEIGHT * 9
+  lazy val INDICATOR_HEIGHT: Int = scaleByCanvas(40)
+
+  // sizes
+  val playerAreaWidth: Int = PIECE_WIDTH * 2 - 4
+  lazy val playerIconWidth: Int = scaleByCanvas(64)
+  lazy val playerIconHeight: Int = PIECE_HEIGHT - INDICATOR_HEIGHT - 3
+  lazy val playerNameWidth: Int = playerAreaWidth - playerIconWidth - 2
 
   // rectangles
+  val playerWhite = Rectangle(MARGIN_LEFT + BOARD_WIDTH - PIECE_WIDTH * 2 + 4, MARGIN_TOP, playerAreaWidth, PIECE_HEIGHT)
+  val indicatorWhite = Rectangle(playerWhite.left + 1, playerWhite.top + 1, playerWhite.width - 2, INDICATOR_HEIGHT)
+  val playerIconWhite = Rectangle(playerWhite.right - playerIconWidth, indicatorWhite.bottom + 1, playerIconWidth, playerIconHeight)
+  val playerNameWhite = Rectangle(playerWhite.left + 1, playerIconWhite.top, playerNameWidth, playerIconWhite.height)
+
   val handWhite = Rectangle(MARGIN_LEFT, MARGIN_TOP, BOARD_WIDTH - PIECE_WIDTH * 2, PIECE_HEIGHT)
-  val indicatorWhite = Rectangle(MARGIN_LEFT, handWhite.bottom + 2, BOARD_WIDTH, INDICATOR_HEIGHT)
-  val board = Rectangle(MARGIN_LEFT, indicatorWhite.bottom + 2, BOARD_WIDTH, BOARD_HEIGHT)
-  val indicatorBlack = Rectangle(MARGIN_LEFT, board.bottom + 2, BOARD_WIDTH, INDICATOR_HEIGHT)
-  val handBlack = Rectangle(MARGIN_LEFT + PIECE_WIDTH * 2, indicatorBlack.bottom + 2, BOARD_WIDTH - PIECE_WIDTH * 2, PIECE_HEIGHT)
-  val fileIndex: Rectangle = indicatorWhite
+
+  val fileIndex: Rectangle = Rectangle(MARGIN_LEFT, handWhite.bottom + 2, BOARD_WIDTH, MARGIN_BLOCK)
+
+  val board = Rectangle(MARGIN_LEFT, handWhite.bottom + MARGIN_BLOCK + 2, BOARD_WIDTH, BOARD_HEIGHT)
+
+  val playerBlack = Rectangle(MARGIN_LEFT, board.bottom + MARGIN_BLOCK + 2, playerAreaWidth, PIECE_HEIGHT)
+  val indicatorBlack = Rectangle(playerBlack.left + 1, playerBlack.bottom - INDICATOR_HEIGHT - 1, playerBlack.width - 2, INDICATOR_HEIGHT)
+  val playerIconBlack = Rectangle(playerBlack.left + 1, playerBlack.top + 1, playerIconWidth, playerIconHeight)
+  val playerNameBlack = Rectangle(playerIconBlack.right + 1, playerIconBlack.top, playerNameWidth, playerIconBlack.height)
+
+  val handBlack = Rectangle(MARGIN_LEFT + PIECE_WIDTH * 2, playerBlack.top, BOARD_WIDTH - PIECE_WIDTH * 2, PIECE_HEIGHT)
+
   val rankIndex = Rectangle(board.right + 1, board.top, MARGIN_RIGHT, BOARD_HEIGHT)
-  val pieceBox = Rectangle(MARGIN_LEFT + PIECE_WIDTH, handBlack.bottom + INDICATOR_HEIGHT + 2, BOARD_WIDTH - PIECE_WIDTH, PIECE_HEIGHT)
+  val pieceBox = Rectangle(MARGIN_LEFT + PIECE_WIDTH, handBlack.bottom + MARGIN_BLOCK + 2, BOARD_WIDTH - PIECE_WIDTH, PIECE_HEIGHT)
 
   // fonts
   object font {
@@ -45,6 +64,10 @@ case class Layout(canvasWidth: Int) {
 
     lazy val numberOfPieces = s"${scaleByPiece(PIECE_WIDTH, 383)}pt ${english}"
     lazy val numberIndex = s"${scaleByPiece(PIECE_WIDTH, 236)}pt ${japanese}"
+    lazy val indicator = s"${scaleByCanvas(28)}pt ${english}"
+    lazy val playerIcon = s"${scaleByCanvas(40)}pt ${japanese}"
+    lazy val playerNameJapanese = s"${scaleByCanvas(32)}pt ${japanese}"
+    lazy val playerNameEnglish = s"${scaleByCanvas(32)}pt ${english}"
   }
 
   // colors
@@ -55,13 +78,15 @@ case class Layout(canvasWidth: Int) {
     // background
     val red = "#b22222"
     // promoted pieces
-    val win = "#83ff9d"
+    val win = "#339933"
     val lose = "#ff5843"
     val draw = "#99877a"
     val active = "#45A1CF"
     val cursor = "#E1B265"
     val dark = "#353535"
     val light = "#E0FFFF"
+    // indicator text
+    val white = "#eeeeee"
     val pieceBox = "#cccccc" // background of the piece box
   }
 
