@@ -129,7 +129,12 @@ trait CursorManageable {
   //
   // mouseDown
   //
-  def touchStart(evt: TouchEvent): Unit = mouseDown(evt.changedTouches(0).clientX, evt.changedTouches(0).clientY)
+  def touchStart(evt: TouchEvent): Unit = {
+    if (evt.changedTouches.length == 1) {
+      evt.preventDefault()
+      mouseDown(evt.changedTouches(0).clientX, evt.changedTouches(0).clientY)
+    }
+  }
 
   def mouseDown(evt: MouseEvent): Unit = mouseDown(evt.clientX, evt.clientY)
 
