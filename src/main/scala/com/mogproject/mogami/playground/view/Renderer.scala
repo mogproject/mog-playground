@@ -369,14 +369,9 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   def hideControlSection(): Unit = controlSection.style.display = "none"
 
-  def askPromote(pieceRenderer: PieceRenderer, lang: Language, ptype: Ptype, callbackUnpromote: () => Unit, callbackPromote: ()=>Unit): Unit = {
-    PromotionDialog(lang, ptype, pieceRenderer, callbackUnpromote, callbackPromote).show()
+  def askPromote(pieceRenderer: PieceRenderer, lang: Language, piece: Piece, callbackUnpromote: () => Unit, callbackPromote: ()=>Unit): Unit = {
+    PromotionDialog(lang, piece, pieceRenderer, callbackUnpromote, callbackPromote).show()
   }
-
-  def askPromote(lang: Language): Boolean = dom.window.confirm(lang match {
-    case Japanese => "成りますか?"
-    case English => "Do you want to promote?"
-  })
 
   def askConfirm(lang: Language, callback: () => Unit): Unit = {
     val s = lang match {

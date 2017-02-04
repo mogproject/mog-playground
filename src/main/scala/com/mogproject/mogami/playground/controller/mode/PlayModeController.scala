@@ -69,7 +69,7 @@ case class PlayModeController(override val renderer: Renderer,
               s <- from.left.toOption
               p <- game.currentState.board.get(s)
             } yield {
-              renderer.askPromote(config.pieceRenderer, config.lang, p.ptype,
+              renderer.askPromote(config.pieceRenderer, config.lang, p,
                 () => Controller.update(game.makeMove(MoveBuilderSfen(from, to, promote = false)).map(g => this.copy(game = g))),
                 () => Controller.update(game.makeMove(MoveBuilderSfen(from, to, promote = true)).map(g => this.copy(game = g)))
               )

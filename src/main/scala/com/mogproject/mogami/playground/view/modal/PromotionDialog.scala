@@ -1,8 +1,6 @@
 package com.mogproject.mogami.playground.view.modal
 
-import com.mogproject.mogami.Ptype
-import com.mogproject.mogami.core.Piece
-import com.mogproject.mogami.core.Player.BLACK
+import com.mogproject.mogami.Piece
 import com.mogproject.mogami.playground.controller.{English, Japanese, Language}
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import org.scalajs.dom.CanvasRenderingContext2D
@@ -16,7 +14,7 @@ import scalatags.JsDom.all._
   */
 // todo: draw on canvas
 case class PromotionDialog(lang: Language,
-                           ptype: Ptype,
+                           piece: Piece,
                            pieceRenderer: PieceRenderer,
                            callbackUnpromote: () => Unit,
                            callbackPromote: () => Unit
@@ -86,8 +84,8 @@ case class PromotionDialog(lang: Language,
       dialog.remove()
     })
 
-    pieceRenderer.drawPiece(contextUnpromote, Piece(BLACK, ptype), 0, 0, 2)
-    pieceRenderer.drawPiece(contextPromote, Piece(BLACK, ptype.promoted), 0, 0, 2)
+    pieceRenderer.drawPiece(contextUnpromote, piece, 0, 0, 2)
+    pieceRenderer.drawPiece(contextPromote, piece.promoted, 0, 0, 2)
     dialog.asInstanceOf[BootstrapJQuery].modal("show")
   }
 }
