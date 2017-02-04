@@ -43,7 +43,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   // forms
   private[this] val recordSelector: HTMLSelectElement = select(
-    cls := "form-control thin-select",
+    cls := "form-control rect-select",
     onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
   ).render
 
@@ -64,11 +64,6 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
                 li(a(href := "#", "Play", onclick := (() => Controller.setMode(Playing)))),
                 li(a(href := "#", "View", onclick := (() => Controller.setMode(Viewing)))),
                 li(a(href := "#", "Edit", onclick := (() => Controller.setMode(Editing))))
-              )
-            ),
-            li(cls := "navbar-form",
-              div(cls := "form-group",
-                recordSelector
               )
             ),
             li(cls := "dropdown pull-right",
@@ -105,7 +100,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     )
   ).render
 
-  private[this] def createControlInput(controlType: Int, glyph: String) = button(cls := "btn btn-default",
+  private[this] def createControlInput(controlType: Int, glyph: String) = button(cls := "btn btn-default btn-control",
     onclick := { () => Controller.setControl(controlType) },
     span(cls := s"glyphicon glyphicon-${glyph}", aria.hidden := true)
   ).render
@@ -118,11 +113,14 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   private[this] val controlSection = div(
     div(
       label("Control"),
-      div(cls := "btn-group btn-group-justified", role := "group", aria.label := "...",
-        div(cls := "btn-group", role := "group", controlInput0),
-        div(cls := "btn-group", role := "group", controlInput1),
-        div(cls := "btn-group", role := "group", controlInput2),
-        div(cls := "btn-group", role := "group", controlInput3)
+      div(cls := "btn-toolbar", role := "toolbar",
+        div(cls := "btn-group", role := "group", aria.label := "...",
+          div(cls := "btn-group", role := "group", controlInput0),
+          div(cls := "btn-group", role := "group", controlInput1),
+          div(cls := "btn-group", role := "group", recordSelector),
+          div(cls := "btn-group", role := "group", controlInput2),
+          div(cls := "btn-group", role := "group", controlInput3)
+        )
       )
     ),
     br(),

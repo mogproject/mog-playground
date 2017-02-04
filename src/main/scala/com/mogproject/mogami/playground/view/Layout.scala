@@ -72,21 +72,27 @@ case class Layout(canvasWidth: Int) {
 
   // colors
   object color {
-    val fg = "black"
     // foreground
-    val bg = "#fefdfa"
+    val fg = "black"
+
     // background
-    val red = "#b22222"
+    val bg = "#fefdfa"
+
     // promoted pieces
+    val red = "#b22222"
+
+    // indicators
+    val active = "#3276b1"
     val win = "#339933"
     val lose = "#ff5843"
     val draw = "#99877a"
-    val active = "#45A1CF"
+
     val cursor = "#E1B265"
     val dark = "#353535"
     val light = "#E0FFFF"
+
     // indicator text
-    val white = "#eeeeee"
+    val white = "#ffffff"
     val pieceBox = "#cccccc" // background of the piece box
   }
 
