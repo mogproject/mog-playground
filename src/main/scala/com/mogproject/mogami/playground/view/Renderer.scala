@@ -1,18 +1,20 @@
 package com.mogproject.mogami.playground.view
 
-import com.mogproject.mogami.playground.controller.{Cursor, Controller, Japanese, English, Language}
+import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami._
 import com.mogproject.mogami.core.Game.GameStatus
 import com.mogproject.mogami.core.Game.GameStatus.GameStatus
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.playground.api.Clipboard
+import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller.mode.{Editing, Mode, Playing, Viewing}
-import com.mogproject.mogami.playground.view.modal.{AlertDialog, PromotionDialog, YesNoDialog}
+import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.{CanvasRenderingContext2D, Element}
 import org.scalajs.dom.html.{Canvas, Div}
 import org.scalajs.dom.raw.HTMLSelectElement
+import org.scalajs.jquery.jQuery
 
 import scalatags.JsDom.all._
 
@@ -73,7 +75,6 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   private[this] val snapshotInput = createInput("snapshot")
   private[this] val recordInput = createInput("record")
 
-
   private[this] def createInput(ident: String) = input(
     tpe := "text", id := ident, cls := "form-control", aria.label := "...", readonly := "readonly"
   ).render
@@ -84,10 +85,22 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       inputElem,
       span(
         cls := "input-group-btn",
-        button(cls := "btn btn-default", data("clipboard-target") := s"#${target}", tpe := "button", "Copy!")
+        button(cls := "btn btn-default", data("clipboard-target") := s"#${target}", tpe := "button",
+          data("toggle") := "tooltip", data("trigger") := "manual", data("placement") := "bottom",
+          "Copy!"
+        )
       )
     )
   ).render
+
+  private[this] def setTooltip(elem: Element, message: String): Unit = {
+    jQuery(elem).attr("data-original-title", message).asInstanceOf[BootstrapJQuery].tooltip("show")
+  }
+
+  private[this] def hideTooltip(elem: Element): Unit = {
+    val f = () => jQuery(elem).asInstanceOf[BootstrapJQuery].tooltip("hide").attr("data-original-title", "")
+    dom.window.setTimeout(f, 1000)
+  }
 
   private[this] def createControlInput(controlType: Int, glyph: String) = button(cls := "btn btn-default btn-control",
     onclick := { () => Controller.setControl(controlType) },
@@ -258,8 +271,15 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
     // initialize clipboard.js
     val cp = new Clipboard(".btn")
+    cp.on("success", (e: Event) => {
+      setTooltip(e.trigger, "Copied!")
+      hideTooltip(e.trigger)
+    })
+    cp.on("error", (e: Event) => {
+      setTooltip(e.trigger, "Failed!")
+      hideTooltip(e.trigger)
+    })
 
-    // todo: show tooptip @see http://stackoverflow.com/questions/37381640/tooltips-highlight-animation-with-clipboard-js-click/37395225
   }
 
   private[this] def createCanvas(zIndexVal: Int): Canvas = {
