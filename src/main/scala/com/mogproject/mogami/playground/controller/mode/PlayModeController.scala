@@ -64,8 +64,18 @@ case class PlayModeController(override val renderer: Renderer,
           case Some(PromotionFlag.CannotPromote) => game.makeMove(MoveBuilderSfen(from, to, promote = false))
           case Some(PromotionFlag.CanPromote) =>
             val tempMv = MoveBuilderSfen(from, to, promote = false).toMove(game.currentState)
-            renderer.drawLastMove(tempMv)
-            game.makeMove(MoveBuilderSfen(from, to, renderer.askPromote(config.lang)))
+
+            for {
+              s <- from.left.toOption
+              p <- game.currentState.board.get(s)
+            } yield {
+              renderer.askPromote(config.pieceRenderer, config.lang, p.ptype,
+                () => Controller.update(game.makeMove(MoveBuilderSfen(from, to, promote = false)).map(g => this.copy(game = g))),
+                () => Controller.update(game.makeMove(MoveBuilderSfen(from, to, promote = true)).map(g => this.copy(game = g)))
+              )
+            }
+            None
+
           case Some(PromotionFlag.MustPromote) => game.makeMove(MoveBuilderSfen(from, to, promote = true))
           case None => None
         }

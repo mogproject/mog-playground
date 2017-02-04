@@ -32,7 +32,7 @@ case class AlertDialog(lang: Language, message: TypedTag[Element]) {
           ),
 
           // body
-          div(cls := "modal-body", p(message)),
+          div(cls := "modal-body", message),
 
           // footer
           div(cls := "modal-footer",

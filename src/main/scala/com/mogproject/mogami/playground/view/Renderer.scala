@@ -1,13 +1,13 @@
 package com.mogproject.mogami.playground.view
 
-import com.mogproject.mogami.playground.controller.{Cursor, _}
+import com.mogproject.mogami.playground.controller.{Cursor, Controller, Japanese, English, Language}
 import com.mogproject.mogami._
 import com.mogproject.mogami.core.Game.GameStatus
 import com.mogproject.mogami.core.Game.GameStatus.GameStatus
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.controller.mode.{Editing, Mode, Playing, Viewing}
-import com.mogproject.mogami.playground.view.modal.{AlertDialog, YesNoDialog}
+import com.mogproject.mogami.playground.view.modal.{AlertDialog, PromotionDialog, YesNoDialog}
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.{CanvasRenderingContext2D, Element}
@@ -19,7 +19,7 @@ import scalatags.JsDom.all._
 /**
   * controls canvas rendering
   */
-case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
+case class Renderer(elem: Element, layout: Layout) extends CursorManageable with TextRenderer {
 
   // main canvas
   protected val canvas0: Canvas = createCanvas(0)
@@ -290,32 +290,31 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
       case English => "abcdefghi"
     }
 
-    ctx.fillStyle = layout.color.fg
-
     // clear
     layout.fileIndex.clear(ctx)
     layout.rankIndex.clear(ctx)
 
     // file
-    ctx.font = layout.font.index
     for (i <- 0 until 9) {
-      val x = layout.board.left + layout.PIECE_WIDTH * (8 - i) + 10
-      val y = layout.board.top - 2
-      ctx.fillText("１２３４５６７８９".charAt(i).toString, x, y)
+      val text = "１２３４５６７８９".charAt(i).toString
+      val left = layout.fileIndex.left + layout.PIECE_WIDTH * (8 - i)
+      val top = layout.fileIndex.top
+      drawTextCenter(ctx, text, left, top, layout.PIECE_WIDTH, layout.fileIndex.height, layout.font.numberIndex, layout.color.fg, rotated=false)
     }
 
     //rank
     for (i <- 0 until 9) {
-      val x = layout.board.right + (lang == Japanese).fold(1, 3)
-      val y = layout.board.top + layout.PIECE_HEIGHT * i + 24
-      ctx.fillText(rankIndex.charAt(i).toString, x, y)
+      val text = rankIndex.charAt(i).toString
+      val left = layout.rankIndex.left
+      val top = layout.rankIndex.top + layout.PIECE_HEIGHT * i
+      drawTextCenter(ctx, text, left, top, layout.rankIndex.width, layout.PIECE_HEIGHT, layout.font.numberIndex, layout.color.fg, rotated=false)
     }
   }
 
   def drawPieces(pieceRenderer: PieceRenderer, state: State): Unit = {
     clearPieces()
     state.board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, pc, sq) }
-    state.hand.foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, pc, n) }
+    state.hand.withFilter(_._2 > 0).foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, pc, n) }
   }
 
   def clearPieces(): Unit = {
@@ -328,8 +327,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     clearPieces()
     clearPiecesInBox()
     board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, pc, sq) }
-    hand.foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, pc, n) }
-    box.filter(_._2 > 0).foreach { case (pt, _) => pieceRenderer.drawInBox(layer2, pt) }
+    hand.withFilter(_._2 > 0).foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, pc, n) }
+    box.withFilter(_._2 > 0).foreach { case (pt, n) => pieceRenderer.drawInBox(layer2, pt, n) }
   }
 
   def clearPiecesInBox(): Unit = {
@@ -369,6 +368,10 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
   def showControlSection(): Unit = controlSection.style.display = "block"
 
   def hideControlSection(): Unit = controlSection.style.display = "none"
+
+  def askPromote(pieceRenderer: PieceRenderer, lang: Language, ptype: Ptype, callbackUnpromote: () => Unit, callbackPromote: ()=>Unit): Unit = {
+    PromotionDialog(lang, ptype, pieceRenderer, callbackUnpromote, callbackPromote).show()
+  }
 
   def askPromote(lang: Language): Boolean = dom.window.confirm(lang match {
     case Japanese => "成りますか?"

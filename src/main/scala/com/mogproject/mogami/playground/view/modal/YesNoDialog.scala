@@ -38,7 +38,7 @@ case class YesNoDialog(lang: Language, message: TypedTag[Element], callback: () 
           ),
 
           // body
-          div(cls := "modal-body", p(message)),
+          div(cls := "modal-body", message),
 
           // footer
           div(cls := "modal-footer",
