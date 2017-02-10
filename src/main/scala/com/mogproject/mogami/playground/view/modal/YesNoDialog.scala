@@ -1,6 +1,7 @@
 package com.mogproject.mogami.playground.view.modal
 
 import com.mogproject.mogami.playground.controller.{English, Japanese, Language}
+import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import org.scalajs.dom.html.{Div, Element}
 
 import scalatags.JsDom.all._
