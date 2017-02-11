@@ -56,6 +56,7 @@ case class Layout(canvasWidth: Int) {
   object font {
     private[this] val japanese = """"游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "HG明朝E", "ＭＳ Ｐ明朝", "ＭＳ 明朝", serif"""
     private[this] val english = "Times, serif"
+    private[this] val menu = "Helvetica Neue"
 
     def pentagon(pieceWidth: Int = PIECE_WIDTH): String = s"${scaleByPiece(pieceWidth, 706)}pt ${japanese}"
 
@@ -65,10 +66,11 @@ case class Layout(canvasWidth: Int) {
 
     lazy val numberOfPieces = s"${scaleByPiece(PIECE_WIDTH, 383)}pt ${english}"
     lazy val numberIndex = s"${scaleByPiece(PIECE_WIDTH, 236)}pt ${japanese}"
-    lazy val indicator = s"${scaleByCanvas(28)}pt ${english}"
+    lazy val indicator = s"${scaleByCanvas(28)}pt ${menu}"
     lazy val playerIcon = s"${scaleByCanvas(40)}pt ${japanese}"
     lazy val playerNameJapanese = s"${scaleByCanvas(32)}pt ${japanese}"
     lazy val playerNameEnglish = s"${scaleByCanvas(32)}pt ${english}"
+    lazy val pieceBoxLabel = s"${scaleByCanvas(28)}pt ${menu}"
   }
 
   // colors
