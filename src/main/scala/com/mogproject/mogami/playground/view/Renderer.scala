@@ -116,7 +116,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   private[this] val controlSection = div(
     div(
-//      label("Control"), // no label to create more space
+      label("Control"),
       div(cls := "btn-toolbar", role := "toolbar",
         div(cls := "btn-group", role := "group", aria.label := "...",
           div(cls := "btn-group", role := "group", controlInput0),
@@ -303,10 +303,12 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   def expandCanvas(): Unit = {
     canvasContainer.style.height = layout.canvasHeight + "px"
+    canvases.foreach(_.height = layout.canvasHeight)
   }
 
   def contractCanvas(): Unit = {
     canvasContainer.style.height = layout.canvasHeightCompact + "px"
+    canvases.foreach(_.height = layout.canvasHeightCompact)
   }
 
   def drawBoard(): Unit = {
