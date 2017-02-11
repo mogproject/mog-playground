@@ -116,7 +116,7 @@ trait GameController extends ModeController {
     renderer.updateRecordIndex(displayPosition)
 
     // backward/forward
-    val canMoveBackward = game.moves.nonEmpty && displayPosition != 0
+    val canMoveBackward = displayPosition != 0
     val canMoveForward = 0 <= displayPosition && displayPosition < renderer.getMaxRecordIndex
     renderer.updateControlBar(canMoveBackward, canMoveBackward, canMoveForward, canMoveForward)
   }
