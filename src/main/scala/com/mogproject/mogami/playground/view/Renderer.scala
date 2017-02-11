@@ -449,7 +449,10 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   }
 
   def drawPieceBox(): Unit = {
-    layout.pieceBox.draw(layer1, layout.color.pieceBox, 3)
+    val r = layout.pieceBox
+    r.draw(layer1, layout.color.pieceBox, 3)
+    drawTextCenter(layer1, "UNUSED PIECES", r.left, r.top - layout.MARGIN_BLOCK, r.width, layout.MARGIN_BLOCK * 3 / 2,
+      layout.font.pieceBoxLabel, layout.color.fg)
   }
 
   def hidePieceBox(): Unit = {
@@ -523,10 +526,9 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     updateRecordIndex(-1)
   }
 
-  def updateRecordIndex(index: Int): Unit = {
-    val maxValue = recordSelector.options.length - 1
-    recordSelector.selectedIndex = (index < 0).fold(maxValue, math.min(index, maxValue))
-  }
+  def getRecordIndex(index: Int): Int = (index < 0).fold(getMaxRecordIndex, math.min(index, getMaxRecordIndex))
+
+  def updateRecordIndex(index: Int): Unit = recordSelector.selectedIndex = getRecordIndex(index)
 
   def getMaxRecordIndex: Int = recordSelector.options.length - 1
 
