@@ -27,6 +27,7 @@ case class EditModeController(renderer: Renderer,
     super.initialize()
     renderer.hideControlSection()
     renderer.expandCanvas()
+    renderer.drawBoard()
     renderer.showEditSection()
     renderer.updateRecordContent(Game(), config.lang)
     renderer.drawPieceBox()
@@ -39,6 +40,7 @@ case class EditModeController(renderer: Renderer,
     renderer.hideEditSection()
     renderer.hidePieceBox()
     renderer.contractCanvas()
+    renderer.drawBoard()
   }
 
   override def renderAll(): Unit = {
