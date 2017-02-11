@@ -1,16 +1,20 @@
 package com.mogproject.mogami.playground.controller.mode
 
-import com.mogproject.mogami.{Game, Player, State}
+import com.mogproject.mogami.{Player, State}
 import com.mogproject.mogami.playground.controller.{Configuration, Cursor, Language}
 import com.mogproject.mogami.playground.view.Renderer
-import com.mogproject.mogami.util.Implicits._
 
-import scala.scalajs.js.URIUtils.encodeURIComponent
 
 /**
   *
   */
-abstract class ModeController(val mode: Mode, val renderer: Renderer, val config: Configuration) {
+trait ModeController {
+
+  def mode: Mode
+
+  def renderer: Renderer
+
+  def config: Configuration
 
   // rendering
   /**
@@ -65,20 +69,5 @@ abstract class ModeController(val mode: Mode, val renderer: Renderer, val config
   def setEditTurn(turn: Player): Option[ModeController] = None
 
   def setEditInitialState(initialState: State): Option[ModeController] = None
-
-  // helper methods
-  protected def renderUrls(game: Game, position: Int = -1): Unit = {
-    val st = (position < 0).fold(game.currentState, game.history(position))
-    val isLatestState = position < 0 || position == game.moves.length
-
-    val configParams = config.toQueryParameters
-    val moveParams = isLatestState.fold(List.empty, List(s"move=${position}"))
-
-    val snapshot = ("sfen=" + encodeURIComponent(Game(st).toSfenString)) +: configParams
-    val record = (("sfen=" + encodeURIComponent(game.toSfenString)) +: configParams) ++ moveParams
-
-    renderer.updateSnapshotUrl(s"${config.baseUrl}?${snapshot.mkString("&")}")
-    renderer.updateRecordUrl(s"${config.baseUrl}?${record.mkString("&")}")
-  }
 
 }

@@ -13,13 +13,15 @@ import scala.util.{Failure, Success, Try}
 /**
   * Edit mode
   */
-case class EditModeController(override val renderer: Renderer,
-                              override val config: Configuration,
+case class EditModeController(renderer: Renderer,
+                              config: Configuration,
                               turn: Player,
                               board: BoardType,
                               hand: HandType,
                               box: Map[Ptype, Int]
-                             ) extends ModeController(Editing, renderer, config) {
+                             ) extends ModeController {
+
+  val mode: Mode = Editing
 
   override def initialize(): Unit = {
     super.initialize()
@@ -114,7 +116,7 @@ case class EditModeController(override val renderer: Renderer,
     Try(State(turn, board, hand, None)) match {
       case Success(st) =>
         nextMode match {
-          case Playing => Some(PlayModeController(renderer, config, Game(st)))
+          case Playing => Some(PlayModeController(renderer, config, Game(st), -1))
           case Viewing => Some(ViewModeController(renderer, config, Game(st), -1))
           case Editing => None
         }
