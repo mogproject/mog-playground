@@ -253,7 +253,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   private[this] def initialize(): Unit = {
     elem.appendChild(div(cls := "container",
       div(cls := "row navbar",
-        div(cls := "col-md-12", navigator)
+        navigator
       ),
       div(cls := "row",
         canvasContainer,
@@ -287,7 +287,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   private[this] def createCanvas(zIndexVal: Int): Canvas = {
     canvas(
       widthA := layout.canvasWidth,
-      heightA := layout.canvasHeight,
+      heightA := layout.canvasHeightCompact,
       marginLeft := "auto",
       marginRight := "auto",
       left := 0,

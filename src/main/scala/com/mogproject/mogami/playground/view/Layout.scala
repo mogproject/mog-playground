@@ -17,7 +17,7 @@ case class Layout(canvasWidth: Int) {
   lazy val PIECE_HEIGHT: Int = scaleByCanvas(113)
   lazy val MARGIN_BLOCK: Int = scaleByCanvas(32)
   lazy val MARGIN_TOP: Int = scaleByCanvas(7)
-  val MARGIN_BOTTOM: Int = 10
+  val MARGIN_BOTTOM: Int = 2
   lazy val MARGIN_LEFT: Int = scaleByCanvas(7)
   lazy val MARGIN_RIGHT: Int = canvasWidth - board.right
   lazy val BOARD_WIDTH: Int = PIECE_WIDTH * 9
