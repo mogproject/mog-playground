@@ -38,7 +38,7 @@ case class EditModeController(renderer: Renderer,
     super.terminate()
     renderer.showControlSection()
     renderer.hideEditSection()
-    renderer.hidePieceBox()
+//    renderer.hidePieceBox() // not necessary
     renderer.contractCanvas()
     renderer.drawBoard()
   }

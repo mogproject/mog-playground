@@ -17,7 +17,7 @@ case class Layout(canvasWidth: Int) {
   lazy val PIECE_HEIGHT: Int = scaleByCanvas(113)
   lazy val MARGIN_BLOCK: Int = scaleByCanvas(32)
   lazy val MARGIN_TOP: Int = scaleByCanvas(7)
-  val MARGIN_BOTTOM: Int = 10
+  val MARGIN_BOTTOM: Int = 2
   lazy val MARGIN_LEFT: Int = scaleByCanvas(7)
   lazy val MARGIN_RIGHT: Int = canvasWidth - board.right
   lazy val BOARD_WIDTH: Int = PIECE_WIDTH * 9
@@ -56,6 +56,7 @@ case class Layout(canvasWidth: Int) {
   object font {
     private[this] val japanese = """"游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "HG明朝E", "ＭＳ Ｐ明朝", "ＭＳ 明朝", serif"""
     private[this] val english = "Times, serif"
+    private[this] val menu = "Helvetica Neue"
 
     def pentagon(pieceWidth: Int = PIECE_WIDTH): String = s"${scaleByPiece(pieceWidth, 706)}pt ${japanese}"
 
@@ -65,10 +66,11 @@ case class Layout(canvasWidth: Int) {
 
     lazy val numberOfPieces = s"${scaleByPiece(PIECE_WIDTH, 383)}pt ${english}"
     lazy val numberIndex = s"${scaleByPiece(PIECE_WIDTH, 236)}pt ${japanese}"
-    lazy val indicator = s"${scaleByCanvas(28)}pt ${english}"
+    lazy val indicator = s"${scaleByCanvas(28)}pt ${menu}"
     lazy val playerIcon = s"${scaleByCanvas(40)}pt ${japanese}"
     lazy val playerNameJapanese = s"${scaleByCanvas(32)}pt ${japanese}"
     lazy val playerNameEnglish = s"${scaleByCanvas(32)}pt ${english}"
+    lazy val pieceBoxLabel = s"${scaleByCanvas(28)}pt ${menu}"
   }
 
   // colors
