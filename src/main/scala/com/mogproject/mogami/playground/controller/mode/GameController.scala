@@ -56,14 +56,13 @@ trait GameController extends ModeController {
   override def setMode(nextMode: Mode): Option[ModeController] = nextMode match {
     case Playing if mode == Viewing => Some(PlayModeController(renderer, config, game, displayPosition))
     case Viewing if mode == Playing => Some(ViewModeController(renderer, config, game, displayPosition))
-    case Editing if game.moves.isEmpty =>
-      val st = game.currentState
-      Some(EditModeController(renderer, config, st.turn, st.board, st.hand, st.getUnusedPtypeCount))
     case Editing =>
-      val st = game.currentState
+      val st = selectedState
       val mc = Some(EditModeController(renderer, config, st.turn, st.board, st.hand, st.getUnusedPtypeCount))
-      renderer.askConfirm(config.lang, () => Controller.update(mc))
-      None
+      game.moves.isEmpty.fold(mc, {
+        renderer.askConfirm(config.lang, () => Controller.update(mc))
+        None
+      })
   }
 
   /**
@@ -82,6 +81,7 @@ trait GameController extends ModeController {
 
   /**
     * Change the display position by backward/forward buttons
+    *
     * @param controlType 0: |<-, 1: <-, 2: ->, 3: ->|
     */
   override def setControl(controlType: Int): Option[ModeController] = {
