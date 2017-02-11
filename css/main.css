@@ -44,7 +44,7 @@
 }
 
 .rect-select {
-    width: 140px !important;
+    width: 160px !important;
     border-radius: 0 !important;
     -webkit-appearance:none;
 }
@@ -59,14 +59,18 @@
     background-color: #fff;
 }
 
+body {
+    /* disables selection */
+    user-select: none; /* CSS3 */
+    -moz-user-select: none; /* Firefox */
+    -webkit-user-select: none; /* Safari/Chrome */
+    -ms-user-select: none; /* IE10 */
+}
+
 div {
     position: relative;
 }
 
 canvas {
     position: absolute;
-    user-select: none; /* CSS3 */
-    -moz-user-select: none; /* Firefox */
-    -webkit-user-select: none; /* Safari/Chrome */
-    -ms-user-select: none; /* IE10 */
 }
