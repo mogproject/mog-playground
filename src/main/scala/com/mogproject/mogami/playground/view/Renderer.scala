@@ -8,6 +8,7 @@ import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller.mode.{Editing, Mode, Playing, Viewing}
+import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom

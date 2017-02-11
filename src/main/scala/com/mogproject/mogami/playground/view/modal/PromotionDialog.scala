@@ -2,6 +2,7 @@ package com.mogproject.mogami.playground.view.modal
 
 import com.mogproject.mogami.Piece
 import com.mogproject.mogami.playground.controller.{English, Japanese, Language}
+import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import org.scalajs.dom.CanvasRenderingContext2D
 import org.scalajs.dom.html.{Canvas, Div}

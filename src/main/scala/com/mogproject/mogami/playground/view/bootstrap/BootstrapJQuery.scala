@@ -1,10 +1,8 @@
-package com.mogproject.mogami.playground.view.modal
+package com.mogproject.mogami.playground.view.bootstrap
 
 import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
-
-// todo: move to another package
 
 @js.native
 trait BootstrapJQuery extends JQuery {
