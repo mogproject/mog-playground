@@ -6,6 +6,7 @@ package com.mogproject.mogami.playground.view
 case class Layout(canvasWidth: Int) {
 
   lazy val canvasHeight: Int = pieceBox.bottom + MARGIN_BOTTOM
+  lazy val canvasHeightCompact: Int = handBlack.bottom + MARGIN_BOTTOM
 
   def scaleByCanvas(x: Int): Int = canvasWidth * x / 1000
 
