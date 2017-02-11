@@ -489,22 +489,26 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     }
 
     val xs = game.moves.zipWithIndex.map { case (m, i) =>
-      (Some(i + 1), game.history(i).turn.toSymbolString + f(m))
+      s"${i + 1}: ${game.history(i).turn.toSymbolString + f(m)}"
+    }.toList
+    val prefix = lng match {
+      case Japanese => "初期局面"
+      case English => "Start"
     }
-    val additional = (game.status, lng) match {
-      case (GameStatus.Mated, Japanese) => List((None, "詰み"))
-      case (GameStatus.Drawn, Japanese) => List((None, "千日手"))
-      case (GameStatus.PerpetualCheck, Japanese) => List((None, "連続王手の千日手"))
-      case (GameStatus.Uchifuzume, Japanese) => List((None, "打ち歩詰め"))
-      case (GameStatus.Mated, English) => List((None, "Mated"))
-      case (GameStatus.Drawn, English) => List((None, "Drawn"))
-      case (GameStatus.PerpetualCheck, English) => List((None, "Perpetual Check"))
-      case (GameStatus.Uchifuzume, English) => List((None, "Uchifuzume"))
+    val suffix = (game.status, lng) match {
+      case (GameStatus.Mated, Japanese) => List("詰み")
+      case (GameStatus.Drawn, Japanese) => List("千日手")
+      case (GameStatus.PerpetualCheck, Japanese) => List("連続王手の千日手")
+      case (GameStatus.Uchifuzume, Japanese) => List("打ち歩詰め")
+      case (GameStatus.Mated, English) => List("Mated")
+      case (GameStatus.Drawn, English) => List("Drawn")
+      case (GameStatus.PerpetualCheck, English) => List("Perpetual Check")
+      case (GameStatus.Uchifuzume, English) => List("Uchifuzume")
       case (GameStatus.Playing, _) => List()
     }
-    val ys = ((Some(0), "-") +: xs) ++ additional
+    val ys = prefix :: xs ++ suffix
 
-    recordSelector.innerHTML = ys.map { case (o, s) => option(o.map(n => s"${n}: ").getOrElse("") + s).toString() }.mkString
+    recordSelector.innerHTML = ys.map(s => option(s)).mkString
     updateRecordIndex(-1)
   }
 
