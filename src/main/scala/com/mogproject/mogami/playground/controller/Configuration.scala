@@ -11,7 +11,9 @@ case class Configuration(screenWidth: Double = 375.0,
                          baseUrl: String = ""
                         ) {
   val layout: Layout = screenWidth match {
-    case x if x >= 375.0 => Layout(375)
+    case x if x >= 1024.0 => Layout(400)
+    case x if x >= 400.0 => Layout(375)
+    case x if x >= 375.0 => Layout(336)
     case _ => Layout(320)
   }
 

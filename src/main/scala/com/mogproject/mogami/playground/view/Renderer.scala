@@ -29,6 +29,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   protected val canvas1: Canvas = createCanvas(1)
   protected val canvas2: Canvas = createCanvas(2)
   protected val canvas3: Canvas = createCanvas(3)
+  protected val canvases: List[Canvas] = List(canvas0, canvas1, canvas2, canvas3)
 
   protected val layer0: CanvasRenderingContext2D = canvas0.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
   protected val layer1: CanvasRenderingContext2D = canvas1.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
@@ -37,7 +38,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   private[this] val canvasContainer: Div = div(cls := "col-md-6",
     padding := 0,
-    height := layout.canvasHeight,
+    height := layout.canvasHeightCompact,
     canvas0,
     canvas1,
     canvas2,
@@ -115,7 +116,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   private[this] val controlSection = div(
     div(
-      label("Control"),
+//      label("Control"), // no label to create more space
       div(cls := "btn-toolbar", role := "toolbar",
         div(cls := "btn-group", role := "group", aria.label := "...",
           div(cls := "btn-group", role := "group", controlInput0),
@@ -299,6 +300,14 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   def hasTouchEvent: Boolean = dom.window.hasOwnProperty("ontouchstart")
 
   def setEventListener[A](eventType: String, f: A => Unit): Unit = canvasContainer.addEventListener(eventType, f, useCapture = false)
+
+  def expandCanvas(): Unit = {
+    canvasContainer.style.height = layout.canvasHeight + "px"
+  }
+
+  def contractCanvas(): Unit = {
+    canvasContainer.style.height = layout.canvasHeightCompact + "px"
+  }
 
   def drawBoard(): Unit = {
     layout.board.draw(layer1)
@@ -489,22 +498,26 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     }
 
     val xs = game.moves.zipWithIndex.map { case (m, i) =>
-      (Some(i + 1), game.history(i).turn.toSymbolString + f(m))
+      s"${i + 1}: ${game.history(i).turn.toSymbolString + f(m)}"
+    }.toList
+    val prefix = lng match {
+      case Japanese => "初期局面"
+      case English => "Start"
     }
-    val additional = (game.status, lng) match {
-      case (GameStatus.Mated, Japanese) => List((None, "詰み"))
-      case (GameStatus.Drawn, Japanese) => List((None, "千日手"))
-      case (GameStatus.PerpetualCheck, Japanese) => List((None, "連続王手の千日手"))
-      case (GameStatus.Uchifuzume, Japanese) => List((None, "打ち歩詰め"))
-      case (GameStatus.Mated, English) => List((None, "Mated"))
-      case (GameStatus.Drawn, English) => List((None, "Drawn"))
-      case (GameStatus.PerpetualCheck, English) => List((None, "Perpetual Check"))
-      case (GameStatus.Uchifuzume, English) => List((None, "Uchifuzume"))
+    val suffix = (game.status, lng) match {
+      case (GameStatus.Mated, Japanese) => List("詰み")
+      case (GameStatus.Drawn, Japanese) => List("千日手")
+      case (GameStatus.PerpetualCheck, Japanese) => List("連続王手の千日手")
+      case (GameStatus.Uchifuzume, Japanese) => List("打ち歩詰め")
+      case (GameStatus.Mated, English) => List("Mated")
+      case (GameStatus.Drawn, English) => List("Drawn")
+      case (GameStatus.PerpetualCheck, English) => List("Perpetual Check")
+      case (GameStatus.Uchifuzume, English) => List("Uchifuzume")
       case (GameStatus.Playing, _) => List()
     }
-    val ys = ((Some(0), "-") +: xs) ++ additional
+    val ys = prefix :: xs ++ suffix
 
-    recordSelector.innerHTML = ys.map { case (o, s) => option(o.map(n => s"${n}: ").getOrElse("") + s).toString() }.mkString
+    recordSelector.innerHTML = ys.map(s => option(s)).mkString
     updateRecordIndex(-1)
   }
 
