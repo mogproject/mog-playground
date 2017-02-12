@@ -1,11 +1,13 @@
 package com.mogproject.mogami.playground.view.piece
 
 import com.mogproject.mogami.core.Player.BLACK
-import com.mogproject.mogami.playground.view.TextRenderer
+import com.mogproject.mogami.playground.view.{Layout, TextRenderer}
 import com.mogproject.mogami.{Hand, Piece, Ptype, Square}
 import org.scalajs.dom.CanvasRenderingContext2D
 
-trait PieceRenderer extends TextRenderer {
+trait PieceRenderer {
+
+  def layout: Layout
 
   def drawPiece(ctx: CanvasRenderingContext2D, piece: Piece, left: Int, top: Int, scale: Int = 1): Unit
 
@@ -17,8 +19,8 @@ trait PieceRenderer extends TextRenderer {
 
   private[this] def drawNumbers(ctx: CanvasRenderingContext2D, n: Int, left: Int, top: Int, rotated: Boolean): Unit = {
     if (n > 1) {
-      drawTextBottomRight(ctx, n.toString, left, top, layout.PIECE_WIDTH, layout.PIECE_HEIGHT,
-        layout.font.numberOfPieces, layout.color.red, rotated, -2, -2)
+      TextRenderer(ctx, n.toString, layout.font.numberOfPieces, layout.color.cursor, left, top, layout.PIECE_WIDTH, layout.PIECE_HEIGHT)
+        .alignRight.alignBottom.withRotate(rotated).withStroke(layout.color.fg, 4).render()
     }
   }
 

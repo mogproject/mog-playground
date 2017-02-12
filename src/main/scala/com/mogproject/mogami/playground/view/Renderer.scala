@@ -22,7 +22,7 @@ import scalatags.JsDom.all._
 /**
   * controls canvas rendering
   */
-case class Renderer(elem: Element, layout: Layout) extends CursorManageable with TextRenderer {
+case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   // main canvas
   protected val canvas0: Canvas = createCanvas(0)
@@ -337,7 +337,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   def drawPlayerIcon(): Unit = {
     val ctx = layer0
     List(("☖", layout.playerIconWhite, true), ("☗", layout.playerIconBlack, false)).foreach { case (t, r, rot) =>
-      drawTextCenter(ctx, t, r.left, r.top, r.width, r.height, layout.font.playerIcon, layout.color.fg, rot)
+      TextRenderer(ctx, t, layout.font.playerIcon, layout.color.fg, r.left, r.top, r.width, r.height)
+        .alignCenter.alignMiddle.withRotate(rot).render()
     }
   }
 
@@ -359,7 +360,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
     // draw
     List((b, layout.playerNameBlack, false), (w, layout.playerNameWhite, true)).foreach { case (t, r, rot) =>
-      drawTextCenter(ctx, t, r.left, r.top, r.width, r.height, font, layout.color.fg, rot)
+      TextRenderer(ctx, t, font, layout.color.fg, r.left, r.top, r.width, r.height)
+        .alignCenter.alignMiddle.withRotate(rot).render()
     }
   }
 
@@ -379,7 +381,9 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       val text = "１２３４５６７８９".charAt(i).toString
       val left = layout.fileIndex.left + layout.PIECE_WIDTH * (8 - i)
       val top = layout.fileIndex.top
-      drawTextCenter(ctx, text, left, top, layout.PIECE_WIDTH, layout.fileIndex.height, layout.font.numberIndex, layout.color.fg, rotated = false)
+
+      TextRenderer(ctx, text, layout.font.numberIndex, layout.color.fg, left, top, layout.PIECE_WIDTH, layout.fileIndex.height)
+        .alignCenter.alignMiddle.render()
     }
 
     //rank
@@ -387,7 +391,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       val text = rankIndex.charAt(i).toString
       val left = layout.rankIndex.left
       val top = layout.rankIndex.top + layout.PIECE_HEIGHT * i
-      drawTextCenter(ctx, text, left, top, layout.rankIndex.width, layout.PIECE_HEIGHT, layout.font.numberIndex, layout.color.fg, rotated = false)
+      TextRenderer(ctx, text, layout.font.numberIndex, layout.color.fg, left, top, layout.rankIndex.width, layout.PIECE_HEIGHT)
+        .alignCenter.alignMiddle.render()
     }
   }
 
@@ -399,8 +404,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   def clearPieces(): Unit = {
     layout.board.clear(layer2)
-    layout.handWhite.clear(layer2)
-    layout.handBlack.clear(layer2)
+    layout.handWhite.clear(layer2, -4)
+    layout.handBlack.clear(layer2, -4)
   }
 
   def drawEditingPieces(pieceRenderer: PieceRenderer, board: BoardType, hand: HandType, box: Map[Ptype, Int]): Unit = {
@@ -412,12 +417,13 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   }
 
   def clearPiecesInBox(): Unit = {
-    layout.pieceBox.clear(layer2)
+    layout.pieceBox.clear(layer2, -4)
   }
 
   def drawIndicators(turn: Player, status: GameStatus): Unit = {
-    def f(rect: Rectangle, text: String, rotated: Boolean): Unit = {
-      drawTextCenter(layer0, text, rect.left, rect.top, rect.width, rect.height, layout.font.indicator, layout.color.white, rotated)
+    def f(r: Rectangle, text: String, rotated: Boolean): Unit = {
+      TextRenderer(layer0, text, layout.font.indicator, layout.color.white, r.left, r.top, r.width, r.height)
+        .alignCenter.alignMiddle.withRotate(rotated).render()
     }
 
     status match {
@@ -451,8 +457,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   def drawPieceBox(): Unit = {
     val r = layout.pieceBox
     r.draw(layer1, layout.color.pieceBox, 3)
-    drawTextCenter(layer1, "UNUSED PIECES", r.left, r.top - layout.MARGIN_BLOCK, r.width, layout.MARGIN_BLOCK * 3 / 2,
-      layout.font.pieceBoxLabel, layout.color.fg)
+    TextRenderer(layer1, "UNUSED PIECES", layout.font.pieceBoxLabel, layout.color.fg, r.left, r.top - layout.MARGIN_BLOCK, r.width, layout.MARGIN_BLOCK * 3 / 2)
+      .alignCenter.alignMiddle.render()
   }
 
   def hidePieceBox(): Unit = {
