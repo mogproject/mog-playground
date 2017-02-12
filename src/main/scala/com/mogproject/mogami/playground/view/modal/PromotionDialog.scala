@@ -47,7 +47,7 @@ case class PromotionDialog(lang: Language,
     canvasPromote.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
 
   private[this] val elem: Div =
-    div(cls := "modal face", tabindex := "-1", role := "dialog", data("backdrop") := "static",
+    div(cls := "modal face", tabindex := "-1", role := "dialog",
       div(cls := "modal-dialog", role := "document",
         div(cls := "modal-content",
           // header

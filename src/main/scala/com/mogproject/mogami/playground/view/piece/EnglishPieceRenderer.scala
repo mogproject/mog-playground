@@ -1,6 +1,6 @@
 package com.mogproject.mogami.playground.view.piece
 
-import com.mogproject.mogami.playground.view.Layout
+import com.mogproject.mogami.playground.view.{Layout, TextRenderer}
 import com.mogproject.mogami.Piece
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom.CanvasRenderingContext2D
@@ -15,7 +15,10 @@ case class EnglishPieceRenderer(layout: Layout) extends PieceRenderer {
     val w = layout.PIECE_WIDTH * scale
     val h = layout.PIECE_HEIGHT * scale
     val color = piece.isPromoted.fold(layout.color.red, layout.color.fg)
-    drawTextCenter(ctx, "☖", left, top, w, h, layout.font.pentagon(w), layout.color.fg, piece.owner.isWhite, 0, yOffset)
-    drawTextCenter(ctx, piece.ptype.demoted.toEnglishSimpleName, left, top, w, h, layout.font.pieceEnglish(w), color, piece.owner.isWhite, 0, yOffset)
+
+    TextRenderer(ctx, "☖", layout.font.pentagon(w), layout.color.fg, left, top, w, h)
+      .alignCenter.alignMiddle.withRotate(piece.owner.isWhite).shift(0, yOffset).render()
+    TextRenderer(ctx, piece.ptype.demoted.toEnglishSimpleName, layout.font.pieceEnglish(w), color, left, top, w, h)
+      .alignCenter.alignMiddle.withRotate(piece.owner.isWhite).shift(0, yOffset).render()
   }
 }
