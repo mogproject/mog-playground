@@ -13,9 +13,10 @@ import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.{CanvasRenderingContext2D, Element, MouseEvent, TouchEvent}
-import org.scalajs.dom.html.{Canvas, Div}
+import org.scalajs.dom.html.{Button, Canvas, Div}
 import org.scalajs.dom.raw.HTMLSelectElement
 import org.scalajs.jquery.jQuery
+import org.w3c.dom.html.HTMLInputElement
 
 import scalatags.JsDom.all._
 
@@ -305,11 +306,11 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def setEventListener[A](eventType: String, f: A => Unit): Unit = canvasContainer.addEventListener(eventType, f, useCapture = false)
 
-  def setClickEvent(elem: Element, f: () => Unit): Unit = {
+  def setClickEvent(elem: Button, f: () => Unit): Unit = {
     val t = hasTouchEvent.fold("touchstart", "mousedown")
     val g = if (hasTouchEvent) {
       evt: TouchEvent => {
-        if (evt.changedTouches.length == 1) {
+        if (elem.disabled.forall(_ != true) && evt.changedTouches.length == 1) {
           f()
         }
       }
