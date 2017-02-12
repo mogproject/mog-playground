@@ -20,7 +20,7 @@ trait PieceRenderer {
   private[this] def drawNumbers(ctx: CanvasRenderingContext2D, n: Int, left: Int, top: Int, rotated: Boolean): Unit = {
     if (n > 1) {
       TextRenderer(ctx, n.toString, layout.font.numberOfPieces, layout.color.cursor, left, top, layout.PIECE_WIDTH, layout.PIECE_HEIGHT)
-        .alignRight.alignBottom.withRotate(rotated).withStroke(layout.color.fg, 4).render()
+        .alignRight.alignBottom.withRotate(rotated).withStroke(layout.color.stroke, layout.strokeSize).render()
     }
   }
 

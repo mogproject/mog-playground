@@ -97,6 +97,10 @@ case class Layout(canvasWidth: Int) {
     // indicator text
     val white = "#ffffff"
     val pieceBox = "#cccccc" // background of the piece box
+
+    // numbers
+    val stroke = "#333333"
   }
 
+  lazy val strokeSize: Int = scaleByCanvas(14)
 }
