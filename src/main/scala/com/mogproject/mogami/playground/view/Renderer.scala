@@ -12,7 +12,7 @@ import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
-import org.scalajs.dom.{CanvasRenderingContext2D, Element}
+import org.scalajs.dom.{CanvasRenderingContext2D, Element, MouseEvent, TouchEvent}
 import org.scalajs.dom.html.{Canvas, Div}
 import org.scalajs.dom.raw.HTMLSelectElement
 import org.scalajs.jquery.jQuery
@@ -104,15 +104,14 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     dom.window.setTimeout(f, 1000)
   }
 
-  private[this] def createControlInput(controlType: Int, glyph: String) = button(cls := "btn btn-default btn-control",
-    onclick := { () => Controller.setControl(controlType) },
+  private[this] def createControlInput(glyph: String) = button(cls := "btn btn-default btn-control",
     span(cls := s"glyphicon glyphicon-${glyph}", aria.hidden := true)
   ).render
 
-  private[this] val controlInput0 = createControlInput(0, "step-backward")
-  private[this] val controlInput1 = createControlInput(1, "backward")
-  private[this] val controlInput2 = createControlInput(2, "forward")
-  private[this] val controlInput3 = createControlInput(3, "step-forward")
+  private[this] val controlInput0 = createControlInput("step-backward")
+  private[this] val controlInput1 = createControlInput("backward")
+  private[this] val controlInput2 = createControlInput("forward")
+  private[this] val controlInput3 = createControlInput("step-forward")
 
   private[this] val controlSection = div(
     div(
@@ -271,6 +270,11 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
       setEventListener("mousedown", mouseDown)
     }
 
+    setClickEvent(controlInput0, () => Controller.setControl(0))
+    setClickEvent(controlInput1, () => Controller.setControl(1))
+    setClickEvent(controlInput2, () => Controller.setControl(2))
+    setClickEvent(controlInput3, () => Controller.setControl(3))
+
     // initialize clipboard.js
     val cp = new Clipboard(".btn")
     cp.on("success", (e: Event) => {
@@ -300,6 +304,18 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
   def hasTouchEvent: Boolean = dom.window.hasOwnProperty("ontouchstart")
 
   def setEventListener[A](eventType: String, f: A => Unit): Unit = canvasContainer.addEventListener(eventType, f, useCapture = false)
+
+  def setClickEvent(elem: Element, f: () => Unit): Unit = {
+    val t = hasTouchEvent.fold("touchstart", "mousedown")
+    val g = if (hasTouchEvent) {
+      evt: TouchEvent => {
+        if (evt.changedTouches.length == 1) {
+          f()
+        }
+      }
+    } else { evt: MouseEvent => f() }
+    elem.addEventListener(t, g, useCapture = false)
+  }
 
   def expandCanvas(): Unit = {
     canvasContainer.style.height = layout.canvasHeight + "px"
