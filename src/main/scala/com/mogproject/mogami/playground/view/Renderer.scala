@@ -10,7 +10,7 @@ import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import com.mogproject.mogami.playground.view.modal._
-import com.mogproject.mogami.playground.view.parts.{EditReset, EditTurn, ModeChanger}
+import com.mogproject.mogami.playground.view.parts.{EditReset, EditTurn, LanguageSelector, ModeSelector}
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.{CanvasRenderingContext2D, Element}
@@ -52,23 +52,13 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
   ).render
 
-  private[this] val langLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false).render
-
   private[this] val navigator = tag("nav")(cls := "navbar navbar-default navbar-fixed-top",
     div(cls := "container",
       div(cls := "row")(
         div(cls := "navbar-header col-md-10 col-md-offset-1",
           ul(cls := "nav navbar-nav",
-            li(ModeChanger.element),
-            li(cls := "dropdown pull-right",
-              textAlign := "right",
-              langLabel,
-              ul(cls := "dropdown-menu",
-                li(cls := "dropdown-header", "Language"),
-                li(a(href := "#", "Japanese", onclick := (() => Controller.setLanguage(Japanese)))),
-                li(a(href := "#", "English", onclick := (() => Controller.setLanguage(English))))
-              )
-            )
+            li(ModeSelector.output),
+            LanguageSelector.output
           )
         )
       )
@@ -134,8 +124,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   ).render
 
   private[this] val editSection = div(display := "none",
-    EditTurn.element,
-    EditReset.element
+    EditTurn.output,
+    EditReset.output
   ).render
 
   private[this] val footer: Div = div(cls := "row",
@@ -173,7 +163,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     setClickEvent(controlInput2, () => Controller.setControl(2))
     setClickEvent(controlInput3, () => Controller.setControl(3))
 
-    ModeChanger.initialize()
+    ModeSelector.initialize()
+    LanguageSelector.initialize()
     EditTurn.initialize()
     EditReset.initialize()
 
@@ -402,9 +393,9 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   def updateRecordUrl(url: String): Unit = recordInput.value = url
 
-  def updateMode(mode: Mode): Unit = ModeChanger.updateModeChangerValue(mode)
+  def updateMode(mode: Mode): Unit = ModeSelector.updateValue(mode)
 
-  def updateLang(lang: Language): Unit = langLabel.innerHTML = lang.label + span(cls := "caret").toString()
+  def updateLang(lang: Language): Unit = LanguageSelector.updateValue(lang)
 
   def updateRecordContent(game: Game, lng: Language): Unit = {
     val f: Move => String = lng match {

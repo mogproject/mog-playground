@@ -22,7 +22,6 @@ case class TextRenderer(ctx: CanvasRenderingContext2D,
                         textHeightHint: Option[Int] = None // b
                        ) {
 
-  println(this)
   lazy val textWidth: Int = textWidthHint.getOrElse {
     ctx.font = font
     ctx.measureText(text).width.toInt
