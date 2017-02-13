@@ -102,5 +102,5 @@ case class Layout(canvasWidth: Int) {
     val stroke = "#333333"
   }
 
-  lazy val strokeSize: Int = scaleByCanvas(14)
+  lazy val strokeSize: Int = scaleByCanvas(10)
 }

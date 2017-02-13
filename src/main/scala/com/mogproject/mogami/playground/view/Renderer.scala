@@ -7,23 +7,23 @@ import com.mogproject.mogami.core.Game.GameStatus.GameStatus
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
-import com.mogproject.mogami.playground.controller.mode.{Editing, Mode, Playing, Viewing}
+import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import com.mogproject.mogami.playground.view.modal._
+import com.mogproject.mogami.playground.view.parts.{EditReset, EditTurn, LanguageSelector, ModeSelector}
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
-import org.scalajs.dom.{CanvasRenderingContext2D, Element, MouseEvent, TouchEvent}
-import org.scalajs.dom.html.{Button, Canvas, Div}
+import org.scalajs.dom.{CanvasRenderingContext2D, Element}
+import org.scalajs.dom.html.{Canvas, Div}
 import org.scalajs.dom.raw.HTMLSelectElement
 import org.scalajs.jquery.jQuery
-import org.w3c.dom.html.HTMLInputElement
 
 import scalatags.JsDom.all._
 
 /**
   * controls canvas rendering
   */
-case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
+case class Renderer(elem: Element, layout: Layout) extends CursorManageable with EventManageable {
 
   // main canvas
   protected val canvas0: Canvas = createCanvas(0)
@@ -52,23 +52,13 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
   ).render
 
-  private[this] val langLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false).render
-
   private[this] val navigator = tag("nav")(cls := "navbar navbar-default navbar-fixed-top",
     div(cls := "container",
       div(cls := "row")(
         div(cls := "navbar-header col-md-10 col-md-offset-1",
           ul(cls := "nav navbar-nav",
-            li(ModeChanger.element),
-            li(cls := "dropdown pull-right",
-              textAlign := "right",
-              langLabel,
-              ul(cls := "dropdown-menu",
-                li(cls := "dropdown-header", "Language"),
-                li(a(href := "#", "Japanese", onclick := (() => Controller.setLanguage(Japanese)))),
-                li(a(href := "#", "English", onclick := (() => Controller.setLanguage(English))))
-              )
-            )
+            li(ModeSelector.output),
+            LanguageSelector.output
           )
         )
       )
@@ -133,112 +123,9 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     createInputGroup("Record URL", recordInput, "record")
   ).render
 
-  object ModeChanger {
-    private[this] val anchors: Map[Mode, Element] = Map(
-      Playing -> a(cls := "btn btn-primary thin-btn active", onclick := { () => Controller.setMode(Playing) }, "Play").render,
-      Viewing -> a(cls := "btn btn-primary thin-btn notActive", onclick := { () => Controller.setMode(Viewing) }, "View").render,
-      Editing -> a(cls := "btn btn-primary thin-btn notActive", onclick := { () => Controller.setMode(Editing) }, "Edit").render
-    )
-
-    val element: Div = div(cls := "input-group",
-      div(id := "radioBtn", cls := "btn-group",
-        anchors(Playing),
-        anchors(Viewing),
-        anchors(Editing)
-      )
-    ).render
-
-    def updateModeChangerValue(newValue: Mode): Unit = {
-      anchors.foreach { case (mode, elem) =>
-        if (mode == newValue) {
-          elem.classList.remove("notActive")
-          elem.classList.add("active")
-        } else {
-          elem.classList.remove("active")
-          elem.classList.add("notActive")
-        }
-      }
-    }
-  }
-
-  object EditTurn {
-    private[this] val anchors: Map[Player, Element] = Map(
-      BLACK -> a(cls := "btn btn-primary active", onclick := { () => Controller.setEditTurn(BLACK) }).render,
-      WHITE -> a(cls := "btn btn-primary notActive", onclick := { () => Controller.setEditTurn(WHITE) }).render
-    )
-
-    val element: Div = div(cls := "form-group",
-      label("Turn"),
-      div(cls := "row",
-        div(cls := "col-sm-8 col-md-8",
-          div(cls := "input-group",
-            div(id := "radioBtn", cls := "btn-group btn-group-justified",
-              anchors(BLACK),
-              anchors(WHITE)
-            )
-          )
-        )
-      )
-    ).render
-
-    def updateEditTurnLabel(lang: Language): Unit = lang match {
-      case Japanese =>
-        anchors(BLACK).innerHTML = "先手番"
-        anchors(WHITE).innerHTML = "後手番"
-      case English =>
-        anchors(BLACK).innerHTML = "Black"
-        anchors(WHITE).innerHTML = "White"
-    }
-
-    def updateEditTurnValue(newValue: Player): Unit = {
-      anchors(newValue).classList.remove("notActive")
-      anchors(newValue).classList.add("active")
-      anchors(!newValue).classList.remove("active")
-      anchors(!newValue).classList.add("notActive")
-    }
-  }
-
-  object EditReset {
-    private[this] val states = Seq(
-      State.HIRATE, State.MATING_BLACK, State.MATING_WHITE,
-      State.HANDICAP_LANCE, State.HANDICAP_BISHOP, State.HANDICAP_ROOK, State.HANDICAP_ROOK_LANCE,
-      State.HANDICAP_2_PIECE, State.HANDICAP_3_PIECE, State.HANDICAP_4_PIECE, State.HANDICAP_5_PIECE,
-      State.HANDICAP_6_PIECE, State.HANDICAP_8_PIECE, State.HANDICAP_10_PIECE,
-      State.HANDICAP_THREE_PAWNS, State.HANDICAP_NAKED_KING
-    )
-
-    private[this] val labels: Map[Language, Seq[String]] = Map(
-      Japanese -> Seq(
-        "平手", "詰将棋 (先手)", "詰将棋 (後手)",
-        "香落ち", "角落ち", "飛車落ち", "飛香落ち",
-        "二枚落ち", "三枚落ち", "四枚落ち", "五枚落ち",
-        "六枚落ち", "八枚落ち", "十枚落ち",
-        "歩三兵", "裸玉"),
-      English -> Seq("Even", "Mating (Black)", "Mating (White)",
-        "Lance", "Bishop", "Rook", "Rook-Lance",
-        "2-Piece", "3-Piece", "4-Piece", "5-Piece",
-        "6-Piece", "8-Piece", "10-Piece",
-        "Three Pawns", "Naked King")
-    )
-
-    private[this] val buttons = states.map(st =>
-      button(
-        tpe := "button",
-        cls := "btn btn-default btn-block",
-        onclick := { () => Controller.setEditInitialState(st) }, ""
-      ).render)
-
-    val element: Div = div(
-      label("Reset"),
-      div(cls := "row", buttons.map(b => div(cls := "col-md-4 col-xs-6", b)))
-    ).render
-
-    def updateLabel(lang: Language): Unit = buttons.zipWithIndex.foreach { case (b, i) => b.innerHTML = labels(lang)(i) }
-  }
-
   private[this] val editSection = div(display := "none",
-    EditTurn.element,
-    EditReset.element
+    EditTurn.output,
+    EditReset.output
   ).render
 
   private[this] val footer: Div = div(cls := "row",
@@ -276,6 +163,11 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     setClickEvent(controlInput2, () => Controller.setControl(2))
     setClickEvent(controlInput3, () => Controller.setControl(3))
 
+    ModeSelector.initialize()
+    LanguageSelector.initialize()
+    EditTurn.initialize()
+    EditReset.initialize()
+
     // initialize clipboard.js
     val cp = new Clipboard(".btn")
     cp.on("success", (e: Event) => {
@@ -302,21 +194,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     ).render
   }
 
-  def hasTouchEvent: Boolean = dom.window.hasOwnProperty("ontouchstart")
-
   def setEventListener[A](eventType: String, f: A => Unit): Unit = canvasContainer.addEventListener(eventType, f, useCapture = false)
-
-  def setClickEvent(elem: Button, f: () => Unit): Unit = {
-    val t = hasTouchEvent.fold("touchstart", "mousedown")
-    val g = if (hasTouchEvent) {
-      evt: TouchEvent => {
-        if (elem.disabled.forall(_ != true) && evt.changedTouches.length == 1) {
-          f()
-        }
-      }
-    } else { evt: MouseEvent => f() }
-    elem.addEventListener(t, g, useCapture = false)
-  }
 
   def expandCanvas(): Unit = {
     canvasContainer.style.height = layout.canvasHeight + "px"
@@ -515,9 +393,9 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def updateRecordUrl(url: String): Unit = recordInput.value = url
 
-  def updateMode(mode: Mode): Unit = ModeChanger.updateModeChangerValue(mode)
+  def updateMode(mode: Mode): Unit = ModeSelector.updateValue(mode)
 
-  def updateLang(lang: Language): Unit = langLabel.innerHTML = lang.label + span(cls := "caret").toString()
+  def updateLang(lang: Language): Unit = LanguageSelector.updateValue(lang)
 
   def updateRecordContent(game: Game, lng: Language): Unit = {
     val f: Move => String = lng match {
@@ -563,4 +441,10 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     controlInput2.disabled = !forwardEnabled
     controlInput3.disabled = !stepForwardEnabled
   }
+
+  def updateEditResetLabel(lang: Language): Unit = EditReset.updateLabel(lang)
+
+  def updateEditTurnLabel(lang: Language): Unit = EditTurn.updateLabel(lang)
+
+  def updateEditTurnValue(newValue: Player): Unit = EditTurn.updateValue(newValue)
 }
