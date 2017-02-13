@@ -46,9 +46,9 @@ case class EditModeController(renderer: Renderer,
   override def renderAll(): Unit = {
     super.renderAll()
 
-    renderer.EditTurn.updateEditTurnLabel(config.lang)
-    renderer.EditTurn.updateEditTurnValue(turn)
-    renderer.EditReset.updateLabel(config.lang)
+    renderer.updateEditTurnLabel(config.lang)
+    renderer.updateEditTurnValue(turn)
+    renderer.updateEditResetLabel(config.lang)
 
     renderer.drawIndicators(turn, GameStatus.Playing)
     renderer.drawEditingPieces(config.pieceRenderer, board, hand, box)
