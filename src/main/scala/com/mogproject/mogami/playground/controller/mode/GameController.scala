@@ -73,6 +73,12 @@ trait GameController extends ModeController {
   override def setLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(lang = lang)))
 
   /**
+    * Flip the board
+    * @return
+    */
+  override def toggleFlip(): Option[ModeController] = Some(this.copy(config = config.copy(flip = !config.flip)))
+
+  /**
     * Change the display position
     *
     * @param index display position
@@ -105,9 +111,9 @@ trait GameController extends ModeController {
   }
 
   protected def renderState(): Unit = {
-    renderer.drawPieces(config.pieceRenderer, selectedState)
-    renderer.drawIndicators(selectedState.turn, isLatestState.fold(game.status, GameStatus.Playing))
-    renderer.drawLastMove(getLastMove)
+    renderer.drawPieces(config, selectedState)
+    renderer.drawIndicators(config, selectedState.turn, isLatestState.fold(game.status, GameStatus.Playing))
+    renderer.drawLastMove(config, getLastMove)
   }
 
   protected def renderControl(): Unit = {

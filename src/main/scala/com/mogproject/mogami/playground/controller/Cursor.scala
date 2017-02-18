@@ -19,6 +19,12 @@ case class Cursor(board: Option[Square], hand: Option[Hand], box: Option[Ptype])
     case (None, Some(h)) => Right(h)
     case _ => throw new IllegalArgumentException(s"cannot create MoveFrom instance: ${this}")
   }
+
+  def unary_! : Cursor = this match {
+    case Cursor(Some(sq), _, _) => Cursor(Some(Square(10 - sq.file, 10 - sq.rank)), None, None)
+    case Cursor(_, Some(h), _) => Cursor(None, Some(!h), None)
+    case _ => this
+  }
 }
 
 object Cursor {

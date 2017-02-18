@@ -27,7 +27,7 @@ trait ButtonLike[Key, Input <: HTMLElement, Output <: Element] extends EventMana
 
   def initialize(): Unit = inputMap.foreach { case (k, e) => setClickEvent(e, () => invoke(k)) }
 
-  final def updateLabel(lang: Language): Unit = inputMap.foreach { case (k, e) => e.innerHTML = labelMap(lang)(k) }
+  def updateLabel(lang: Language): Unit = inputMap.foreach { case (k, e) => e.innerHTML = labelMap(lang)(k) }
 
   def updateValue(newValue: Key): Unit = {
     inputMap.foreach { case (k, e) =>

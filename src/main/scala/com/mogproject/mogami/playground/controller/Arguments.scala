@@ -32,6 +32,19 @@ case class Arguments(game: Game = Game(), currentMove: Int = -1, config: Configu
           println(s"Invalid parameter: move=${s}")
           f(sofar, xs)
       }
+      case ("flip" :: s :: Nil) :: xs => s.toLowerCase match {
+        case "true" => f(sofar.copy(config = sofar.config.copy(flip = true)), xs)
+        case "false" => f(sofar, xs)
+        case _ =>
+          println(s"Invalid parameter: flip=${s}")
+          f(sofar, xs)
+      }
+      case ("action" :: s :: Nil) :: xs => s match {
+        case "image" => f(sofar.copy(config = sofar.config.copy(action = ImageAction)), xs)
+        case _ =>
+          println(s"Invalid parameter: action=${s}")
+          f(sofar, xs)
+      }
       case _ :: xs => f(sofar, xs)
       case Nil => sofar
     }

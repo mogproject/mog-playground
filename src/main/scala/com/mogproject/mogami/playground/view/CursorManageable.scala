@@ -1,7 +1,8 @@
 package com.mogproject.mogami.playground.view
 
+import com.mogproject.mogami.{Hand, Ptype, Square}
 import com.mogproject.mogami.core._
-import com.mogproject.mogami.playground.controller.{Controller, Cursor}
+import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor}
 import org.scalajs.dom.html.Canvas
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
@@ -14,7 +15,6 @@ trait CursorManageable {
   // variables
   private[this] var activeCursor: Option[Cursor] = None
   private[this] var selectedCursor: Option[Cursor] = None
-  private[this] var lastMoveArea: Set[Cursor] = Set.empty
 
   // constants
   private[this] val boxPtypes: Seq[Ptype] = Ptype.KING +: Ptype.inHand
@@ -33,6 +33,9 @@ trait CursorManageable {
     * @return Cursor if the mouse position is inside the specific area
     */
   def getCursor(clientX: Double, clientY: Double): Option[Cursor] = {
+    // todo: refactor
+    // flip the cursor here when config.flip=true
+
     val rect = canvas2.getBoundingClientRect()
     val (x, y) = (clientX - rect.left, clientY - rect.top)
 
@@ -59,8 +62,8 @@ trait CursorManageable {
   /**
     * Convert Cursor object to Rectangle.
     */
-  private[this] def cursorToRect(cursor: Cursor): Rectangle = {
-    val (x, y) = cursor match {
+  private[this] def cursorToRect(cursor: Cursor, isFlipped: Boolean = false): Rectangle = {
+    val (x, y) = isFlipped.when[Cursor](!_)(cursor) match {
       case Cursor(None, Some(Hand(Player.BLACK, pt)), None) =>
         (layout.handBlack.left + (pt.sortId - 1) * layout.PIECE_WIDTH, layout.handBlack.top)
       case Cursor(None, Some(Hand(Player.WHITE, pt)), None) =>
@@ -117,7 +120,7 @@ trait CursorManageable {
   /**
     * Draw the last move area.
     */
-  def drawLastMove(move: Option[Move]): Unit = {
+  def drawLastMove(config: Configuration, move: Option[Move]): Unit = {
     val newArea: Set[Cursor] = move match {
       case None => Set.empty
       case Some(mv) =>
@@ -128,12 +131,15 @@ trait CursorManageable {
         Set(fr, Cursor(mv.to))
     }
 
-    (lastMoveArea -- newArea).foreach(cursorToRect(_).clear(layer0))
-    (newArea -- lastMoveArea).foreach(cursorToRect(_).drawFill(layer0, layout.color.light, 1))
-    lastMoveArea = newArea
+    clearLastMove()
+    newArea.foreach(a => cursorToRect(a, config.flip).drawFill(layer0, layout.color.light, 1))
   }
 
-  def clearLastMove(): Unit = drawLastMove(None)
+  def clearLastMove(): Unit = {
+    layout.board.clear(layer0)
+    layout.handWhite.clear(layer0)
+    layout.handBlack.clear(layer0)
+  }
 
   //
   // mouseDown
@@ -170,5 +176,10 @@ trait CursorManageable {
     case x@Some(cursor) if Controller.canActivate(cursor) => drawActiveCursor(cursor)
     case _ => clearActiveCursor()
   }
+
+  //
+  // utilities
+  //
+  protected def flipSquare(square: Square): Square = Square(10 - square.file, 10 - square.rank)
 
 }

@@ -1,10 +1,10 @@
 package com.mogproject.mogami.playground.view.modal
 
 import com.mogproject.mogami.Piece
-import com.mogproject.mogami.playground.controller.{English, Japanese, Language}
+import com.mogproject.mogami.playground.controller.{Configuration, English, Japanese, Language}
 import com.mogproject.mogami.playground.view.EventManageable
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
-import com.mogproject.mogami.playground.view.piece.PieceRenderer
+import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom.CanvasRenderingContext2D
 import org.scalajs.dom.html.{Canvas, Div}
 import org.scalajs.jquery.jQuery
@@ -15,21 +15,20 @@ import scalatags.JsDom.all._
   * Promotion dialog
   */
 // todo: draw on canvas
-case class PromotionDialog(lang: Language,
+case class PromotionDialog(config: Configuration,
                            piece: Piece,
-                           pieceRenderer: PieceRenderer,
                            callbackUnpromote: () => Unit,
                            callbackPromote: () => Unit
                           ) extends EventManageable {
 
-  private[this] val title = lang match {
+  private[this] val title = config.lang match {
     case Japanese => "成りますか?"
     case English => "Do you want to promote?"
   }
 
   private[this] def createCanvas: Canvas = canvas(
-    widthA := pieceRenderer.layout.PIECE_WIDTH * 2,
-    heightA := pieceRenderer.layout.PIECE_HEIGHT * 2,
+    widthA := config.pieceRenderer.layout.PIECE_WIDTH * 2,
+    heightA := config.pieceRenderer.layout.PIECE_HEIGHT * 2,
     marginLeft := "auto",
     marginRight := "auto",
     left := 0,
@@ -48,13 +47,13 @@ case class PromotionDialog(lang: Language,
     canvasPromote.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
 
   private[this] val buttonUnpromote = button(tpe := "button", cls := "btn btn-default btn-block",
-    style := s"height: ${pieceRenderer.layout.PIECE_HEIGHT * 2}px !important",
+    style := s"height: ${config.pieceRenderer.layout.PIECE_HEIGHT * 2}px !important",
     data("dismiss") := "modal",
     canvasUnpromote
   ).render
 
   private[this] val buttonPromote = button(tpe := "button", cls := "btn btn-default btn-block",
-    style := s"height: ${pieceRenderer.layout.PIECE_HEIGHT * 2}px !important",
+    style := s"height: ${config.pieceRenderer.layout.PIECE_HEIGHT * 2}px !important",
     data("dismiss") := "modal",
     canvasPromote
   ).render
@@ -90,8 +89,8 @@ case class PromotionDialog(lang: Language,
     setModalClickEvent(buttonPromote, dialog, callbackPromote)
 
     // draw large pieces
-    pieceRenderer.drawPiece(contextUnpromote, piece, 0, 0, 2)
-    pieceRenderer.drawPiece(contextPromote, piece.promoted, 0, 0, 2)
+    config.pieceRenderer.drawPiece(contextUnpromote, config.flip.when[Piece](!_)(piece), 0, 0, 2)
+    config.pieceRenderer.drawPiece(contextPromote, config.flip.when[Piece](!_)(piece.promoted), 0, 0, 2)
 
     // show the modal
     dialog.asInstanceOf[BootstrapJQuery].modal("show")
