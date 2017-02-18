@@ -11,8 +11,7 @@ case class Configuration(screenWidth: Double = 375.0,
                          layoutSize: Int = 0,
                          lang: Language = Japanese,
                          flip: Boolean = false,
-                         baseUrl: String = "",
-                         action: Action = PlayAction
+                         baseUrl: String = ""
                         ) {
   val layout: Layout =
     if (layoutSize > 0)

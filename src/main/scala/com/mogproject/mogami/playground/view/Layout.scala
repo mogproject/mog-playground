@@ -50,7 +50,7 @@ case class Layout(canvasWidth: Int) {
 
   val handBlack = Rectangle(MARGIN_LEFT + PIECE_WIDTH * 2, playerBlack.top, BOARD_WIDTH - PIECE_WIDTH * 2, PIECE_HEIGHT)
 
-  val rankIndex = Rectangle(board.right + 1, board.top, MARGIN_RIGHT, BOARD_HEIGHT)
+  val rankIndex = Rectangle(board.right - 1, board.top, MARGIN_RIGHT, BOARD_HEIGHT)
   val pieceBox = Rectangle(MARGIN_LEFT + PIECE_WIDTH, handBlack.bottom + MARGIN_BLOCK + 2, BOARD_WIDTH - PIECE_WIDTH, PIECE_HEIGHT)
 
   // fonts

@@ -4,7 +4,6 @@ import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami._
 import com.mogproject.mogami.core.Game.GameStatus
 import com.mogproject.mogami.core.Game.GameStatus.GameStatus
-import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller.mode.Mode
@@ -390,6 +389,36 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   def hidePieceBox(): Unit = {
     layout.pieceBox.clear(layer1, -3)
     clearPiecesInBox()
+  }
+
+  def getImageBase64: String = {
+    val c = canvases.head
+
+    // create a hidden canvas
+    val hiddenCanvas: Canvas = canvas(
+      widthA := c.width,
+      heightA := c.height
+    ).render
+
+    val hiddenContext: CanvasRenderingContext2D = hiddenCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+
+    // set background as white
+    hiddenContext.fillStyle = "#ffffff"
+    hiddenContext.fillRect(0, 0, c.width, c.height)
+
+    // copy layers
+    canvases.foreach(src => hiddenContext.drawImage(src, 0, 0))
+
+    // export image
+    hiddenCanvas.toDataURL("image/png")
+  }
+
+  /**
+    * Display
+    */
+  def drawAsImage(): Unit = {
+    dom.window.document.body.style.backgroundColor = "black"
+    dom.window.document.body.innerHTML = img(src := getImageBase64).toString
   }
 
   def showEditSection(): Unit = editSection.style.display = "block"

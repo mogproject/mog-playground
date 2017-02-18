@@ -9,7 +9,10 @@ import scala.util.{Success, Try}
 /**
   * stores parameters
   */
-case class Arguments(game: Game = Game(), currentMove: Int = -1, config: Configuration = Configuration()) {
+case class Arguments(game: Game = Game(),
+                     currentMove: Int = -1,
+                     action: Action = PlayAction,
+                     config: Configuration = Configuration()) {
   def parseQueryString(query: String): Arguments = {
     @tailrec
     def f(sofar: Arguments, ls: List[List[String]]): Arguments = ls match {
@@ -40,7 +43,7 @@ case class Arguments(game: Game = Game(), currentMove: Int = -1, config: Configu
           f(sofar, xs)
       }
       case ("action" :: s :: Nil) :: xs => s match {
-        case "image" => f(sofar.copy(config = sofar.config.copy(action = ImageAction)), xs)
+        case "image" => f(sofar.copy(action = ImageAction), xs)
         case _ =>
           println(s"Invalid parameter: action=${s}")
           f(sofar, xs)
