@@ -151,7 +151,6 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     LanguageSelector.initialize()
     EditTurn.initialize()
     EditReset.initialize()
-    saveImageButton.initialize()
 
     // initialize clipboard.js
     val cp = new Clipboard(".btn")
