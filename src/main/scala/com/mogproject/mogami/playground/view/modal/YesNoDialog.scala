@@ -1,6 +1,7 @@
 package com.mogproject.mogami.playground.view.modal
 
 import com.mogproject.mogami.playground.controller.{English, Japanese, Language}
+import com.mogproject.mogami.playground.view.EventManageable
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import org.scalajs.dom.html.{Div, Element}
 
@@ -12,7 +13,7 @@ import scalatags.JsDom.TypedTag
 /**
   * Yes-no dialog
   */
-case class YesNoDialog(lang: Language, message: TypedTag[Element], callback: () => Unit) {
+case class YesNoDialog(lang: Language, message: TypedTag[Element], callback: () => Unit) extends EventManageable {
 
   private[this] val title = lang match {
     case Japanese => "確認"
@@ -28,6 +29,10 @@ case class YesNoDialog(lang: Language, message: TypedTag[Element], callback: () 
     case Japanese => "いいえ"
     case English => "No"
   }
+
+  private[this] val yesButton = button(
+    tpe := "button", cls := "btn btn-primary btn-block", data("dismiss") := "modal", yes
+  ).render
 
   private[this] val elem: Div =
     div(cls := "modal face", tabindex := "-1", role := "dialog", data("backdrop") := "static",
@@ -48,7 +53,7 @@ case class YesNoDialog(lang: Language, message: TypedTag[Element], callback: () 
                 button(tpe := "button", cls := "btn btn-default btn-block", data("dismiss") := "modal", no)
               ),
               div(cls := "col-xs-4 col-md-3",
-                button(tpe := "button", cls := "btn btn-primary btn-block", data("dismiss") := "modal", onclick := callback, yes)
+                yesButton
               )
             )
           )
@@ -58,10 +63,13 @@ case class YesNoDialog(lang: Language, message: TypedTag[Element], callback: () 
 
   def show(): Unit = {
     val dialog = jQuery(elem)
+
     dialog.on("hidden.bs.modal", () ⇒ {
       // Remove from DOM
       dialog.remove()
     })
+
+    setClickEvent(yesButton, callback)
 
     dialog.asInstanceOf[BootstrapJQuery].modal("show")
   }
