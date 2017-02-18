@@ -231,8 +231,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       Line(layout.board.left, y, layout.board.right, y).draw(layer1)
 
       if (i % 3 == 0) {
-        Circle(x, layout.board.top + layout.PIECE_HEIGHT * 3, 3).draw(layer1)
-        Circle(x, layout.board.top + layout.PIECE_HEIGHT * 6, 3).draw(layer1)
+        Circle(x, layout.board.top + layout.PIECE_HEIGHT * 3, layout.DOT_SIZE).draw(layer1)
+        Circle(x, layout.board.top + layout.PIECE_HEIGHT * 6, layout.DOT_SIZE).draw(layer1)
       }
     }
   }

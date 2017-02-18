@@ -45,6 +45,12 @@ case class Arguments(game: Game = Game(), currentMove: Int = -1, config: Configu
           println(s"Invalid parameter: action=${s}")
           f(sofar, xs)
       }
+      case ("size" :: s :: Nil) :: xs => Try(s.toInt) match {
+        case Success(n) if n > 0 => f(sofar.copy(config = sofar.config.copy(layoutSize = n)), xs)
+        case _ =>
+          println(s"Invalid parameter: size=${s}")
+          f(sofar, xs)
+      }
       case _ :: xs => f(sofar, xs)
       case Nil => sofar
     }
