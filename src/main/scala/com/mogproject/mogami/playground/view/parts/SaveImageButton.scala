@@ -24,21 +24,24 @@ case class SaveImageButton(canvases: Seq[Canvas]) extends ButtonLike[Int, Button
 
   override protected def invoke(key: Int): Unit = {
     val data = createImage
-    key match {
+    val elem = (key match {
       case 0 =>
         // view
-        dom.window.open(data, "_blank")
+        a(
+          href := data,
+          target := "_blank"
+        )
       case 1 =>
         // download
-        val elem = a(
+        a(
           href := data,
           attr("download") := "snapshot.png"
-        ).render
+        )
+    }).render
 
-        dom.document.body.appendChild(elem)
-        elem.click()
-        dom.document.body.removeChild(elem)
-    }
+    dom.document.body.appendChild(elem)
+    elem.click()
+    dom.document.body.removeChild(elem)
   }
 
   private[this] def createImage: String = {
