@@ -67,28 +67,6 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     )
   )
 
-  private[this] val snapshotInput = createInput("snapshot")
-  private[this] val recordInput = createInput("record")
-  private[this] val sfenInput = createInput("sfen")
-
-  private[this] def createInput(ident: String) = input(
-    tpe := "text", id := ident, cls := "form-control", aria.label := "...", readonly := "readonly"
-  ).render
-
-  private[this] def createInputGroup(labelString: String, inputElem: Element, target: String) = div(
-    label(labelString),
-    div(cls := "input-group",
-      inputElem,
-      span(
-        cls := "input-group-btn",
-        button(cls := "btn btn-default", data("clipboard-target") := s"#${target}", tpe := "button",
-          data("toggle") := "tooltip", data("trigger") := "manual", data("placement") := "bottom",
-          "Copy!"
-        )
-      )
-    )
-  ).render
-
   private[this] def setTooltip(elem: Element, message: String): Unit = {
     jQuery(elem).attr("data-original-title", message).asInstanceOf[BootstrapJQuery].tooltip("show")
   }
@@ -121,13 +99,13 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       )
     ),
     br(),
-    createInputGroup("Snapshot URL", snapshotInput, "snapshot"),
+    SnapshotCopyButton.output,
     br(),
-    createInputGroup("Record URL", recordInput, "record"),
+    RecordCopyButton.output,
     br(),
     saveImageButton.output,
     br(),
-    createInputGroup("Snapshot SFEN String", sfenInput, "sfen")
+    SfenStringCopyButton.output
   ).render
 
   private[this] val editSection = div(display := "none",
@@ -449,11 +427,11 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     AlertDialog(lang, s).show()
   }
 
-  def updateSnapshotUrl(url: String): Unit = snapshotInput.value = url
+  def updateSnapshotUrl(url: String): Unit = SnapshotCopyButton.updateValue(url)
 
-  def updateRecordUrl(url: String): Unit = recordInput.value = url
+  def updateRecordUrl(url: String): Unit = RecordCopyButton.updateValue(url)
 
-  def updateSfenString(sfen: String): Unit = sfenInput.value = sfen
+  def updateSfenString(sfen: String): Unit = SfenStringCopyButton.updateValue(sfen)
 
   def updateMode(mode: Mode): Unit = ModeSelector.updateValue(mode)
 
