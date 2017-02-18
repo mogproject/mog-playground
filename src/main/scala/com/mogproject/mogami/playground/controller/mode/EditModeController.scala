@@ -50,13 +50,13 @@ case class EditModeController(renderer: Renderer,
     renderer.updateEditTurnValue(turn)
     renderer.updateEditResetLabel(config.lang)
 
-    renderer.drawIndicators(turn, GameStatus.Playing)
-    renderer.drawEditingPieces(config.pieceRenderer, board, hand, box)
+    renderer.drawIndicators(config, turn, GameStatus.Playing)
+    renderer.drawEditingPieces(config, board, hand, box)
   }
 
   override def canActivate(cursor: Cursor): Boolean = true
 
-  override def canSelect(cursor: Cursor): Boolean = cursor match {
+  override def canSelect(cursor: Cursor): Boolean = config.flip.when[Cursor](!_)(cursor) match {
     case Cursor(Some(sq), None, None) => board.contains(sq)
     case Cursor(None, Some(h), None) => hand(h) > 0
     case Cursor(None, None, Some(pt)) => box(pt) > 0
@@ -70,7 +70,7 @@ case class EditModeController(renderer: Renderer,
     * @param invoked  to
     */
   override def invokeCursor(selected: Cursor, invoked: Cursor): Option[ModeController] = {
-    (selected, invoked) match {
+    (config.flip.when[Cursor](!_)(selected), config.flip.when[Cursor](!_)(invoked)) match {
       // square is selected
       case (Cursor(Some(s1), None, None), Cursor(Some(s2), None, None)) =>
         (board(s1), board.get(s2)) match {

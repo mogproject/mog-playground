@@ -111,9 +111,9 @@ trait GameController extends ModeController {
   }
 
   protected def renderState(): Unit = {
-    renderer.drawPieces(config.pieceRenderer, selectedState)
-    renderer.drawIndicators(selectedState.turn, isLatestState.fold(game.status, GameStatus.Playing))
-    renderer.drawLastMove(getLastMove)
+    renderer.drawPieces(config, selectedState)
+    renderer.drawIndicators(config, selectedState.turn, isLatestState.fold(game.status, GameStatus.Playing))
+    renderer.drawLastMove(config, getLastMove)
   }
 
   protected def renderControl(): Unit = {

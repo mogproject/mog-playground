@@ -2,6 +2,7 @@ package com.mogproject.mogami.playground.controller
 
 import com.mogproject.mogami.playground.view.Layout
 import com.mogproject.mogami.playground.view.piece.{EnglishPieceRenderer, PieceRenderer, SimpleJapanesePieceRenderer}
+import com.mogproject.mogami.util.Implicits._
 
 /**
   *
@@ -25,10 +26,14 @@ case class Configuration(screenWidth: Double = 375.0,
   }
 
   def toQueryParameters: List[String] = {
-    lang match {
-      case Japanese => List()
-      case English => List("lang=en")
+    val parseLanguage = (xs: List[String]) => lang match {
+      case Japanese => xs
+      case English => "lang=en" :: xs
     }
+
+    val parseFlip = (xs: List[String]) => flip.fold("flip=true" :: xs, xs)
+
+    (parseLanguage andThen parseFlip) (List.empty)
   }
 
 }

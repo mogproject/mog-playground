@@ -39,19 +39,19 @@ trait ModeController {
     renderer.clearSelectedArea()
 
     // player names
-    renderer.drawPlayerNames(config.lang)
+    renderer.drawPlayerNames(config)
 
     // draw indexes
-    renderer.drawIndexes(config.lang)
+    renderer.drawIndexes(config)
 
     // update flip button
-    renderer.updateFlip(config.flip)
+    renderer.updateFlip(config)
 
     // update menu bar
-    renderer.updateLang(config.lang)
+    renderer.updateLang(config)
 
     // update flip button
-    renderer.updateFlip(config.flip)
+    renderer.updateFlip(config)
   }
 
   // cursor check
