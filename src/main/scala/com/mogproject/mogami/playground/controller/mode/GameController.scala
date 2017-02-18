@@ -74,6 +74,7 @@ trait GameController extends ModeController {
 
   /**
     * Flip the board
+    *
     * @return
     */
   override def toggleFlip(): Option[ModeController] = Some(this.copy(config = config.copy(flip = !config.flip)))
@@ -132,11 +133,24 @@ trait GameController extends ModeController {
     val configParams = config.toQueryParameters
     val moveParams = isLatestState.fold(List.empty, List(s"move=${realPosition}"))
 
-    val snapshot = ("sfen=" + encodeURIComponent(Game(selectedState).toSfenString)) +: configParams
+    val instantGame = Game(selectedState)
+    val instantGameWithLastMove =
+      if (realPosition == 0)
+        instantGame
+      else
+        Game(
+          game.history(realPosition - 1),
+          game.moves.slice(realPosition - 1, realPosition),
+          givenHistory = Some(game.history.slice(realPosition - 1, realPosition + 1))
+        )
+
+    val snapshot = ("sfen=" + encodeURIComponent(instantGame.toSfenString)) +: configParams
     val record = (("sfen=" + encodeURIComponent(game.toSfenString)) +: configParams) ++ moveParams
+    val image = "action=image" :: ("sfen=" + encodeURIComponent(instantGameWithLastMove.toSfenString)) +: configParams
 
     renderer.updateSnapshotUrl(s"${config.baseUrl}?${snapshot.mkString("&")}")
     renderer.updateRecordUrl(s"${config.baseUrl}?${record.mkString("&")}")
+    renderer.updateImageLinkUrl(s"${config.baseUrl}?${image.mkString("&")}")
     renderer.updateSfenString(selectedState.toSfenString)
   }
 
