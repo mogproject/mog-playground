@@ -145,7 +145,10 @@ trait CursorManageable {
     }
   }
 
-  def mouseDown(evt: MouseEvent): Unit = mouseDown(evt.clientX, evt.clientY)
+  /**
+    * Detect the left click. (button == 0)
+    */
+  def mouseDown(evt: MouseEvent): Unit = if (evt.button == 0) mouseDown(evt.clientX, evt.clientY)
 
   private[this] def mouseDown(x: Double, y: Double): Unit = mouseDown(getCursor(x, y))
 

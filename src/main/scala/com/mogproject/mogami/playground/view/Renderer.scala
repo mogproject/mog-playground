@@ -10,7 +10,7 @@ import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import com.mogproject.mogami.playground.view.modal._
-import com.mogproject.mogami.playground.view.parts.{EditReset, EditTurn, LanguageSelector, ModeSelector}
+import com.mogproject.mogami.playground.view.parts._
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.{CanvasRenderingContext2D, Element}
@@ -39,6 +39,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   protected val layer3: CanvasRenderingContext2D = canvas3.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
   protected val layer4: CanvasRenderingContext2D = canvas4.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
 
+  // elements
+  val saveImageButton = SaveImageButton(canvases)
 
   private[this] val canvasContainer: Div = div(cls := "col-md-6",
     padding := 0,
@@ -120,7 +122,9 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     br(),
     createInputGroup("Snapshot URL", snapshotInput, "snapshot"),
     br(),
-    createInputGroup("Record URL", recordInput, "record")
+    createInputGroup("Record URL", recordInput, "record"),
+    br(),
+    saveImageButton.output
   ).render
 
   private[this] val editSection = div(display := "none",
@@ -167,6 +171,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     LanguageSelector.initialize()
     EditTurn.initialize()
     EditReset.initialize()
+    saveImageButton.initialize()
 
     // initialize clipboard.js
     val cp = new Clipboard(".btn")
