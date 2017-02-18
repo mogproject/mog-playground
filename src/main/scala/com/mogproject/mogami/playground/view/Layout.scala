@@ -18,11 +18,12 @@ case class Layout(canvasWidth: Int) {
   lazy val MARGIN_BLOCK: Int = scaleByCanvas(32)
   lazy val MARGIN_TOP: Int = 4
   val MARGIN_BOTTOM: Int = 4
-  lazy val MARGIN_LEFT: Int = scaleByCanvas(20)
+  lazy val MARGIN_LEFT: Int = (canvasWidth - BOARD_WIDTH) / 4
   lazy val MARGIN_RIGHT: Int = canvasWidth - board.right
   lazy val BOARD_WIDTH: Int = PIECE_WIDTH * 9
   lazy val BOARD_HEIGHT: Int = PIECE_HEIGHT * 9
   lazy val INDICATOR_HEIGHT: Int = scaleByCanvas(40)
+  lazy val DOT_SIZE: Int = math.max(0, math.min(3, (canvasWidth - 80) / 100))
 
   // sizes
   val playerAreaWidth: Int = PIECE_WIDTH * 2 - 4
@@ -49,7 +50,7 @@ case class Layout(canvasWidth: Int) {
 
   val handBlack = Rectangle(MARGIN_LEFT + PIECE_WIDTH * 2, playerBlack.top, BOARD_WIDTH - PIECE_WIDTH * 2, PIECE_HEIGHT)
 
-  val rankIndex = Rectangle(board.right + 1, board.top, MARGIN_RIGHT, BOARD_HEIGHT)
+  val rankIndex = Rectangle(board.right - 1, board.top, MARGIN_RIGHT, BOARD_HEIGHT)
   val pieceBox = Rectangle(MARGIN_LEFT + PIECE_WIDTH, handBlack.bottom + MARGIN_BLOCK + 2, BOARD_WIDTH - PIECE_WIDTH, PIECE_HEIGHT)
 
   // fonts
@@ -65,7 +66,7 @@ case class Layout(canvasWidth: Int) {
     def pieceEnglish(pieceWidth: Int = PIECE_WIDTH): String = s"${scaleByPiece(pieceWidth, 530)}pt ${english}"
 
     lazy val numberOfPieces = s"${scaleByPiece(PIECE_WIDTH, 383)}pt ${english}"
-    lazy val numberIndex = s"${scaleByPiece(PIECE_WIDTH, 236)}pt ${japanese}"
+    lazy val numberIndex = s"${scaleByPiece(PIECE_WIDTH, 180)}pt ${japanese}"
     lazy val indicator = s"${scaleByCanvas(28)}pt ${menu}"
     lazy val playerIcon = s"${scaleByCanvas(40)}pt ${japanese}"
     lazy val playerNameJapanese = s"${scaleByCanvas(32)}pt ${japanese}"

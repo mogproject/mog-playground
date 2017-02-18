@@ -38,6 +38,9 @@ object Controller {
 
     // render all parts
     modeController.get.initialize()
+
+    // create image if the action is ImageAction
+    if (args.action == ImageAction) renderer.drawAsImage()
   }
 
   /**
