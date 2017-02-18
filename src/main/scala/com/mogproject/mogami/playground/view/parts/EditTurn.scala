@@ -27,7 +27,7 @@ object EditTurn extends ButtonLike[Player, Anchor, Div] {
     div(cls := "row",
       div(cls := "col-sm-8 col-md-8",
         div(cls := "input-group",
-          div(id := "radioBtn", cls := "btn-group btn-group-justified",
+          div(cls := "btn-group btn-group-justified",
             inputs
           )
         )

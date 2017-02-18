@@ -95,4 +95,5 @@ object Controller {
 
   def setEditInitialState(initialState: State): Unit = doAction(_.setEditInitialState(initialState), _.renderAll())
 
+  def toggleFlip(): Unit = doAction(_.toggleFlip, _.renderAll())
 }

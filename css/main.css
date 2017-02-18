@@ -1,7 +1,7 @@
 .navbar {
     display: block;
-    height: 28px;
-    min-height:28px !important;
+    height: 29px;
+    min-height:29px !important;
     margin-bottom: 10px;
 }
 
@@ -49,12 +49,7 @@
     -webkit-appearance:none;
 }
 
-#radioBtn .notActive{
-    color: #3276b1;
-    background-color: #fff;
-}
-
-#radioBtnMode .notActive {
+.notActive{
     color: #3276b1;
     background-color: #fff;
 }

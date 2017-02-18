@@ -19,7 +19,7 @@ object ModeSelector extends ButtonLike[Mode, Anchor, Div] {
   override protected def invoke(key: Mode): Unit = Controller.setMode(key)
 
   override def output: Div = div(cls := "input-group",
-    div(id := "radioBtn", cls := "btn-group", inputs)
+    div(cls := "btn-group", inputs)
   ).render
 
   override def initialize(): Unit = {

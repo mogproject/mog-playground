@@ -60,7 +60,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
         div(cls := "navbar-header col-md-10 col-md-offset-1",
           ul(cls := "nav navbar-nav",
             li(ModeSelector.output),
-            LanguageSelector.output
+            LanguageSelector.output,
+            FlipButton.output
           )
         )
       )
@@ -171,6 +172,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     setClickEvent(controlInput3, () => Controller.setControl(3))
 
     ModeSelector.initialize()
+    FlipButton.initialize()
     LanguageSelector.initialize()
     EditTurn.initialize()
     EditReset.initialize()
@@ -406,6 +408,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   def updateMode(mode: Mode): Unit = ModeSelector.updateValue(mode)
 
   def updateLang(lang: Language): Unit = LanguageSelector.updateValue(lang)
+
+  def updateFlip(flip: Boolean): Unit = FlipButton.updateValue(flip)
 
   def updateRecordContent(game: Game, lng: Language): Unit = {
     val f: Move => String = lng match {

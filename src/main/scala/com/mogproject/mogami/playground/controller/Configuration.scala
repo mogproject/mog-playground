@@ -8,7 +8,9 @@ import com.mogproject.mogami.playground.view.piece.{EnglishPieceRenderer, PieceR
   */
 case class Configuration(screenWidth: Double = 375.0,
                          lang: Language = Japanese,
-                         baseUrl: String = ""
+                         flip: Boolean = false,
+                         baseUrl: String = "",
+                         action: Action = PlayAction
                         ) {
   val layout: Layout = screenWidth match {
     case x if x >= 1024.0 => Layout(400)

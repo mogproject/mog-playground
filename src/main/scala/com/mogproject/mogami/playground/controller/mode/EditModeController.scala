@@ -132,6 +132,8 @@ case class EditModeController(renderer: Renderer,
 
   override def setLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(lang = lang)))
 
+  override def toggleFlip(): Option[ModeController] = Some(this.copy(config = config.copy(flip = !config.flip)))
+
   override def setEditTurn(player: Player): Option[ModeController] =
     (player != turn).option(this.copy(turn = player))
 

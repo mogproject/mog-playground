@@ -44,8 +44,14 @@ trait ModeController {
     // draw indexes
     renderer.drawIndexes(config.lang)
 
+    // update flip button
+    renderer.updateFlip(config.flip)
+
     // update menu bar
     renderer.updateLang(config.lang)
+
+    // update flip button
+    renderer.updateFlip(config.flip)
   }
 
   // cursor check
@@ -64,6 +70,8 @@ trait ModeController {
   def setRecord(index: Int): Option[ModeController] = None
 
   def setControl(controlType: Int): Option[ModeController] = None
+
+  def toggleFlip(): Option[ModeController] = None
 
   // actions for edit mode
   def setEditTurn(turn: Player): Option[ModeController] = None
