@@ -4,6 +4,7 @@ import com.mogproject.mogami.core._
 import com.mogproject.mogami.playground.controller.{Controller, Cursor}
 import org.scalajs.dom.html.Canvas
 import com.mogproject.mogami.util.Implicits._
+import org.scalajs.dom
 import org.scalajs.dom.{CanvasRenderingContext2D, MouseEvent, TouchEvent}
 
 /**
@@ -23,6 +24,7 @@ trait CursorManageable {
   protected val canvas2: Canvas
   protected val layer0: CanvasRenderingContext2D
   protected val layer3: CanvasRenderingContext2D
+  protected val layer4: CanvasRenderingContext2D
 
 
   /**
@@ -79,6 +81,13 @@ trait CursorManageable {
     clearActiveCursor()
     cursorToRect(cursor).draw(layer3, layout.color.cursor, -2)
     activeCursor = Some(cursor)
+  }
+
+  def flashCursor(cursor: Cursor): Unit = {
+    val c = cursorToRect(cursor)
+    c.draw(layer4, layout.color.flash, -2)
+    val f = () => c.clear(layer4)
+    dom.window.setTimeout(f, 200)
   }
 
   /**
@@ -138,11 +147,16 @@ trait CursorManageable {
 
   def mouseDown(evt: MouseEvent): Unit = mouseDown(evt.clientX, evt.clientY)
 
-  private[this] def mouseDown(x: Double, y: Double): Unit = (selectedCursor, getCursor(x, y)) match {
-    case (Some(sel), Some(invoked)) => clearSelectedArea(); Controller.invokeCursor(sel, invoked)
-    case (Some(sel), None) => clearSelectedArea()
-    case (None, Some(sel)) if Controller.canSelect(sel) => drawSelectedArea(sel)
-    case _ => // do nothing
+  private[this] def mouseDown(x: Double, y: Double): Unit = mouseDown(getCursor(x, y))
+
+  private[this] def mouseDown(cursor: Option[Cursor]): Unit = {
+    cursor.foreach(c => if (Controller.canActivate(c)) flashCursor(c))
+    (selectedCursor, cursor) match {
+      case (Some(sel), Some(invoked)) => clearSelectedArea(); Controller.invokeCursor(sel, invoked)
+      case (Some(sel), None) => clearSelectedArea()
+      case (None, Some(sel)) if Controller.canSelect(sel) => drawSelectedArea(sel)
+      case _ => // do nothing
+    }
   }
 
   //

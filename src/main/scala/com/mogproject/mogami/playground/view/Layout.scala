@@ -91,6 +91,7 @@ case class Layout(canvasWidth: Int) {
     val draw = "#99877a"
 
     val cursor = "#E1B265"
+    val flash = "#805819"
     val dark = "#353535"
     val light = "#E0FFFF"
 

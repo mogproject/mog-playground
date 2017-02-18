@@ -30,20 +30,20 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   protected val canvas1: Canvas = createCanvas(1)
   protected val canvas2: Canvas = createCanvas(2)
   protected val canvas3: Canvas = createCanvas(3)
-  protected val canvases: List[Canvas] = List(canvas0, canvas1, canvas2, canvas3)
+  protected val canvas4: Canvas = createCanvas(4)
+  protected val canvases: List[Canvas] = List(canvas0, canvas1, canvas2, canvas3, canvas4)
 
   protected val layer0: CanvasRenderingContext2D = canvas0.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
   protected val layer1: CanvasRenderingContext2D = canvas1.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
   protected val layer2: CanvasRenderingContext2D = canvas2.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
   protected val layer3: CanvasRenderingContext2D = canvas3.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+  protected val layer4: CanvasRenderingContext2D = canvas4.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+
 
   private[this] val canvasContainer: Div = div(cls := "col-md-6",
     padding := 0,
     height := layout.canvasHeightCompact,
-    canvas0,
-    canvas1,
-    canvas2,
-    canvas3
+    canvases
   ).render
 
   // forms
