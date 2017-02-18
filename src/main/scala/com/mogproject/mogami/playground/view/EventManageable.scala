@@ -17,6 +17,7 @@ trait EventManageable {
     val g = if (hasTouchEvent) {
       evt: TouchEvent => {
         if (elem.disabled.forall(_ != true) && evt.changedTouches.length == 1) {
+          evt.preventDefault()
           f()
         }
       }
