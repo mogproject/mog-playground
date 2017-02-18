@@ -69,6 +69,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   private[this] val snapshotInput = createInput("snapshot")
   private[this] val recordInput = createInput("record")
+  private[this] val sfenInput = createInput("sfen")
 
   private[this] def createInput(ident: String) = input(
     tpe := "text", id := ident, cls := "form-control", aria.label := "...", readonly := "readonly"
@@ -124,7 +125,9 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     br(),
     createInputGroup("Record URL", recordInput, "record"),
     br(),
-    saveImageButton.output
+    saveImageButton.output,
+    br(),
+    createInputGroup("Snapshot SFEN String", sfenInput, "sfen")
   ).render
 
   private[this] val editSection = div(display := "none",
@@ -397,6 +400,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   def updateSnapshotUrl(url: String): Unit = snapshotInput.value = url
 
   def updateRecordUrl(url: String): Unit = recordInput.value = url
+
+  def updateSfenString(sfen: String): Unit = sfenInput.value = sfen
 
   def updateMode(mode: Mode): Unit = ModeSelector.updateValue(mode)
 

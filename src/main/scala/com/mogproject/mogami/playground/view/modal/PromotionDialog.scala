@@ -2,6 +2,7 @@ package com.mogproject.mogami.playground.view.modal
 
 import com.mogproject.mogami.Piece
 import com.mogproject.mogami.playground.controller.{English, Japanese, Language}
+import com.mogproject.mogami.playground.view.EventManageable
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import com.mogproject.mogami.playground.view.piece.PieceRenderer
 import org.scalajs.dom.CanvasRenderingContext2D
@@ -19,7 +20,7 @@ case class PromotionDialog(lang: Language,
                            pieceRenderer: PieceRenderer,
                            callbackUnpromote: () => Unit,
                            callbackPromote: () => Unit
-                          ) {
+                          ) extends EventManageable {
 
   private[this] val title = lang match {
     case Japanese => "成りますか?"
@@ -46,6 +47,18 @@ case class PromotionDialog(lang: Language,
   private[this] val contextPromote: CanvasRenderingContext2D =
     canvasPromote.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
 
+  private[this] val unpromoteButton = button(tpe := "button", cls := "btn btn-default btn-block",
+    style := s"height: ${pieceRenderer.layout.PIECE_HEIGHT * 2}px !important",
+    data("dismiss") := "modal", onclick := callbackUnpromote,
+    canvasUnpromote
+  ).render
+
+  private[this] val promoteButton = button(tpe := "button", cls := "btn btn-default btn-block",
+    style := s"height: ${pieceRenderer.layout.PIECE_HEIGHT * 2}px !important",
+    data("dismiss") := "modal", onclick := callbackPromote,
+    canvasPromote
+  ).render
+
   private[this] val elem: Div =
     div(cls := "modal face", tabindex := "-1", role := "dialog", data("backdrop") := "static",
       div(cls := "modal-dialog", role := "document",
@@ -58,20 +71,8 @@ case class PromotionDialog(lang: Language,
           // footer
           div(cls := "modal-footer",
             div(cls := "row",
-              div(cls := "col-xs-5 col-xs-offset-1 col-md-3 col-md-offset-3",
-                button(tpe := "button", cls := "btn btn-default btn-block",
-                  style := s"height: ${pieceRenderer.layout.PIECE_HEIGHT * 2}px !important",
-                  data("dismiss") := "modal", onclick := callbackUnpromote,
-                  canvasUnpromote
-                )
-              ),
-              div(cls := "col-xs-5 col-md-3",
-                button(tpe := "button", cls := "btn btn-default btn-block",
-                  style := s"height: ${pieceRenderer.layout.PIECE_HEIGHT * 2}px !important",
-                  data("dismiss") := "modal", onclick := callbackPromote,
-                  canvasPromote
-                )
-              )
+              div(cls := "col-xs-5 col-xs-offset-1 col-md-3 col-md-offset-3", unpromoteButton),
+              div(cls := "col-xs-5 col-md-3", promoteButton)
             )
           )
         )
@@ -84,6 +85,9 @@ case class PromotionDialog(lang: Language,
       // Remove from DOM
       dialog.remove()
     })
+
+    setClickEvent(unpromoteButton, callbackUnpromote)
+    setClickEvent(promoteButton, callbackPromote)
 
     pieceRenderer.drawPiece(contextUnpromote, piece, 0, 0, 2)
     pieceRenderer.drawPiece(contextPromote, piece.promoted, 0, 0, 2)

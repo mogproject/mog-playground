@@ -67,7 +67,7 @@ case class SaveImageButton(canvases: Seq[Canvas]) extends ButtonLike[Int, Button
   }
 
   override val output: Div = div(
-    label("Snapshot Image"),
+    label("Snapshot Image (not supported on some browsers)"),
     div(cls := "row", inputs.map(e => div(cls := "col-md-4 col-xs-6", e)))
   ).render
 

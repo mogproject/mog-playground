@@ -21,7 +21,7 @@ trait EventManageable {
           f()
         }
       }
-    } else { evt: MouseEvent => if (evt.button == 0) f() }
+    } else { evt: MouseEvent => if (evt.button == 0 /* left click */ ) f() }
     elem.addEventListener(t, g, useCapture = false)
   }
 
