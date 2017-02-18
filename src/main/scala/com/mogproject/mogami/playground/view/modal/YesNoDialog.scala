@@ -69,7 +69,7 @@ case class YesNoDialog(lang: Language, message: TypedTag[Element], callback: () 
       dialog.remove()
     })
 
-    setClickEvent(yesButton, callback)
+    setModalClickEvent(yesButton, dialog, callback)
 
     dialog.asInstanceOf[BootstrapJQuery].modal("show")
   }

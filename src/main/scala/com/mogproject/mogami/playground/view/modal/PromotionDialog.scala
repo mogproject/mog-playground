@@ -47,15 +47,15 @@ case class PromotionDialog(lang: Language,
   private[this] val contextPromote: CanvasRenderingContext2D =
     canvasPromote.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
 
-  private[this] val unpromoteButton = button(tpe := "button", cls := "btn btn-default btn-block",
+  private[this] val buttonUnpromote = button(tpe := "button", cls := "btn btn-default btn-block",
     style := s"height: ${pieceRenderer.layout.PIECE_HEIGHT * 2}px !important",
-    data("dismiss") := "modal", onclick := callbackUnpromote,
+    data("dismiss") := "modal",
     canvasUnpromote
   ).render
 
-  private[this] val promoteButton = button(tpe := "button", cls := "btn btn-default btn-block",
+  private[this] val buttonPromote = button(tpe := "button", cls := "btn btn-default btn-block",
     style := s"height: ${pieceRenderer.layout.PIECE_HEIGHT * 2}px !important",
-    data("dismiss") := "modal", onclick := callbackPromote,
+    data("dismiss") := "modal",
     canvasPromote
   ).render
 
@@ -71,8 +71,8 @@ case class PromotionDialog(lang: Language,
           // footer
           div(cls := "modal-footer",
             div(cls := "row",
-              div(cls := "col-xs-5 col-xs-offset-1 col-md-3 col-md-offset-3", unpromoteButton),
-              div(cls := "col-xs-5 col-md-3", promoteButton)
+              div(cls := "col-xs-5 col-xs-offset-1 col-md-3 col-md-offset-3", buttonUnpromote),
+              div(cls := "col-xs-5 col-md-3", buttonPromote)
             )
           )
         )
@@ -86,11 +86,14 @@ case class PromotionDialog(lang: Language,
       dialog.remove()
     })
 
-    setClickEvent(unpromoteButton, callbackUnpromote)
-    setClickEvent(promoteButton, callbackPromote)
+    setModalClickEvent(buttonUnpromote, dialog, callbackUnpromote)
+    setModalClickEvent(buttonPromote, dialog, callbackPromote)
 
+    // draw large pieces
     pieceRenderer.drawPiece(contextUnpromote, piece, 0, 0, 2)
     pieceRenderer.drawPiece(contextPromote, piece.promoted, 0, 0, 2)
+
+    // show the modal
     dialog.asInstanceOf[BootstrapJQuery].modal("show")
   }
 }
