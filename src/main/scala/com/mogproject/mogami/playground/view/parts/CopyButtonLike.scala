@@ -1,6 +1,6 @@
 package com.mogproject.mogami.playground.view.parts
 
-import org.scalajs.dom.html.Div
+import org.scalajs.dom.html.{Button, Div, Input}
 
 import scalatags.JsDom.all._
 
@@ -12,20 +12,27 @@ trait CopyButtonLike {
 
   protected def labelString: String
 
-  private[this] lazy val inputElem = input(
+  protected lazy val inputElem: Input = input(
     tpe := "text", id := ident, cls := "form-control", aria.label := "...", readonly := "readonly"
+  ).render
+
+  protected lazy val copyButton: Button = button(
+    cls := "btn btn-default",
+    tpe := "button",
+    data("clipboard-target") := s"#${ident}",
+    data("toggle") := "tooltip",
+    data("trigger") := "manual",
+    data("placement") := "bottom",
+    "Copy"
   ).render
 
   lazy val output: Div = div(
     label(labelString),
     div(cls := "input-group",
       inputElem,
-      span(
+      div(
         cls := "input-group-btn",
-        button(cls := "btn btn-default", data("clipboard-target") := s"#${ident}", tpe := "button",
-          data("toggle") := "tooltip", data("trigger") := "manual", data("placement") := "bottom",
-          "Copy!"
-        )
+        copyButton
       )
     )
   ).render

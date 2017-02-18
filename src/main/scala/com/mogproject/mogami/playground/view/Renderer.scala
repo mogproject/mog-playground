@@ -39,8 +39,6 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   protected val layer4: CanvasRenderingContext2D = canvas4.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
 
   // elements
-  val saveImageButton = SaveImageButton(canvases)
-
   private[this] val canvasContainer: Div = div(cls := "col-md-6",
     padding := 0,
     height := layout.canvasHeightCompact,
@@ -103,7 +101,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     br(),
     RecordCopyButton.output,
     br(),
-    saveImageButton.output,
+    ImageLinkButton.output,
     br(),
     SfenStringCopyButton.output
   ).render
@@ -430,6 +428,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   def updateSnapshotUrl(url: String): Unit = SnapshotCopyButton.updateValue(url)
 
   def updateRecordUrl(url: String): Unit = RecordCopyButton.updateValue(url)
+
+  def updateImageLinkUrl(url: String): Unit = ImageLinkButton.updateValue(url)
 
   def updateSfenString(sfen: String): Unit = SfenStringCopyButton.updateValue(sfen)
 
