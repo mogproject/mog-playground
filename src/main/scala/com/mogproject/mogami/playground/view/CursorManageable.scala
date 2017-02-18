@@ -33,6 +33,9 @@ trait CursorManageable {
     * @return Cursor if the mouse position is inside the specific area
     */
   def getCursor(clientX: Double, clientY: Double): Option[Cursor] = {
+    // todo: refactor
+    // flip the cursor here when config.flip=true
+
     val rect = canvas2.getBoundingClientRect()
     val (x, y) = (clientX - rect.left, clientY - rect.top)
 
