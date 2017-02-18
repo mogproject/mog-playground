@@ -131,6 +131,7 @@ trait GameController extends ModeController {
 
     renderer.updateSnapshotUrl(s"${config.baseUrl}?${snapshot.mkString("&")}")
     renderer.updateRecordUrl(s"${config.baseUrl}?${record.mkString("&")}")
+    renderer.updateSfenString(selectedState.toSfenString)
   }
 
 }
