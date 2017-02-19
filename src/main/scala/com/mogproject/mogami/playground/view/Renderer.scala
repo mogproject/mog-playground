@@ -430,9 +430,4 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   def updateRecordLang(lang: Language): Unit = RecordLanguageSelector.updateValue(lang)
 
   def updatePieceLang(lang: Language): Unit = PieceLanguageSelector.updateValue(lang)
-
-  // meta info
-  def setOpenGraphImage(url: String): Unit = {
-    jQuery("""meta[property="og:image]"""").attr("content", url)
-  }
 }

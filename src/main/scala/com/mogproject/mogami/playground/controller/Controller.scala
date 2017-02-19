@@ -41,9 +41,6 @@ object Controller {
 
     // create image if the action is ImageAction
     if (args.action == ImageAction) renderer.drawAsImage()
-
-    // set open graph image
-    renderer.setOpenGraphImage("http://mogproject.com/assets/img/header-bg.jpg")
   }
 
   /**
