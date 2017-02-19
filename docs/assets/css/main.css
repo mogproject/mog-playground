@@ -1,5 +1,7 @@
-html {
-    overflow-y: scroll;
+@media screen and (min-width: 768px) {
+    html {
+        overflow-y: scroll;
+    }
 }
 
 .navbar {
@@ -10,9 +12,17 @@ html {
 }
 
 .navbar-nav {
-    width: 100%;
+    width: 100% !important;
     margin-top: 0;
     margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+.navbar-brand {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 .navbar-form {
@@ -23,7 +33,6 @@ html {
 }
 
 .nav>li {
-    float: float;
     display: inline-block;
     margin-left: 5px !important;
     margin-right: 5px !important;
@@ -40,6 +49,8 @@ html {
     margin-bottom: 2px !important;
     padding-top: 2px !important;
     padding-bottom: 2px !important;
+    padding-right: 10px !important;
+    padding-left: 10px !important;
     height: 24px !important;
 }
 
