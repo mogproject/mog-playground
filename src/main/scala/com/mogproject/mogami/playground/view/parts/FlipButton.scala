@@ -23,7 +23,6 @@ object FlipButton extends ButtonLike[Boolean, Button, LI] {
   ).render
 
   override val output: LI = li(
-    cls := "pull-right",
     div(cls := "input-group",
       inputs
     )

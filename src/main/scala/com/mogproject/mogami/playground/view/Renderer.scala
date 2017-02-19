@@ -49,14 +49,14 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   // forms
   private[this] val navigator = tag("nav")(cls := "navbar navbar-default navbar-fixed-top",
-    div(cls := "container",
+    div(cls := "container", padding := 0,
       div(cls := "row")(
-        div(cls := "navbar-header col-md-10 col-md-offset-1",
+        div(cls := "navbar-header col-md-10 col-md-offset-1", width := "100%",
           ul(cls := "nav navbar-nav",
-            li(cls := "navbar-brand hidden-xs hidden-sm", padding := 4, "Shogi Playground"),
+            li(cls := "navbar-brand hidden-xs hidden-sm", "Shogi Playground"),
             li(ModeSelector.output),
-            MenuButton.output,
-            FlipButton.output
+            FlipButton.output,
+            li(cls := "pull-right visible-xs visible-sm", MenuButton.output)
           )
         )
       )

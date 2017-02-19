@@ -1,12 +1,10 @@
 package com.mogproject.mogami.playground.view.modal
 
-import com.mogproject.mogami.playground.controller.{English, Japanese, Language}
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import com.mogproject.mogami.playground.view.section.{AboutSection, EditSection, GameMenuSection, LanguageSection}
-import org.scalajs.dom.html.{Div, Element}
+import org.scalajs.dom.html.Div
 import org.scalajs.jquery.jQuery
 
-import scalatags.JsDom.TypedTag
 import scalatags.JsDom.all._
 
 /**
@@ -24,7 +22,10 @@ object MenuDialog {
         div(cls := "modal-content",
           // header
           div(cls := "modal-header",
-            h4(cls := "modal-title", title)
+            h4(cls := "modal-title", float := "left", title),
+            button(tpe := "button", cls := "close", data("dismiss") := "modal", aria.label := "Close",
+              span(aria.hidden := true, raw("&times;"))
+            )
           ),
 
           // body
