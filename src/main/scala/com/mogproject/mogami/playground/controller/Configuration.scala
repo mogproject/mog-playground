@@ -25,7 +25,7 @@ case class Configuration(screenWidth: Double = 375.0,
         case x if x >= 1024.0 => Layout(400, isMobile)
         case x if x >= 400.0 => Layout(375, isMobile)
         case x if x >= 375.0 => Layout(336, isMobile)
-        case _ => Layout(320, isMobile)
+        case _ => Layout(300, isMobile)
       }
   }
 
