@@ -1,3 +1,7 @@
+html {
+    overflow-y: scroll;
+}
+
 .navbar {
     display: block;
     height: 29px;
@@ -39,12 +43,7 @@
     height: 24px !important;
 }
 
-.btn-control {
-    width: 48px !important;
-}
-
 .rect-select {
-    width: 150px !important;
     border-radius: 0 !important;
     -webkit-appearance:none;
 }
