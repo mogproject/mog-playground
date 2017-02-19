@@ -89,8 +89,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
         navigator
       ),
       div(cls := "row",
-        div(cls := "col-md-6", padding := 0, width := layout.canvasWidth,
-          div(
+        div(cls := "col-md-6",
+          div(margin := "auto", padding := 0, width := layout.canvasWidth,
             canvasContainer,
             controlSection.output
           )
