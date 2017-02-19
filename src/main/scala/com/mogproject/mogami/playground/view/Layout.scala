@@ -3,7 +3,7 @@ package com.mogproject.mogami.playground.view
 /**
   * layout constants
   */
-case class Layout(canvasWidth: Int) {
+case class Layout(canvasWidth: Int, isMobile: Boolean) {
 
   lazy val canvasHeight: Int = pieceBox.bottom + MARGIN_BOTTOM
   lazy val canvasHeightCompact: Int = handBlack.bottom + MARGIN_BOTTOM

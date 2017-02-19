@@ -10,11 +10,11 @@ import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.playground.view.parts._
+import com.mogproject.mogami.playground.view.section._
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.{CanvasRenderingContext2D, Element}
 import org.scalajs.dom.html.{Canvas, Div}
-import org.scalajs.dom.raw.HTMLSelectElement
 import org.scalajs.jquery.jQuery
 
 import scalatags.JsDom.all._
@@ -39,18 +39,13 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   protected val layer4: CanvasRenderingContext2D = canvas4.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
 
   // elements
-  private[this] val canvasContainer: Div = div(cls := "col-md-6",
+  private[this] val canvasContainer: Div = div(
     padding := 0,
     height := layout.canvasHeightCompact,
     canvases
   ).render
 
   // forms
-  private[this] val recordSelector: HTMLSelectElement = select(
-    cls := "form-control rect-select",
-    onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
-  ).render
-
   private[this] val navigator = tag("nav")(cls := "navbar navbar-default navbar-fixed-top",
     div(cls := "container",
       div(cls := "row")(
@@ -74,62 +69,15 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     dom.window.setTimeout(f, 1000)
   }
 
-  private[this] def createControlInput(glyph: String) = button(cls := "btn btn-default btn-control",
-    span(cls := s"glyphicon glyphicon-${glyph}", aria.hidden := true)
-  ).render
+  private[this] val footer: Div = {
+    val sections = List(LanguageSection, GameMenuSection, EditSection, AboutSection)
 
-  private[this] val controlInput0 = createControlInput("step-backward")
-  private[this] val controlInput1 = createControlInput("backward")
-  private[this] val controlInput2 = createControlInput("forward")
-  private[this] val controlInput3 = createControlInput("step-forward")
-
-  private[this] val controlSection = div(
-    div(
-      label("Control"),
-      div(cls := "btn-toolbar", role := "toolbar",
-        div(cls := "btn-group", role := "group", aria.label := "...",
-          div(cls := "btn-group", role := "group", controlInput0),
-          div(cls := "btn-group", role := "group", controlInput1),
-          div(cls := "btn-group", role := "group", recordSelector),
-          div(cls := "btn-group", role := "group", controlInput2),
-          div(cls := "btn-group", role := "group", controlInput3)
-        )
+    div(cls := "row",
+      div(cls := "col-md-10 col-md-offset-1",
+        sections.map(_.output)
       )
-    ),
-    br(),
-    SnapshotCopyButton.output,
-    br(),
-    RecordCopyButton.output,
-    br(),
-    ImageLinkButton.output,
-    br(),
-    SfenStringCopyButton.output
-  ).render
-
-  private[this] val editSection = div(display := "none",
-    EditTurn.output,
-    EditReset.output
-  ).render
-
-  private[this] val helpSection = div(
-    br(),
-    div(
-      label("About This Site"),
-      p(i(""""Run anywhere, without installing!"""")),
-      p("Shogi Playground is a platform for all shogi --Japanese chess-- fans in the world." +
-        " This mobile-friendly website enables you to manage, analyze, and share shogi games as well as mating problems."),
-      p("If you have any questions, trouble, or suggestion, please tell the ",
-        a(href:="https://twitter.com/mogproject", "author"), ". Your voice matters.")
-    )
-  )
-
-  private[this] val footer: Div = div(cls := "row",
-    div(cls := "col-md-10 col-md-offset-1",
-      editSection,
-      controlSection,
-      helpSection
-    )
-  ).render
+    ).render
+  }
 
   initialize()
 
@@ -139,8 +87,11 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
         navigator
       ),
       div(cls := "row",
-        canvasContainer,
-        div(cls := "col-md-6", footer)
+        div(cls := "col-md-6",
+          canvasContainer,
+          ControlSection.output
+        ),
+        div(cls := "col-md-6 hidden-xs hidden-sm", footer)
       ),
       hr(),
       small(p(textAlign := "right", "Shogi Playground © 2017 ", a(href := "http://mogproject.com", "mogproject")))
@@ -154,16 +105,11 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       setEventListener("mousedown", mouseDown)
     }
 
-    setClickEvent(controlInput0, () => Controller.setControl(0))
-    setClickEvent(controlInput1, () => Controller.setControl(1))
-    setClickEvent(controlInput2, () => Controller.setControl(2))
-    setClickEvent(controlInput3, () => Controller.setControl(3))
-
+    ControlSection.initialize()
     ModeSelector.initialize()
     FlipButton.initialize()
     LanguageSelector.initialize()
-    EditTurn.initialize()
-    EditReset.initialize()
+    EditSection.initialize()
 
     // initialize clipboard.js
     val cp = new Clipboard(".btn")
@@ -409,13 +355,13 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     dom.window.document.body.innerHTML = img(src := getImageBase64).toString
   }
 
-  def showEditSection(): Unit = editSection.style.display = "block"
+  def showEditSection(): Unit = EditSection.show()
 
-  def hideEditSection(): Unit = editSection.style.display = "none"
+  def hideEditSection(): Unit = EditSection.hide()
 
-  def showControlSection(): Unit = controlSection.style.display = "block"
+  def showControlSection(): Unit = List(ControlSection, GameMenuSection).foreach(_.show())
 
-  def hideControlSection(): Unit = controlSection.style.display = "none"
+  def hideControlSection(): Unit = List(ControlSection, GameMenuSection).foreach(_.hide())
 
   def askPromote(config: Configuration, piece: Piece, callbackUnpromote: () => Unit, callbackPromote: () => Unit): Unit = {
     PromotionDialog(config, piece, callbackUnpromote, callbackPromote).show()
@@ -451,50 +397,20 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   def updateFlip(config: Configuration): Unit = FlipButton.updateValue(config.flip)
 
-  def updateRecordContent(game: Game, lng: Language): Unit = {
-    val f: Move => String = lng match {
-      case Japanese => _.toKifString
-      case English => _.toWesternNotationString
-    }
+  // record
+  def updateRecordContent(game: Game, lng: Language): Unit = ControlSection.updateRecordContent(game, lng)
 
-    val xs = game.moves.zipWithIndex.map { case (m, i) =>
-      s"${i + 1}: ${game.history(i).turn.toSymbolString + f(m)}"
-    }.toList
-    val prefix = lng match {
-      case Japanese => "初期局面"
-      case English => "Start"
-    }
-    val suffix = (game.status, lng) match {
-      case (GameStatus.Mated, Japanese) => List("詰み")
-      case (GameStatus.Drawn, Japanese) => List("千日手")
-      case (GameStatus.PerpetualCheck, Japanese) => List("連続王手の千日手")
-      case (GameStatus.Uchifuzume, Japanese) => List("打ち歩詰め")
-      case (GameStatus.Mated, English) => List("Mated")
-      case (GameStatus.Drawn, English) => List("Drawn")
-      case (GameStatus.PerpetualCheck, English) => List("Perpetual Check")
-      case (GameStatus.Uchifuzume, English) => List("Uchifuzume")
-      case (GameStatus.Playing, _) => List()
-    }
-    val ys = prefix :: xs ++ suffix
+  def updateRecordIndex(index: Int): Unit = ControlSection.updateRecordIndex(index)
 
-    recordSelector.innerHTML = ys.map(s => option(s)).mkString
-    updateRecordIndex(-1)
-  }
+  def getRecordIndex(index: Int): Int = ControlSection.getRecordIndex(index)
 
-  def getRecordIndex(index: Int): Int = (index < 0).fold(getMaxRecordIndex, math.min(index, getMaxRecordIndex))
+  def getMaxRecordIndex: Int = ControlSection.getMaxRecordIndex
 
-  def updateRecordIndex(index: Int): Unit = recordSelector.selectedIndex = getRecordIndex(index)
+  def getSelectedIndex: Int = ControlSection.getSelectedIndex
 
-  def getMaxRecordIndex: Int = recordSelector.options.length - 1
-
-  def getSelectedIndex: Int = recordSelector.selectedIndex
-
-  def updateControlBar(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean): Unit = {
-    controlInput0.disabled = !stepBackwardEnabled
-    controlInput1.disabled = !backwardEnabled
-    controlInput2.disabled = !forwardEnabled
-    controlInput3.disabled = !stepForwardEnabled
-  }
+  // control bar
+  def updateControlBar(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean): Unit =
+    ControlSection.updateLabels(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean)
 
   def updateEditResetLabel(lang: Language): Unit = EditReset.updateLabel(lang)
 

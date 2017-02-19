@@ -13,16 +13,19 @@ case class Configuration(screenWidth: Double = 375.0,
                          flip: Boolean = false,
                          baseUrl: String = ""
                         ) {
-  val layout: Layout =
+  val layout: Layout = {
+    val isMobile: Boolean = screenWidth < 768
+
     if (layoutSize > 0)
-      Layout(layoutSize)
+      Layout(layoutSize, isMobile)
     else
       screenWidth match {
-        case x if x >= 1024.0 => Layout(400)
-        case x if x >= 400.0 => Layout(375)
-        case x if x >= 375.0 => Layout(336)
-        case _ => Layout(320)
+        case x if x >= 1024.0 => Layout(400, isMobile)
+        case x if x >= 400.0 => Layout(375, isMobile)
+        case x if x >= 375.0 => Layout(336, isMobile)
+        case _ => Layout(320, isMobile)
       }
+  }
 
   lazy val pieceRenderer: PieceRenderer = lang match {
     case Japanese => SimpleJapanesePieceRenderer(layout)
