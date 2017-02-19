@@ -16,6 +16,8 @@ object EditSection extends Section {
 
   val output: Div = div(display := "none",
     EditTurn.output,
-    EditReset.output
+    EditReset.output,
+    h4("Help"),
+    p("to be implemented")
   ).render
 }

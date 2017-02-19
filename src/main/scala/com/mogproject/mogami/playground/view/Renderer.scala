@@ -99,7 +99,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
         div(cls := "col-md-6 hidden-xs hidden-sm", footer)
       ),
       hr(),
-      small(p(textAlign := "right", "Shogi Playground © 2017 ", a(href := "http://mogproject.com", "mogproject")))
+      small(p(textAlign := "right", "Shogi Playground © 2017 ", a(href := "http://mogproject.com", target := "_blank", "mogproject")))
     ).render)
 
     // register events
