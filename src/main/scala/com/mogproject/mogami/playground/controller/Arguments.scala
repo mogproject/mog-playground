@@ -22,11 +22,25 @@ case class Arguments(game: Game = Game(),
           println(s"Invalid parameter: sfen=${s}")
           f(sofar, xs)
       }
-      case ("lang" :: s :: Nil) :: xs => s match {
-        case "ja" => f(sofar.copy(config = sofar.config.copy(lang = Japanese)), xs)
-        case "en" => f(sofar.copy(config = sofar.config.copy(lang = English)), xs)
+      case ("mlang" :: s :: Nil) :: xs => s match {
+        case "ja" => f(sofar.copy(config = sofar.config.copy(messageLang = Japanese)), xs)
+        case "en" => f(sofar.copy(config = sofar.config.copy(messageLang = English)), xs)
         case _ =>
-          println(s"Invalid parameter: lang=${s}")
+          println(s"Invalid parameter: mlang=${s}")
+          f(sofar, xs)
+      }
+      case ("rlang" :: s :: Nil) :: xs => s match {
+        case "ja" => f(sofar.copy(config = sofar.config.copy(recordLang = Japanese)), xs)
+        case "en" => f(sofar.copy(config = sofar.config.copy(recordLang = English)), xs)
+        case _ =>
+          println(s"Invalid parameter: rlang=${s}")
+          f(sofar, xs)
+      }
+      case ("plang" :: s :: Nil) :: xs => s match {
+        case "ja" => f(sofar.copy(config = sofar.config.copy(pieceLang = Japanese)), xs)
+        case "en" => f(sofar.copy(config = sofar.config.copy(pieceLang = English)), xs)
+        case _ =>
+          println(s"Invalid parameter: plang=${s}")
           f(sofar, xs)
       }
       case ("move" :: s :: Nil) :: xs => Try(s.toInt) match {

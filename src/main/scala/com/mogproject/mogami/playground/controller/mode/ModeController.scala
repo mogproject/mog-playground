@@ -47,8 +47,10 @@ trait ModeController {
     // update flip button
     renderer.updateFlip(config)
 
-    // update menu bar
-    renderer.updateLang(config)
+    // update language buttons
+    renderer.updateMessageLang(config.messageLang)
+    renderer.updateRecordLang(config.recordLang)
+    renderer.updatePieceLang(config.pieceLang)
 
     // update flip button
     renderer.updateFlip(config)
@@ -65,7 +67,11 @@ trait ModeController {
   // actions
   def setMode(nextMode: Mode): Option[ModeController]
 
-  def setLanguage(lang: Language): Option[ModeController]
+  def setMessageLanguage(lang: Language): Option[ModeController]
+
+  def setRecordLanguage(lang: Language): Option[ModeController]
+
+  def setPieceLanguage(lang: Language): Option[ModeController]
 
   def setRecord(index: Int): Option[ModeController] = None
 

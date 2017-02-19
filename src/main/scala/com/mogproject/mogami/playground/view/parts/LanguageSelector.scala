@@ -1,14 +1,15 @@
 package com.mogproject.mogami.playground.view.parts
 
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
-import org.scalajs.dom.html.{Anchor, LI}
+import org.scalajs.dom.html.{Anchor, Div}
 
 import scalatags.JsDom.all._
 
 /**
   *
   */
-object LanguageSelector extends ButtonLike[Language, Anchor, LI] {
+sealed trait LanguageSelector extends ButtonLike[Language, Anchor, Div] {
+  protected def labelString: String
 
   override protected val keys = Seq(Japanese, English)
 
@@ -16,18 +17,18 @@ object LanguageSelector extends ButtonLike[Language, Anchor, LI] {
     English -> Seq("Japanese", "English")
   )
 
-  override protected def generateInput(key: Language): Anchor = a(href := "#").render
+  override protected def generateInput(key: Language): Anchor = a(cls := "btn btn-primary").render
 
-  override protected def invoke(key: Language): Unit = Controller.setLanguage(key)
-
-  private[this] val langLabel = a(href := "#", cls := "dropdown-toggle", data.toggle := "dropdown", role := "button", aria.haspopup := true, aria.expanded := false).render
-
-  override val output: LI = li(cls := "dropdown pull-right",
-    textAlign := "right",
-    langLabel,
-    ul(cls := "dropdown-menu",
-      li(cls := "dropdown-header", "Language"),
-      inputs.map(e => li(e))
+  override val output: Div = div(cls := "form-group",
+    div(cls := "row",
+      div(cls := "col-xs-4", label(labelString)),
+      div(cls := "col-xs-8",
+        div(cls := "input-group",
+          div(cls := "btn-group btn-group-justified",
+            inputs
+          )
+        )
+      )
     )
   ).render
 
@@ -35,8 +36,22 @@ object LanguageSelector extends ButtonLike[Language, Anchor, LI] {
     super.initialize()
     updateLabel(English)
   }
+}
 
-  override def updateValue(newValue: Language): Unit = {
-    langLabel.innerHTML = newValue.label + span(cls := "caret").toString()
-  }
+object MessageLanguageSelector extends LanguageSelector {
+  override lazy val labelString = "Messages"
+
+  override protected def invoke(key: Language): Unit = Controller.setMessageLanguage(key)
+}
+
+object RecordLanguageSelector extends LanguageSelector {
+  override lazy val labelString = "Record"
+
+  override protected def invoke(key: Language): Unit = Controller.setRecordLanguage(key)
+}
+
+object PieceLanguageSelector extends LanguageSelector {
+  override lazy val labelString = "Pieces"
+
+  override protected def invoke(key: Language): Unit = Controller.setPieceLanguage(key)
 }

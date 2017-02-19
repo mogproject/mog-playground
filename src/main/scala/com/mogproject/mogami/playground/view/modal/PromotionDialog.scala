@@ -1,7 +1,7 @@
 package com.mogproject.mogami.playground.view.modal
 
 import com.mogproject.mogami.Piece
-import com.mogproject.mogami.playground.controller.{Configuration, English, Japanese, Language}
+import com.mogproject.mogami.playground.controller.{Configuration, English, Japanese}
 import com.mogproject.mogami.playground.view.EventManageable
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import com.mogproject.mogami.util.Implicits._
@@ -21,7 +21,7 @@ case class PromotionDialog(config: Configuration,
                            callbackPromote: () => Unit
                           ) extends EventManageable {
 
-  private[this] val title = config.lang match {
+  private[this] val title = config.messageLang match {
     case Japanese => "成りますか?"
     case English => "Do you want to promote?"
   }
