@@ -45,6 +45,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     canvases
   ).render
 
+  private[this] val controlSection = ControlSection(layout.canvasWidth)
+
   // forms
   private[this] val navigator = tag("nav")(cls := "navbar navbar-default navbar-fixed-top",
     div(cls := "container",
@@ -87,9 +89,11 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
         navigator
       ),
       div(cls := "row",
-        div(cls := "col-md-6",
-          canvasContainer,
-          ControlSection.output
+        div(cls := "col-md-6", padding := 0, width := layout.canvasWidth,
+          div(
+            canvasContainer,
+            controlSection.output
+          )
         ),
         div(cls := "col-md-6 hidden-xs hidden-sm", footer)
       ),
@@ -105,7 +109,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       setEventListener("mousedown", mouseDown)
     }
 
-    ControlSection.initialize()
+    controlSection.initialize()
     ModeSelector.initialize()
     FlipButton.initialize()
     LanguageSelector.initialize()
@@ -359,9 +363,9 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   def hideEditSection(): Unit = EditSection.hide()
 
-  def showControlSection(): Unit = List(ControlSection, GameMenuSection).foreach(_.show())
+  def showControlSection(): Unit = List(controlSection, GameMenuSection).foreach(_.show())
 
-  def hideControlSection(): Unit = List(ControlSection, GameMenuSection).foreach(_.hide())
+  def hideControlSection(): Unit = List(controlSection, GameMenuSection).foreach(_.hide())
 
   def askPromote(config: Configuration, piece: Piece, callbackUnpromote: () => Unit, callbackPromote: () => Unit): Unit = {
     PromotionDialog(config, piece, callbackUnpromote, callbackPromote).show()
@@ -398,19 +402,19 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   def updateFlip(config: Configuration): Unit = FlipButton.updateValue(config.flip)
 
   // record
-  def updateRecordContent(game: Game, lng: Language): Unit = ControlSection.updateRecordContent(game, lng)
+  def updateRecordContent(game: Game, lng: Language): Unit = controlSection.updateRecordContent(game, lng)
 
-  def updateRecordIndex(index: Int): Unit = ControlSection.updateRecordIndex(index)
+  def updateRecordIndex(index: Int): Unit = controlSection.updateRecordIndex(index)
 
-  def getRecordIndex(index: Int): Int = ControlSection.getRecordIndex(index)
+  def getRecordIndex(index: Int): Int = controlSection.getRecordIndex(index)
 
-  def getMaxRecordIndex: Int = ControlSection.getMaxRecordIndex
+  def getMaxRecordIndex: Int = controlSection.getMaxRecordIndex
 
-  def getSelectedIndex: Int = ControlSection.getSelectedIndex
+  def getSelectedIndex: Int = controlSection.getSelectedIndex
 
   // control bar
   def updateControlBar(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean): Unit =
-    ControlSection.updateLabels(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean)
+    controlSection.updateLabels(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean)
 
   def updateEditResetLabel(lang: Language): Unit = EditReset.updateLabel(lang)
 

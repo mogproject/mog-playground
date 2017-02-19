@@ -13,7 +13,8 @@ import scalatags.JsDom.all._
 /**
   *
   */
-object ControlSection extends Section with EventManageable {
+case class ControlSection(canvasWidth: Int) extends Section with EventManageable {
+  val CONTROL_WIDTH = 48
 
   private[this] val controlInput0 = createControlInput("step-backward")
   private[this] val controlInput1 = createControlInput("backward")
@@ -22,6 +23,7 @@ object ControlSection extends Section with EventManageable {
 
   private[this] val recordSelector: HTMLSelectElement = select(
     cls := "form-control rect-select",
+    width := canvasWidth - CONTROL_WIDTH * 4,
     onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
   ).render
 
@@ -70,7 +72,8 @@ object ControlSection extends Section with EventManageable {
     setClickEvent(controlInput3, () => Controller.setControl(3))
   }
 
-  private[this] def createControlInput(glyph: String) = button(cls := "btn btn-default btn-control",
+  private[this] def createControlInput(glyph: String) = button(cls := "btn btn-default",
+    width := CONTROL_WIDTH,
     span(cls := s"glyphicon glyphicon-${glyph}", aria.hidden := true)
   ).render
 

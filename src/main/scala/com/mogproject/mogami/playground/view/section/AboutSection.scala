@@ -9,7 +9,6 @@ import scalatags.JsDom.all._
   */
 object AboutSection extends Section {
   val output: Div = div(
-    br(),
     div(
       h4("About This Site"),
       p(i(""""Run anywhere, without installing!"""")),
