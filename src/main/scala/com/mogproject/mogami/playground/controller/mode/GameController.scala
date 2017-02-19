@@ -60,7 +60,7 @@ trait GameController extends ModeController {
       val st = selectedState
       val mc = Some(EditModeController(renderer, config, st.turn, st.board, st.hand, st.getUnusedPtypeCount))
       game.moves.isEmpty.fold(mc, {
-        renderer.askConfirm(config.lang, () => Controller.update(mc))
+        renderer.askConfirm(config.messageLang, () => Controller.update(mc))
         None
       })
   }
@@ -70,7 +70,11 @@ trait GameController extends ModeController {
     *
     * @param lang language
     */
-  override def setLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(lang = lang)))
+  override def setMessageLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(messageLang = lang)))
+
+  override def setRecordLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(recordLang = lang)))
+
+  override def setPieceLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(pieceLang = lang)))
 
   /**
     * Flip the board
@@ -119,7 +123,7 @@ trait GameController extends ModeController {
 
   protected def renderControl(): Unit = {
     // record
-    renderer.updateRecordContent(game, config.lang)
+    renderer.updateRecordContent(game, config.recordLang)
     renderer.updateRecordIndex(displayPosition)
 
     // backward/forward

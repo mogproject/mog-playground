@@ -29,7 +29,7 @@ case class EditModeController(renderer: Renderer,
     renderer.expandCanvas()
     renderer.drawBoard()
     renderer.showEditSection()
-    renderer.updateRecordContent(Game(), config.lang)
+    renderer.updateRecordContent(Game(), config.recordLang)
     renderer.drawPieceBox()
     renderAll()
   }
@@ -38,7 +38,7 @@ case class EditModeController(renderer: Renderer,
     super.terminate()
     renderer.showControlSection()
     renderer.hideEditSection()
-//    renderer.hidePieceBox() // not necessary
+    //    renderer.hidePieceBox() // not necessary
     renderer.contractCanvas()
     renderer.drawBoard()
   }
@@ -46,9 +46,9 @@ case class EditModeController(renderer: Renderer,
   override def renderAll(): Unit = {
     super.renderAll()
 
-    renderer.updateEditTurnLabel(config.lang)
+    renderer.updateEditTurnLabel(config.messageLang)
     renderer.updateEditTurnValue(turn)
-    renderer.updateEditResetLabel(config.lang)
+    renderer.updateEditResetLabel(config.messageLang)
 
     renderer.drawIndicators(config, turn, GameStatus.Playing)
     renderer.drawEditingPieces(config, board, hand, box)
@@ -125,12 +125,16 @@ case class EditModeController(renderer: Renderer,
           case Editing => None
         }
       case Failure(e) =>
-        renderer.alertEditedState(e.getMessage, config.lang)
+        renderer.alertEditedState(e.getMessage, config.messageLang)
         None
     }
   } else None
 
-  override def setLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(lang = lang)))
+  override def setMessageLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(messageLang = lang)))
+
+  override def setRecordLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(recordLang = lang)))
+
+  override def setPieceLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(pieceLang = lang)))
 
   override def toggleFlip(): Option[ModeController] = Some(this.copy(config = config.copy(flip = !config.flip)))
 

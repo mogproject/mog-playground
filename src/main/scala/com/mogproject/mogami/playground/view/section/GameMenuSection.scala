@@ -20,6 +20,9 @@ object GameMenuSection extends Section {
     SfenStringCopyButton.output,
     br(),
     h4("Manage"),
+    label("Load from File"),
+    p("to be implemented"),
+    label("Save to File"),
     p("to be implemented"),
     h4("Help"),
     p("to be implemented")

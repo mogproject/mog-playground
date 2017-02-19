@@ -21,7 +21,7 @@ case class PromotionDialog(config: Configuration,
                            callbackPromote: () => Unit
                           ) extends EventManageable {
 
-  private[this] val title = config.lang match {
+  private[this] val title = config.messageLang match {
     case Japanese => "成りますか?"
     case English => "Do you want to promote?"
   }

@@ -9,7 +9,9 @@ import com.mogproject.mogami.util.Implicits._
   */
 case class Configuration(screenWidth: Double = 375.0,
                          layoutSize: Int = 0,
-                         lang: Language = Japanese,
+                         messageLang: Language = Japanese,
+                         recordLang: Language = Japanese,
+                         pieceLang: Language = Japanese,
                          flip: Boolean = false,
                          baseUrl: String = ""
                         ) {
@@ -27,20 +29,32 @@ case class Configuration(screenWidth: Double = 375.0,
       }
   }
 
-  lazy val pieceRenderer: PieceRenderer = lang match {
+  lazy val pieceRenderer: PieceRenderer = pieceLang match {
     case Japanese => SimpleJapanesePieceRenderer(layout)
     case English => EnglishPieceRenderer(layout)
   }
 
   def toQueryParameters: List[String] = {
-    val parseLanguage = (xs: List[String]) => lang match {
+    type Parser = List[String] => List[String]
+
+    val parseMessageLang: Parser = xs => messageLang match {
       case Japanese => xs
-      case English => "lang=en" :: xs
+      case English => "mlang=en" :: xs
     }
 
-    val parseFlip = (xs: List[String]) => flip.fold("flip=true" :: xs, xs)
+    val parseRecordLang: Parser = xs => recordLang match {
+      case Japanese => xs
+      case English => "rlang=en" :: xs
+    }
 
-    (parseLanguage andThen parseFlip) (List.empty)
+    val parsePieceLang: Parser = xs => pieceLang match {
+      case Japanese => xs
+      case English => "plang=en" :: xs
+    }
+
+    val parseFlip: Parser = xs => flip.fold("flip=true" :: xs, xs)
+
+    (parseMessageLang andThen parseRecordLang andThen parsePieceLang andThen parseFlip)(List.empty)
   }
 
 }

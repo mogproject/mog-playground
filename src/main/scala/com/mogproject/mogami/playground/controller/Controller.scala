@@ -86,9 +86,13 @@ object Controller {
   def invokeCursor(selected: Cursor, invoked: Cursor): Unit = doAction(_.invokeCursor(selected, invoked), _.renderAll())
 
   // actions
-  def setMode(mode: Mode): Unit = doAction(_.setMode(mode), mc => {})
+  def setMode(mode: Mode): Unit = doAction(_.setMode(mode), _ => {})
 
-  def setLanguage(lang: Language): Unit = doAction(_.setLanguage(lang), _.renderAll())
+  def setMessageLanguage(lang: Language): Unit = doAction(_.setMessageLanguage(lang), _.renderAll())
+
+  def setRecordLanguage(lang: Language): Unit = doAction(_.setRecordLanguage(lang), _.renderAll())
+
+  def setPieceLanguage(lang: Language): Unit = doAction(_.setPieceLanguage(lang), _.renderAll())
 
   def setRecord(index: Int): Unit = doAction(_.setRecord(index), _.renderAll())
 
@@ -98,5 +102,7 @@ object Controller {
 
   def setEditInitialState(initialState: State): Unit = doAction(_.setEditInitialState(initialState), _.renderAll())
 
-  def toggleFlip(): Unit = doAction(_.toggleFlip, _.renderAll())
+  def toggleFlip(): Unit = doAction(_.toggleFlip(), _.renderAll())
+
+  def showMenu(): Unit = modeController.get.renderer.showMenuModal()
 }

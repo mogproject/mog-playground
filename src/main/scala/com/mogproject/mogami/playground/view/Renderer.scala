@@ -53,8 +53,9 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       div(cls := "row")(
         div(cls := "navbar-header col-md-10 col-md-offset-1",
           ul(cls := "nav navbar-nav",
+            li(cls := "navbar-brand hidden-xs hidden-sm", padding := 4, "Shogi Playground"),
             li(ModeSelector.output),
-            LanguageSelector.output,
+            MenuButton.output,
             FlipButton.output
           )
         )
@@ -109,10 +110,11 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       setEventListener("mousedown", mouseDown)
     }
 
-    controlSection.initialize()
     ModeSelector.initialize()
     FlipButton.initialize()
-    LanguageSelector.initialize()
+    MenuButton.initialize()
+    controlSection.initialize()
+    LanguageSection.initialize()
     EditSection.initialize()
 
     // initialize clipboard.js
@@ -198,7 +200,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     drawPlayerIcon(config)
 
     val ctx = layer0
-    val (b, w, font) = config.lang match {
+    val (b, w, font) = config.recordLang match {
       case Japanese => ("先手", "後手", layout.font.playerNameJapanese)
       case English => ("Black", "White", layout.font.playerNameEnglish)
     }
@@ -224,7 +226,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   def drawIndexes(config: Configuration): Unit = {
     val ctx = layer3
     val fileIndex = "１２３４５６７８９"
-    val rankIndex = config.lang match {
+    val rankIndex = config.recordLang match {
       case Japanese => "一二三四五六七八九"
       case English => "abcdefghi"
     }
@@ -387,6 +389,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     AlertDialog(lang, s).show()
   }
 
+  def showMenuModal(): Unit = MenuDialog.show()
+
   def updateSnapshotUrl(url: String): Unit = SnapshotCopyButton.updateValue(url)
 
   def updateRecordUrl(url: String): Unit = RecordCopyButton.updateValue(url)
@@ -396,8 +400,6 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   def updateSfenString(sfen: String): Unit = SfenStringCopyButton.updateValue(sfen)
 
   def updateMode(mode: Mode): Unit = ModeSelector.updateValue(mode)
-
-  def updateLang(config: Configuration): Unit = LanguageSelector.updateValue(config.lang)
 
   def updateFlip(config: Configuration): Unit = FlipButton.updateValue(config.flip)
 
@@ -421,4 +423,11 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   def updateEditTurnLabel(lang: Language): Unit = EditTurn.updateLabel(lang)
 
   def updateEditTurnValue(newValue: Player): Unit = EditTurn.updateValue(newValue)
+
+  // languages
+  def updateMessageLang(lang: Language): Unit = MessageLanguageSelector.updateValue(lang)
+
+  def updateRecordLang(lang: Language): Unit = RecordLanguageSelector.updateValue(lang)
+
+  def updatePieceLang(lang: Language): Unit = PieceLanguageSelector.updateValue(lang)
 }
