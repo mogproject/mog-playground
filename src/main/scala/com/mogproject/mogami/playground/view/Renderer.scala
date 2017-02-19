@@ -358,7 +358,11 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     */
   def drawAsImage(): Unit = {
     dom.window.document.body.style.backgroundColor = "black"
-    dom.window.document.body.innerHTML = img(src := getImageBase64).toString
+
+    val t = "Snapshot - Shogi Playground"
+    val base64 = getImageBase64
+    val elem = a(attr("download") := "snapshot.png", title := t, href := base64, img(alt := t, src := base64))
+    dom.window.document.body.innerHTML = elem.toString
   }
 
   def showEditSection(): Unit = EditSection.show()
