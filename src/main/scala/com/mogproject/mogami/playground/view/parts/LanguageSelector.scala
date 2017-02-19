@@ -8,7 +8,9 @@ import scalatags.JsDom.all._
 /**
   *
   */
-object MessageLanguageSelector extends ButtonLike[Language, Anchor, Div] {
+sealed trait LanguageSelector extends ButtonLike[Language, Anchor, Div] {
+  protected def labelString: String
+
   override protected val keys = Seq(Japanese, English)
 
   override protected val labels = Map(
@@ -17,12 +19,10 @@ object MessageLanguageSelector extends ButtonLike[Language, Anchor, Div] {
 
   override protected def generateInput(key: Language): Anchor = a(cls := "btn btn-primary").render
 
-  override protected def invoke(key: Language): Unit = Controller.setMessageLanguage(key)
-
   override val output: Div = div(cls := "form-group",
-    label("Messages"),
     div(cls := "row",
-      div(cls := "col-sm-8 col-md-8",
+      div(cls := "col-xs-4", label(labelString)),
+      div(cls := "col-xs-8",
         div(cls := "input-group",
           div(cls := "btn-group btn-group-justified",
             inputs
@@ -36,4 +36,22 @@ object MessageLanguageSelector extends ButtonLike[Language, Anchor, Div] {
     super.initialize()
     updateLabel(English)
   }
+}
+
+object MessageLanguageSelector extends LanguageSelector {
+  override lazy val labelString = "Messages"
+
+  override protected def invoke(key: Language): Unit = Controller.setMessageLanguage(key)
+}
+
+object RecordLanguageSelector extends LanguageSelector {
+  override lazy val labelString = "Record"
+
+  override protected def invoke(key: Language): Unit = Controller.setRecordLanguage(key)
+}
+
+object PieceLanguageSelector extends LanguageSelector {
+  override lazy val labelString = "Pieces"
+
+  override protected def invoke(key: Language): Unit = Controller.setPieceLanguage(key)
 }

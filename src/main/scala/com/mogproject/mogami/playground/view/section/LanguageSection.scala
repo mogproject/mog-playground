@@ -18,9 +18,7 @@ object LanguageSection extends Section {
   val output: Div = div(
     h4("Language"),
     MessageLanguageSelector.output,
-    br(),
     RecordLanguageSelector.output,
-    br(),
     PieceLanguageSelector.output
   ).render
 
