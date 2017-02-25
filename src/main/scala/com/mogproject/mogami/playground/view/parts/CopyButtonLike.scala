@@ -38,4 +38,6 @@ trait CopyButtonLike {
   ).render
 
   def updateValue(value: String): Unit = inputElem.value = value
+
+  def getValue: String = inputElem.value
 }

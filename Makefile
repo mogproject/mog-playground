@@ -1,8 +1,15 @@
 SBT = sbt
 OPEN = open
+TEST_RSC = src/test/resources
+PROD_RSC = docs
+TEST_ASS = ${TEST_RSC}/assets
+PROD_ASS = ${PROD_RSC}/assets
+COPY_DEV = cp -f target/scala-2.12/mog-playground-jsdeps.js target/scala-2.12/mog-playground-fastopt.js ${TEST_ASS}/js/ && cp -f css/main.css ${TEST_ASS}/css/
+COPY_PROD = cp -f target/scala-2.12/mog-playground-jsdeps.js target/scala-2.12/mog-playground-opt.js ${PROD_ASS}/js/ && cp -f css/main.css ${PROD_ASS}/css/
+
 
 build:
-	${SBT} compile
+	${DEV_CMD}
 
 test:
 	${SBT} test
@@ -13,11 +20,11 @@ console:
 clean:
 	rm -rf ~/.sbt/0.13/staging/*/mog-core-scala && ${SBT} clean
 
-develop:
-	${SBT} fastOptJS && ${OPEN} index-dev.html
+local:
+	${COPY_DEV} && ${OPEN} http://localhost:8083/test/index-dev.html
 
 publish:
-	${SBT} fullOptJS && cp -f target/scala-2.12/mog-playground-opt.js docs/assets/js/ && cp -f css/main.css docs/assets/css/
+	sbt fullOptJS && ${COPY_PROD}
 
-.PHONY: build test console clean develop publish
+.PHONY: build test console clean local publish
 

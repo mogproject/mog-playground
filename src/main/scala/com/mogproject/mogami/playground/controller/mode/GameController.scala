@@ -3,6 +3,7 @@ package com.mogproject.mogami.playground.controller.mode
 import com.mogproject.mogami.core.Game.GameStatus
 import com.mogproject.mogami.{Game, Move, State}
 import com.mogproject.mogami.playground.controller.{Configuration, Controller, Language}
+import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.util.Implicits._
 
 import scala.scalajs.js.URIUtils.encodeURIComponent
@@ -153,9 +154,16 @@ trait GameController extends ModeController {
     val image = "action=image" :: ("sfen=" + encodeURIComponent(instantGameWithLastMove.toSfenString)) +: configParams
 
     renderer.updateSnapshotUrl(s"${config.baseUrl}?${snapshot.mkString("&")}")
+    renderer.updateSnapshotShortUrl("")
     renderer.updateRecordUrl(s"${config.baseUrl}?${record.mkString("&")}")
     renderer.updateImageLinkUrl(s"${config.baseUrl}?${image.mkString("&")}")
     renderer.updateSfenString(selectedState.toSfenString)
   }
 
+  def shortenSnapshotUrl(shortener: URLShortener): Unit = {
+    // todo: implement failure tooltip
+    shortener.makeShortenedURL(renderer.getSnapshotUrl, renderer.updateSnapshotShortUrl, () => {
+      println(s"URLShortener failed: url=${renderer.getSnapshotUrl}")
+    })
+  }
 }

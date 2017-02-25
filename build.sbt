@@ -1,3 +1,10 @@
+import wav.devtools.sbt.httpserver.{SbtHttpServerPlugin, FileServer}
+import SbtHttpServerPlugin.autoImport._
+
+enablePlugins(SbtHttpServerPlugin)
+addHttpServices(
+  _ += FileServer.service("test", (resourceDirectories in Test).value)
+)
 
 enablePlugins(ScalaJSPlugin)
 
@@ -16,11 +23,14 @@ lazy val root = (project in file("."))
       "org.scalacheck" %%% "scalacheck" % "1.13.4" % Test
     ),
     scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation"),
+
+    skip in packageJSDependencies := false,
+
     jsDependencies ++= Seq(
-      RuntimeDOM
+      RuntimeDOM,
+      "org.webjars" % "jquery" % "2.1.4" / "2.1.4/jquery.min.js"
     )
   )
   .dependsOn(mogCore)
 
 lazy val mogCore = ProjectRef(uri("git://github.com/mogproject/mog-core-scala.git#master"), "mogCoreJS")
-
