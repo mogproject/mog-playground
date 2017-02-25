@@ -15,6 +15,7 @@ object GameMenuSection extends Section {
     SnapshotShortenButton.output,
     br(),
     RecordCopyButton.output,
+    RecordShortenButton.output,
     br(),
     ImageLinkButton.output,
     br(),

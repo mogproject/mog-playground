@@ -44,9 +44,6 @@ object Controller {
 
     // create image if the action is ImageAction
     if (args.action == ImageAction) renderer.drawAsImage()
-
-    // initialize URL Shortener
-    urlShortener.initialize()
   }
 
   /**
@@ -114,6 +111,11 @@ object Controller {
 
   def shortenSnapshotUrl(): Unit = modeController match {
     case Some(gc: GameController) => gc.shortenSnapshotUrl(urlShortener)
+    case _ =>
+  }
+
+  def shortenRecordUrl(): Unit = modeController match {
+    case Some(gc: GameController) => gc.shortenRecordUrl(urlShortener)
     case _ =>
   }
 }

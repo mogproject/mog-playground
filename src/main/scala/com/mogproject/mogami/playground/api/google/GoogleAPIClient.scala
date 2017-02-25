@@ -8,6 +8,11 @@ import scala.scalajs.js.|
   */
 
 @js.native
+trait Thenable extends js.Object {
+  def `then`(callback: js.Function): Unit = js.native
+}
+
+@js.native
 trait RequestParams extends js.Object {
   var longUrl: String = js.native
 }
@@ -28,7 +33,7 @@ object gapi extends js.Object {
 
     def setApiKey(apiKey: String): Unit = js.native
 
-    def load(urlOrObject: String | js.Object): Unit = js.native
+    def load(urlOrObject: String | js.Object): Thenable = js.native
 
     @js.native
     class HttpRequest[T] extends js.Object {

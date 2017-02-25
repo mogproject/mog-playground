@@ -405,6 +405,10 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   def updateRecordUrl(url: String): Unit = RecordCopyButton.updateValue(url)
 
+  def getRecordUrl: String = RecordCopyButton.getValue
+
+  def updateRecordShortUrl(url: String): Unit = RecordShortenButton.updateValue(url)
+
   def updateImageLinkUrl(url: String): Unit = ImageLinkButton.updateValue(url)
 
   def updateSfenString(sfen: String): Unit = SfenStringCopyButton.updateValue(sfen)
