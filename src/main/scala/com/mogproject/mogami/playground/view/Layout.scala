@@ -83,7 +83,7 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
     val bg = "#fefdfa"
 
     // promoted pieces
-    val red = "#b22222"
+    val red = "#d9534f"
 
     // indicators
     val active = "#3276b1"
@@ -94,7 +94,7 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
     val cursor = "#E1B265"
     val flash = "#805819"
     val dark = "#353535"
-    val light = "#E0FFFF"
+    val light = "#f0f0f0"
 
     // indicator text
     val white = "#ffffff"
