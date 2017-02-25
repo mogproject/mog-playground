@@ -54,6 +54,13 @@
     height: 24px !important;
 }
 
+.small-padding {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-right: 3px !important;
+    padding-left: 3px !important;
+}
+
 .rect-select {
     border-radius: 0 !important;
     -webkit-appearance:none;
