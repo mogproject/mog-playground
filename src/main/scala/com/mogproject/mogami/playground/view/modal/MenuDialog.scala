@@ -51,6 +51,8 @@ object MenuDialog {
   def show(): Unit = {
     val dialog = jQuery(elem)
     dialog.on("hidden.bs.modal", () ⇒ {
+      // Hide all manual tooltips
+      jQuery("""[data-toggle="tooltip",data-trigger="manual"]""").asInstanceOf[BootstrapJQuery].tooltip("hide").attr("data-original-title", "")
       // Remove from DOM
       dialog.remove()
     })
