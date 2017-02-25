@@ -7,7 +7,7 @@ import com.mogproject.mogami.core.Game.GameStatus.GameStatus
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller.mode.Mode
-import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
+import com.mogproject.mogami.playground.view.bootstrap.{BootstrapJQuery, TooltipOptions}
 import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.playground.view.parts._
 import com.mogproject.mogami.playground.view.section._
@@ -17,6 +17,7 @@ import org.scalajs.dom.{CanvasRenderingContext2D, Element}
 import org.scalajs.dom.html.{Canvas, Div}
 import org.scalajs.jquery.jQuery
 
+import scala.scalajs.js
 import scalatags.JsDom.all._
 
 /**
@@ -129,7 +130,12 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     })
 
     // initialize tooltips
-    jQuery("""[data-toggle="tooltip"]""").asInstanceOf[BootstrapJQuery].tooltip()
+
+    jQuery("""[data-toggle="tooltip"]""").asInstanceOf[BootstrapJQuery].tooltip {
+      val r = js.Dynamic.literal()
+      r.trigger = layout.isMobile.fold("focus", "hover")
+      r.asInstanceOf[TooltipOptions]
+    }
   }
 
   private[this] def createCanvas(zIndexVal: Int): Canvas = {
