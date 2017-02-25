@@ -20,8 +20,9 @@ sealed trait LanguageSelector extends ButtonLike[Language, Anchor, Div] {
   override protected def generateInput(key: Language): Anchor = a(cls := "btn btn-primary").render
 
   override val output: Div = div(cls := "form-group",
+    marginBottom := 3,
     div(cls := "row",
-      div(cls := "col-xs-4", label(labelString)),
+      div(cls := "col-xs-4 small-padding", textAlign := "right", label(marginTop := 6, labelString)),
       div(cls := "col-xs-8",
         div(cls := "input-group",
           div(cls := "btn-group btn-group-justified",

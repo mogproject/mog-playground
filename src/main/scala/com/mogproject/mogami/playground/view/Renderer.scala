@@ -128,6 +128,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       hideTooltip(e.trigger)
     })
 
+    // initialize tooltips
+    jQuery("""[data-toggle="tooltip"]""").asInstanceOf[BootstrapJQuery].tooltip()
   }
 
   private[this] def createCanvas(zIndexVal: Int): Canvas = {
@@ -397,7 +399,15 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   def updateSnapshotUrl(url: String): Unit = SnapshotCopyButton.updateValue(url)
 
+  def getSnapshotUrl: String = SnapshotCopyButton.getValue
+
+  def updateSnapshotShortUrl(url: String): Unit = SnapshotShortenButton.updateValue(url)
+
   def updateRecordUrl(url: String): Unit = RecordCopyButton.updateValue(url)
+
+  def getRecordUrl: String = RecordCopyButton.getValue
+
+  def updateRecordShortUrl(url: String): Unit = RecordShortenButton.updateValue(url)
 
   def updateImageLinkUrl(url: String): Unit = ImageLinkButton.updateValue(url)
 

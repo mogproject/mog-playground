@@ -30,3 +30,6 @@ src/debug/
 # Node.js
 node_modules/
 
+# for local testing
+src/test/resources/assets
+

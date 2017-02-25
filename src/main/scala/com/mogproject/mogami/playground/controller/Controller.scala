@@ -3,6 +3,7 @@ package com.mogproject.mogami.playground.controller
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.view.Renderer
 import com.mogproject.mogami._
+import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller.mode._
 import org.scalajs.dom.Element
 
@@ -10,6 +11,8 @@ import org.scalajs.dom.Element
   * logic controller
   */
 object Controller {
+
+  private[this] val urlShortener = URLShortener()
 
   // mutable reference
   private[this] var modeController: Option[ModeController] = None
@@ -105,4 +108,14 @@ object Controller {
   def toggleFlip(): Unit = doAction(_.toggleFlip(), _.renderAll())
 
   def showMenu(): Unit = modeController.get.renderer.showMenuModal()
+
+  def shortenSnapshotUrl(): Unit = modeController match {
+    case Some(gc: GameController) => gc.shortenSnapshotUrl(urlShortener)
+    case _ =>
+  }
+
+  def shortenRecordUrl(): Unit = modeController match {
+    case Some(gc: GameController) => gc.shortenRecordUrl(urlShortener)
+    case _ =>
+  }
 }
