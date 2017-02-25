@@ -26,13 +26,12 @@ object SnapshotShortenButton extends CopyButtonLike {
 
   override lazy val output: Div = div(
     div(cls := "input-group",
-      div(
-        cls := "input-group-btn",
+      marginTop := 3,
+      div(cls := "input-group-btn",
         shortenButton
       ),
       inputElem,
-      div(
-        cls := "input-group-btn",
+      div(cls := "input-group-btn",
         copyButton
       )
     )
