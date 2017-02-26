@@ -23,8 +23,8 @@ case class PlayModeController(renderer: Renderer,
   override def canActivate(cursor: Cursor): Boolean = !cursor.isBox
 
   override def canSelect(cursor: Cursor): Boolean = config.flip.when[Cursor](!_)(cursor) match {
-    case Cursor(Some(sq), None, None) => selectedState.board.get(sq).exists(selectedState.turn == _.owner)
-    case Cursor(None, Some(h), None) => h.owner == selectedState.turn && selectedState.hand.get(h).exists(_ > 0)
+    case Cursor(Some(sq), None, None, None) => selectedState.board.get(sq).exists(selectedState.turn == _.owner)
+    case Cursor(None, Some(h), None, None) => h.owner == selectedState.turn && selectedState.hand.get(h).exists(_ > 0)
     case _ => false
   }
 
@@ -42,7 +42,7 @@ case class PlayModeController(renderer: Renderer,
     }
 
     config.flip.when[Cursor](!_)(invoked) match {
-      case Cursor(Some(to), None, None) if selectedState.canAttack(from, to) =>
+      case Cursor(Some(to), None, None, None) if selectedState.canAttack(from, to) =>
         selectedState.getPromotionFlag(from, to) match {
           case Some(PromotionFlag.CannotPromote) => f(to, promote = false)
           case Some(PromotionFlag.CanPromote) =>

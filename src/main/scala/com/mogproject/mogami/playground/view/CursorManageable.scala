@@ -39,23 +39,32 @@ trait CursorManageable {
     val rect = canvas2.getBoundingClientRect()
     val (x, y) = (clientX - rect.left, clientY - rect.top)
 
-    (layout.board.isInside(x, y), layout.handBlack.isInside(x, y), layout.handWhite.isInside(x, y), layout.pieceBox.isInside(x, y)) match {
-      case (true, _, _, _) =>
-        val file = 9 - ((x - layout.board.left) / layout.PIECE_WIDTH).toInt
-        val rank = 1 + ((y - layout.board.top) / layout.PIECE_HEIGHT).toInt
-        Some(Cursor(Square(file, rank)))
-      case (false, false, false, false) =>
-        None
-      case (false, false, false, true) =>
-        val offset = x - layout.pieceBox.left
-        val i = (offset / layout.PIECE_WIDTH).toInt
-        (i <= 7 && offset % layout.PIECE_WIDTH <= layout.PIECE_WIDTH).option(Cursor(boxPtypes(i)))
-      case (false, isBlack, _, _) =>
-        val offset = isBlack.fold(x - layout.handBlack.left, layout.handWhite.right - x)
-        val i = (offset / layout.HAND_PIECE_WIDTH).toInt
-        (i <= 6 && offset % layout.HAND_PIECE_WIDTH <= layout.HAND_PIECE_WIDTH).option {
-          Cursor(Piece(isBlack.fold(Player.BLACK, Player.WHITE), Ptype.inHand(i)))
-        }
+    if (layout.board.isInside(x, y)) {
+      val file = 9 - ((x - layout.board.left) / layout.PIECE_WIDTH).toInt
+      val rank = 1 + ((y - layout.board.top) / layout.PIECE_HEIGHT).toInt
+      Some(Cursor(Square(file, rank)))
+    } else if (layout.handBlack.isInside(x, y)) {
+      getCursorHand(x, isBlack = true)
+    } else if (layout.handWhite.isInside(x, y)) {
+      getCursorHand(x, isBlack = false)
+    } else if (layout.playerBlack.isInside(x, y)) {
+      Some(Cursor(Player.BLACK))
+    } else if (layout.playerWhite.isInside(x, y)) {
+      Some(Cursor(Player.WHITE))
+    } else if (layout.pieceBox.isInside(x, y)) {
+      val offset = x - layout.pieceBox.left
+      val i = (offset / layout.PIECE_WIDTH).toInt
+      (i <= 7 && offset % layout.PIECE_WIDTH <= layout.PIECE_WIDTH).option(Cursor(boxPtypes(i)))
+    } else {
+      None
+    }
+  }
+
+  private[this] def getCursorHand(x: Double, isBlack: Boolean): Option[Cursor] = {
+    val offset = isBlack.fold(x - layout.handBlack.left, layout.handWhite.right - x)
+    val i = (offset / layout.HAND_PIECE_WIDTH).toInt
+    (i <= 6 && offset % layout.HAND_PIECE_WIDTH <= layout.HAND_PIECE_WIDTH).option {
+      Cursor(Piece(isBlack.fold(Player.BLACK, Player.WHITE), Ptype.inHand(i)))
     }
   }
 
@@ -64,34 +73,36 @@ trait CursorManageable {
     */
   private[this] def cursorToRect(cursor: Cursor, isFlipped: Boolean = false): Rectangle = {
     isFlipped.when[Cursor](!_)(cursor) match {
-      case Cursor(None, Some(Hand(Player.BLACK, pt)), None) =>
+      case Cursor(None, Some(Hand(Player.BLACK, pt)), None, None) =>
         Rectangle(
           layout.handBlack.left + (pt.sortId - 1) * layout.HAND_PIECE_WIDTH,
           layout.handBlack.top,
           layout.HAND_PIECE_WIDTH,
           layout.HAND_PIECE_HEIGHT
         )
-      case Cursor(None, Some(Hand(Player.WHITE, pt)), None) =>
+      case Cursor(None, Some(Hand(Player.WHITE, pt)), None, None) =>
         Rectangle(
           layout.handWhite.right - (pt.sortId - 1) * layout.HAND_PIECE_WIDTH - layout.HAND_PIECE_WIDTH,
           layout.handWhite.top,
           layout.HAND_PIECE_WIDTH,
           layout.HAND_PIECE_HEIGHT
         )
-      case Cursor(Some(sq), None, None) =>
+      case Cursor(Some(sq), None, None, None) =>
         Rectangle(
           layout.board.left + (9 - sq.file) * layout.PIECE_WIDTH,
           layout.board.top + (sq.rank - 1) * layout.PIECE_HEIGHT,
           layout.PIECE_WIDTH,
           layout.PIECE_HEIGHT
         )
-      case Cursor(None, None, Some(pt)) =>
+      case Cursor(None, None, Some(pt), None) =>
         Rectangle(
           layout.pieceBox.left + pt.sortId * layout.PIECE_WIDTH,
           layout.pieceBox.top,
           layout.PIECE_WIDTH,
           layout.PIECE_HEIGHT
         )
+      case Cursor(None, None, None, Some(Player.BLACK)) => layout.playerBlack
+      case Cursor(None, None, None, Some(Player.WHITE)) => layout.playerWhite
       case _ => Rectangle(0, 0, layout.PIECE_WIDTH, layout.PIECE_HEIGHT) // never happens
     }
   }
@@ -180,6 +191,7 @@ trait CursorManageable {
   private[this] def mouseDown(cursor: Option[Cursor]): Unit = {
     cursor.foreach(c => if (Controller.canActivate(c)) flashCursor(c))
     (selectedCursor, cursor) match {
+      case (_, Some(invoked)) if invoked.isPlayer => Controller.invokeCursor(invoked, invoked)
       case (Some(sel), Some(invoked)) => clearSelectedArea(); Controller.invokeCursor(sel, invoked)
       case (Some(sel), None) => clearSelectedArea()
       case (None, Some(sel)) if Controller.canSelect(sel) => drawSelectedArea(sel)
