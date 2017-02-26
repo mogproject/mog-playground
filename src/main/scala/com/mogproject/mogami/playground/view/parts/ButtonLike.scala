@@ -21,7 +21,7 @@ trait ButtonLike[Key, Input <: HTMLElement, Output <: Element] extends EventMana
 
   private[this] lazy val labelMap: Map[Language, Map[Key, String]] = labels.map { case (l, s) => l -> keys.zip(s).toMap }
 
-  private[this] lazy val inputMap: Map[Key, Input] = keys.map(k => k -> generateInput(k)).toMap
+  protected lazy val inputMap: Map[Key, Input] = keys.map(k => k -> generateInput(k)).toMap
 
   protected def inputs: Seq[Input] = keys.map(inputMap)
 

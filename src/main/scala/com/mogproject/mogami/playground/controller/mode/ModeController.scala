@@ -110,10 +110,13 @@ trait ModeController {
 
   // helper functions
   protected def getConvertedPlayerNames(oldLang: Language, newLang: Language): GameInfo = {
-    if (gameInfo.tags.get('blackName) == Some(handicapNames((oldLang, BLACK))) && gameInfo.tags.get('whiteName) == Some(handicapNames((oldLang, WHITE)))) {
-      gameInfo.copy(tags = gameInfo.tags ++ Map('blackName -> handicapNames((newLang, BLACK)), 'whiteName -> handicapNames((newLang, WHITE))))
-    } else {
-      gameInfo
-    }
+    (for {
+      names <- List(defaultNames, handicapNames)
+      if List((BLACK, 'blackName), (WHITE, 'whiteName)).forall { case (p, k) => gameInfo.tags.get(k).contains(names(oldLang, p)) }
+    } yield {
+      names
+    }).headOption.map { names =>
+      gameInfo.copy(tags = gameInfo.tags ++ Map('blackName -> names((newLang, BLACK)), 'whiteName -> names((newLang, WHITE))))
+    }.getOrElse(gameInfo)
   }
 }
