@@ -400,6 +400,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   def showMenuModal(): Unit = MenuDialog.show()
 
+  def showGameInfoModal(config: Configuration, gameInfo: GameInfo): Unit = GameInfoDialog(config, gameInfo).show()
+
   def updateSnapshotUrl(url: String): Unit = SnapshotCopyButton.updateValue(url)
 
   def getSnapshotUrl: String = SnapshotCopyButton.getValue

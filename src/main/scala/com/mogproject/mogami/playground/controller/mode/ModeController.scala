@@ -99,6 +99,8 @@ trait ModeController {
 
   def setControl(controlType: Int): Option[ModeController] = None
 
+  def setGameInfo(gameInfo: GameInfo): Option[ModeController] = None
+
   def toggleFlip(): Option[ModeController] = None
 
   // actions for edit mode

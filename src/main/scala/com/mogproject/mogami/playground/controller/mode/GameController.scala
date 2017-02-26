@@ -110,6 +110,13 @@ trait GameController extends ModeController {
     }
   }
 
+  /**
+    * Change the game information
+    *
+    * @param gameInfo game info
+    */
+  override def setGameInfo(gameInfo: GameInfo): Option[ModeController] = Some(this.copy(game = game.copy(gameInfo = gameInfo)))
+
   //
   // renderer
   //

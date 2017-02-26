@@ -31,7 +31,7 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
   lazy val playerAreaWidth: Int = PIECE_WIDTH * 3 - 4
   lazy val playerIconWidth: Int = scaleByCanvas(64)
   lazy val playerIconHeight: Int = MARGIN_BLOCK / 2 + HAND_PIECE_HEIGHT - INDICATOR_HEIGHT
-  lazy val playerNameWidth: Int = playerAreaWidth - playerIconWidth - 2
+  lazy val playerNameWidth: Int = playerAreaWidth - playerIconWidth
   lazy val playerNameHeight: Int = HAND_PIECE_HEIGHT - INDICATOR_HEIGHT - 1
 
   // rectangles
@@ -49,7 +49,7 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
   val playerBlack = Rectangle(MARGIN_LEFT, board.bottom + MARGIN_BLOCK + 2, playerAreaWidth, HAND_PIECE_HEIGHT)
   val indicatorBlack = Rectangle(playerBlack.left + 1, playerBlack.bottom - INDICATOR_HEIGHT - 1, playerBlack.width - 2, INDICATOR_HEIGHT)
   val playerIconBlack = Rectangle(playerBlack.left + 1, playerBlack.bottom - INDICATOR_HEIGHT - playerIconHeight, playerIconWidth, playerIconHeight)
-  val playerNameBlack = Rectangle(playerIconBlack.right + 1, playerBlack.top + 1, playerNameWidth, playerNameHeight)
+  val playerNameBlack = Rectangle(playerIconBlack.right - 1, playerBlack.top + 1, playerNameWidth, playerNameHeight)
 
   val handBlack = Rectangle(MARGIN_LEFT + PIECE_WIDTH * 3, playerBlack.top, BOARD_WIDTH - PIECE_WIDTH * 3, HAND_PIECE_HEIGHT)
 
