@@ -176,20 +176,16 @@ trait GameController extends ModeController {
   }
 
   def shortenSnapshotUrl(shortener: URLShortener): Unit = {
-    // todo: implement failure tooltip
     renderer.updateSnapshotShortUrl("creating...", completed = false)
     shortener.makeShortenedURL(renderer.getSnapshotUrl, renderer.updateSnapshotShortUrl(_, completed = true), s => {
-      renderer.updateSnapshotShortUrl("failed", completed = false)
-      println(s)
+      renderer.updateSnapshotShortUrl(s, completed = false)
     })
   }
 
   def shortenRecordUrl(shortener: URLShortener): Unit = {
-    // todo: implement failure tooltip
     renderer.updateRecordShortUrl("creating...", completed = false)
     shortener.makeShortenedURL(renderer.getRecordUrl, renderer.updateRecordShortUrl(_, completed = true), s => {
-      renderer.updateRecordShortUrl("failed", completed = false)
-      println(s)
+      renderer.updateRecordShortUrl(s, completed = false)
     })
   }
 }

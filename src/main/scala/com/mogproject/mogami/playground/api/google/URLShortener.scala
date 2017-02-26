@@ -23,7 +23,7 @@ case class URLShortener(
 
   private[this] def initialize(): Option[Thenable] = {
     // check if Google API client is ready
-    if (js.isUndefined(gapi.client)) {
+    if (js.isUndefined(gapi) || js.isUndefined(gapi.client)) {
       // not yet loaded
       None
     } else {
