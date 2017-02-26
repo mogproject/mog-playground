@@ -185,21 +185,21 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   }
 
   def drawPlayerIcon(config: Configuration): Unit = {
-    val (b, w) = config.flip.fold(("☖", "☗"), ("☗", "☖"))
-    val ctx = layer0
+    val (b, w) = config.flip.fold((layout.color.white, layout.color.fg), (layout.color.fg, layout.color.white))
+    val ctx = layer2
 
     // clear
     clearPlayerIcon()
 
     // draw
-    List((w, layout.playerIconWhite, true), (b, layout.playerIconBlack, false)).foreach { case (t, r, rot) =>
-      TextRenderer(ctx, t, layout.font.playerIcon, layout.color.fg, r.left, r.top, r.width, r.height)
-        .alignCenter.alignMiddle.withRotate(rot).render()
+    List((w, layout.playerIconWhite, true), (b, layout.playerIconBlack, false)).foreach { case (c, r, rot) =>
+      TextRenderer(ctx, "☗", layout.font.playerIcon, c, r.left, r.top, r.width, r.height)
+        .alignCenter.alignMiddle.withRotate(rot).withStroke(layout.color.fg, layout.strokeSize).render()
     }
   }
 
   def clearPlayerIcon(): Unit = {
-    val ctx = layer0
+    val ctx = layer2
     layout.playerIconWhite.clear(ctx)
     layout.playerIconBlack.clear(ctx)
   }
@@ -221,7 +221,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       (config.flip.fold(w, b), layout.playerNameBlack, false),
       (config.flip.fold(b, w), layout.playerNameWhite, true)).foreach { case (t, r, rot) =>
       TextRenderer(ctx, t, font, layout.color.fg, r.left, r.top, r.width, r.height)
-        .alignCenter.alignMiddle.withRotate(rot).render()
+        .alignLeft.alignMiddle.withRotate(rot).render()
     }
   }
 

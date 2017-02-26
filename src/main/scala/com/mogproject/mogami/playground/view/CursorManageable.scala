@@ -52,8 +52,8 @@ trait CursorManageable {
         (i <= 7 && offset % layout.PIECE_WIDTH <= layout.PIECE_WIDTH).option(Cursor(boxPtypes(i)))
       case (false, isBlack, _, _) =>
         val offset = isBlack.fold(x - layout.handBlack.left, layout.handWhite.right - x)
-        val i = (offset / layout.PIECE_WIDTH).toInt
-        (i <= 6 && offset % layout.PIECE_WIDTH <= layout.PIECE_WIDTH).option {
+        val i = (offset / layout.HAND_PIECE_WIDTH).toInt
+        (i <= 6 && offset % layout.HAND_PIECE_WIDTH <= layout.HAND_PIECE_WIDTH).option {
           Cursor(Piece(isBlack.fold(Player.BLACK, Player.WHITE), Ptype.inHand(i)))
         }
     }
@@ -63,18 +63,37 @@ trait CursorManageable {
     * Convert Cursor object to Rectangle.
     */
   private[this] def cursorToRect(cursor: Cursor, isFlipped: Boolean = false): Rectangle = {
-    val (x, y) = isFlipped.when[Cursor](!_)(cursor) match {
+    isFlipped.when[Cursor](!_)(cursor) match {
       case Cursor(None, Some(Hand(Player.BLACK, pt)), None) =>
-        (layout.handBlack.left + (pt.sortId - 1) * layout.PIECE_WIDTH, layout.handBlack.top)
+        Rectangle(
+          layout.handBlack.left + (pt.sortId - 1) * layout.HAND_PIECE_WIDTH,
+          layout.handBlack.top,
+          layout.HAND_PIECE_WIDTH,
+          layout.HAND_PIECE_HEIGHT
+        )
       case Cursor(None, Some(Hand(Player.WHITE, pt)), None) =>
-        (layout.handWhite.right - (pt.sortId - 1) * layout.PIECE_WIDTH - layout.PIECE_WIDTH, layout.handWhite.top)
+        Rectangle(
+          layout.handWhite.right - (pt.sortId - 1) * layout.HAND_PIECE_WIDTH - layout.HAND_PIECE_WIDTH,
+          layout.handWhite.top,
+          layout.HAND_PIECE_WIDTH,
+          layout.HAND_PIECE_HEIGHT
+        )
       case Cursor(Some(sq), None, None) =>
-        (layout.board.left + (9 - sq.file) * layout.PIECE_WIDTH, layout.board.top + (sq.rank - 1) * layout.PIECE_HEIGHT)
+        Rectangle(
+          layout.board.left + (9 - sq.file) * layout.PIECE_WIDTH,
+          layout.board.top + (sq.rank - 1) * layout.PIECE_HEIGHT,
+          layout.PIECE_WIDTH,
+          layout.PIECE_HEIGHT
+        )
       case Cursor(None, None, Some(pt)) =>
-        (layout.pieceBox.left + pt.sortId * layout.PIECE_WIDTH, layout.pieceBox.top)
-      case _ => (0, 0) // never happens
+        Rectangle(
+          layout.pieceBox.left + pt.sortId * layout.PIECE_WIDTH,
+          layout.pieceBox.top,
+          layout.PIECE_WIDTH,
+          layout.PIECE_HEIGHT
+        )
+      case _ => Rectangle(0, 0, layout.PIECE_WIDTH, layout.PIECE_HEIGHT) // never happens
     }
-    Rectangle(x, y, layout.PIECE_WIDTH, layout.PIECE_HEIGHT)
   }
 
   /**
