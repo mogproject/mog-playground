@@ -58,9 +58,6 @@ object MenuDialog {
       dialog.remove()
     })
 
-    // Close the modal when one of reset buttons is clicked
-    EditReset.initialize(dialog)
-
     dialog.asInstanceOf[BootstrapJQuery].modal("show")
   }
 

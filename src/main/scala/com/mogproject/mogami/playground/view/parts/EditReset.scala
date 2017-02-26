@@ -46,11 +46,11 @@ object EditReset extends ButtonLike[(State, Boolean), Button, Div] {
 
   override def initialize(): Unit = {}
 
-  def initialize(modal: JQuery): Unit = inputMap.foreach { case (k, e) => setModalClickEvent(e, modal, () => invoke(k)) }
-
   override protected def generateInput(key: (State, Boolean)): Button = button(
     tpe := "button",
-    cls := "btn btn-default btn-block"
+    cls := "btn btn-default btn-block",
+    data("dismiss") := "modal",
+    onclick := { () => invoke(key) }
   ).render
 
   override protected def invoke(key: (State, Boolean)): Unit = Controller.setEditInitialState(key._1, key._2)
