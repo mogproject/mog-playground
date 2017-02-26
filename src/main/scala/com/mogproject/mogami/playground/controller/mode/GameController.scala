@@ -148,6 +148,9 @@ trait GameController extends ModeController {
   protected def renderUrls(): Unit = {
     val configParams = config.toQueryParameters
     val moveParams = isLatestState.fold(List.empty, List(s"move=${realPosition}"))
+    val gameInfoParams = List(("bn", 'blackName), ("wn", 'whiteName)).flatMap { case (q, k) =>
+        game.gameInfo.tags.get(k).map(s => s"${q}=${encodeURIComponent(s)}")
+    }
 
     val instantGame = Game(selectedState)
     val instantGameWithLastMove =
@@ -160,9 +163,9 @@ trait GameController extends ModeController {
           givenHistory = Some(game.history.slice(realPosition - 1, realPosition + 1))
         )
 
-    val snapshot = ("sfen=" + encodeURIComponent(instantGame.toSfenString)) +: configParams
-    val record = (("sfen=" + encodeURIComponent(game.toSfenString)) +: configParams) ++ moveParams
-    val image = "action=image" :: ("sfen=" + encodeURIComponent(instantGameWithLastMove.toSfenString)) +: configParams
+    val snapshot = List("sfen=" + encodeURIComponent(instantGame.toSfenString)) ++ gameInfoParams ++ configParams
+    val record = List("sfen=" + encodeURIComponent(game.toSfenString)) ++ gameInfoParams ++ configParams ++ moveParams
+    val image = List("action=image", "sfen=" + encodeURIComponent(instantGameWithLastMove.toSfenString)) ++ gameInfoParams ++ configParams
 
     renderer.updateSnapshotUrl(s"${config.baseUrl}?${snapshot.mkString("&")}")
     renderer.updateSnapshotShortUrl("")
