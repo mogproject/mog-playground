@@ -1,6 +1,7 @@
 package com.mogproject.mogami.playground.controller.mode
 
 import com.mogproject.mogami.core.Game.GameStatus
+import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.{Game, Move, State}
 import com.mogproject.mogami.playground.controller.{Configuration, Controller, Language}
 import com.mogproject.mogami.playground.api.google.URLShortener
@@ -18,6 +19,8 @@ trait GameController extends ModeController {
   def game: Game
 
   def displayPosition: Int
+
+  override def gameInfo: GameInfo = game.gameInfo
 
   /**
     * Abstract copy method
@@ -59,7 +62,7 @@ trait GameController extends ModeController {
     case Viewing if mode == Playing => Some(ViewModeController(renderer, config, game, displayPosition))
     case Editing =>
       val st = selectedState
-      val mc = Some(EditModeController(renderer, config, st.turn, st.board, st.hand, st.getUnusedPtypeCount))
+      val mc = Some(EditModeController(renderer, config, st.turn, st.board, st.hand, st.getUnusedPtypeCount, game.gameInfo))
       game.moves.isEmpty.fold(mc, {
         renderer.askConfirm(config.messageLang, () => Controller.update(mc))
         None
@@ -73,7 +76,8 @@ trait GameController extends ModeController {
     */
   override def setMessageLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(messageLang = lang)))
 
-  override def setRecordLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(recordLang = lang)))
+  override def setRecordLanguage(lang: Language): Option[ModeController] =
+    Some(this.copy(config = config.copy(recordLang = lang), game = game.copy(gameInfo = getConvertedPlayerNames(config.recordLang, lang))))
 
   override def setPieceLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(pieceLang = lang)))
 

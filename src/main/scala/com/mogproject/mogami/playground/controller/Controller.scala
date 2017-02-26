@@ -103,7 +103,8 @@ object Controller {
 
   def setEditTurn(player: Player): Unit = doAction(_.setEditTurn(player), _.renderAll())
 
-  def setEditInitialState(initialState: State): Unit = doAction(_.setEditInitialState(initialState), _.renderAll())
+  def setEditInitialState(initialState: State, isHandicap: Boolean): Unit =
+    doAction(_.setEditInitialState(initialState, isHandicap), _.renderAll())
 
   def toggleFlip(): Unit = doAction(_.toggleFlip(), _.renderAll())
 
