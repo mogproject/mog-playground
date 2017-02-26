@@ -1,7 +1,9 @@
 package com.mogproject.mogami.playground.controller.mode
 
+import com.mogproject.mogami.core.GameInfo
+import com.mogproject.mogami.core.Player.{BLACK, WHITE}
 import com.mogproject.mogami.{Player, State}
-import com.mogproject.mogami.playground.controller.{Configuration, Cursor, Language}
+import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.view.Renderer
 
 
@@ -15,6 +17,8 @@ trait ModeController {
   def renderer: Renderer
 
   def config: Configuration
+
+  def gameInfo: GameInfo
 
   // rendering
   /**
@@ -34,12 +38,30 @@ trait ModeController {
     renderer.clearLastMove()
   }
 
+  protected val defaultNames: Map[(Language, Player), String] = Map(
+    (Japanese, BLACK) -> "先手",
+    (Japanese, WHITE) -> "後手",
+    (English, BLACK) -> "Black",
+    (English, WHITE) -> "White"
+  )
+
+  protected val handicapNames: Map[(Language, Player), String] = Map(
+    (Japanese, BLACK) -> "下手",
+    (Japanese, WHITE) -> "上手",
+    (English, BLACK) -> "Shimote",
+    (English, WHITE) -> "Uwate"
+  )
+
   def renderAll(): Unit = {
     // clear selection
     renderer.clearSelectedArea()
 
     // player names
-    renderer.drawPlayerNames(config)
+    renderer.drawPlayerNames(
+      config,
+      gameInfo.tags.getOrElse('blackName, defaultNames(config.recordLang, BLACK)),
+      gameInfo.tags.getOrElse('whiteName, defaultNames(config.recordLang, WHITE))
+    )
 
     // draw indexes
     renderer.drawIndexes(config)
@@ -77,11 +99,21 @@ trait ModeController {
 
   def setControl(controlType: Int): Option[ModeController] = None
 
+  def setGameInfo(gameInfo: GameInfo): Option[ModeController] = None
+
   def toggleFlip(): Option[ModeController] = None
 
   // actions for edit mode
   def setEditTurn(turn: Player): Option[ModeController] = None
 
-  def setEditInitialState(initialState: State): Option[ModeController] = None
+  def setEditInitialState(initialState: State, isHandicap: Boolean): Option[ModeController] = None
 
+  // helper functions
+  protected def getConvertedPlayerNames(oldLang: Language, newLang: Language): GameInfo = {
+    if (gameInfo.tags.get('blackName) == Some(handicapNames((oldLang, BLACK))) && gameInfo.tags.get('whiteName) == Some(handicapNames((oldLang, WHITE)))) {
+      gameInfo.copy(tags = gameInfo.tags ++ Map('blackName -> handicapNames((newLang, BLACK)), 'whiteName -> handicapNames((newLang, WHITE))))
+    } else {
+      gameInfo
+    }
+  }
 }

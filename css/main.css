@@ -86,3 +86,7 @@ div {
 canvas {
     position: absolute;
 }
+
+.modal-open {
+    padding-right: 0px !important;
+}

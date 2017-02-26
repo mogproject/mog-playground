@@ -7,15 +7,26 @@ import org.scalajs.dom.html.{Button, Div}
 import scalatags.JsDom.all._
 
 /**
-  *
+  * key: (state: State, isHandicap: Boolean)
   */
-object EditReset extends ButtonLike[State, Button, Div] {
+object EditReset extends ButtonLike[(State, Boolean), Button, Div] {
   override protected val keys = Seq(
-    State.HIRATE, State.MATING_BLACK, State.MATING_WHITE,
-    State.HANDICAP_LANCE, State.HANDICAP_BISHOP, State.HANDICAP_ROOK, State.HANDICAP_ROOK_LANCE,
-    State.HANDICAP_2_PIECE, State.HANDICAP_3_PIECE, State.HANDICAP_4_PIECE, State.HANDICAP_5_PIECE,
-    State.HANDICAP_6_PIECE, State.HANDICAP_8_PIECE, State.HANDICAP_10_PIECE,
-    State.HANDICAP_THREE_PAWNS, State.HANDICAP_NAKED_KING
+    (State.HIRATE, false),
+    (State.MATING_BLACK, false),
+    (State.MATING_WHITE, false),
+    (State.HANDICAP_LANCE, true),
+    (State.HANDICAP_BISHOP, true),
+    (State.HANDICAP_ROOK, true),
+    (State.HANDICAP_ROOK_LANCE, true),
+    (State.HANDICAP_2_PIECE, true),
+    (State.HANDICAP_3_PIECE, true),
+    (State.HANDICAP_4_PIECE, true),
+    (State.HANDICAP_5_PIECE, true),
+    (State.HANDICAP_6_PIECE, true),
+    (State.HANDICAP_8_PIECE, true),
+    (State.HANDICAP_10_PIECE, true),
+    (State.HANDICAP_THREE_PAWNS, true),
+    (State.HANDICAP_NAKED_KING, true)
   )
 
   override protected val labels: Map[Language, Seq[String]] = Map(
@@ -32,12 +43,12 @@ object EditReset extends ButtonLike[State, Button, Div] {
       "Three Pawns", "Naked King")
   )
 
-  override protected def generateInput(key: State): Button = button(
+  override protected def generateInput(key: (State, Boolean)): Button = button(
     tpe := "button",
     cls := "btn btn-default btn-block"
   ).render
 
-  override protected def invoke(key: State): Unit = Controller.setEditInitialState(key)
+  override protected def invoke(key: (State, Boolean)): Unit = Controller.setEditInitialState(key._1, key._2)
 
   override val output: Div = div(
     h4("Reset"),

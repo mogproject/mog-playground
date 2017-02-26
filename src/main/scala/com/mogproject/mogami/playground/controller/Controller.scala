@@ -3,6 +3,7 @@ package com.mogproject.mogami.playground.controller
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.view.Renderer
 import com.mogproject.mogami._
+import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller.mode._
 import org.scalajs.dom.Element
@@ -103,7 +104,10 @@ object Controller {
 
   def setEditTurn(player: Player): Unit = doAction(_.setEditTurn(player), _.renderAll())
 
-  def setEditInitialState(initialState: State): Unit = doAction(_.setEditInitialState(initialState), _.renderAll())
+  def setEditInitialState(initialState: State, isHandicap: Boolean): Unit =
+    doAction(_.setEditInitialState(initialState, isHandicap), _.renderAll())
+
+  def setGameInfo(gameInfo: GameInfo): Unit = doAction(_.setGameInfo(gameInfo), _.renderAll())
 
   def toggleFlip(): Unit = doAction(_.toggleFlip(), _.renderAll())
 

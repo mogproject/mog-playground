@@ -38,7 +38,7 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
   val playerWhite = Rectangle(MARGIN_LEFT + BOARD_WIDTH - PIECE_WIDTH * 3 + 4, MARGIN_TOP, playerAreaWidth, HAND_PIECE_HEIGHT)
   val indicatorWhite = Rectangle(playerWhite.left + 1, playerWhite.top + 1, playerWhite.width - 2, INDICATOR_HEIGHT)
   val playerIconWhite = Rectangle(playerWhite.right - playerIconWidth, indicatorWhite.bottom - 1, playerIconWidth, playerIconHeight)
-  val playerNameWhite = Rectangle(playerWhite.left + 1, playerIconWhite.top, playerNameWidth, playerNameHeight)
+  val playerNameWhite = Rectangle(playerWhite.left + 1, playerIconWhite.top + 1, playerNameWidth, playerNameHeight)
 
   val handWhite = Rectangle(MARGIN_LEFT, MARGIN_TOP, BOARD_WIDTH - PIECE_WIDTH * 3, HAND_PIECE_HEIGHT)
 
@@ -72,8 +72,7 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
     lazy val numberIndex = s"${scaleByPiece(PIECE_WIDTH, 180)}pt ${japanese}"
     lazy val indicator = s"${scaleByCanvas(28)}pt ${menu}"
     lazy val playerIcon = s"${scaleByCanvas(40)}pt ${japanese}"
-    lazy val playerNameJapanese = s"${scaleByCanvas(32)}pt ${japanese}"
-    lazy val playerNameEnglish = s"${scaleByCanvas(32)}pt ${english}"
+    lazy val playerName = s"${scaleByCanvas(28)}pt ${japanese}"
     lazy val pieceBoxLabel = s"${scaleByCanvas(28)}pt ${menu}"
   }
 

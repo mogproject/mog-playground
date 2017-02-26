@@ -2,8 +2,9 @@ package com.mogproject.mogami.playground.controller.mode
 
 import com.mogproject.mogami._
 import com.mogproject.mogami.core.Game.GameStatus
+import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.core.State.BoardType
-import com.mogproject.mogami.playground.controller.{Configuration, Cursor, Language}
+import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.view.Renderer
 import com.mogproject.mogami.util.MapUtil
 import com.mogproject.mogami.util.Implicits._
@@ -18,7 +19,8 @@ case class EditModeController(renderer: Renderer,
                               turn: Player,
                               board: BoardType,
                               hand: HandType,
-                              box: Map[Ptype, Int]
+                              box: Map[Ptype, Int],
+                              override val gameInfo: GameInfo
                              ) extends ModeController {
 
   val mode: Mode = Editing
@@ -122,8 +124,8 @@ case class EditModeController(renderer: Renderer,
     Try(State(turn, board, hand, None)) match {
       case Success(st) =>
         nextMode match {
-          case Playing => Some(PlayModeController(renderer, config, Game(st), -1))
-          case Viewing => Some(ViewModeController(renderer, config, Game(st), -1))
+          case Playing => Some(PlayModeController(renderer, config, Game(st, gameInfo = gameInfo), -1))
+          case Viewing => Some(ViewModeController(renderer, config, Game(st, gameInfo = gameInfo), -1))
           case Editing => None
         }
       case Failure(e) =>
@@ -134,7 +136,8 @@ case class EditModeController(renderer: Renderer,
 
   override def setMessageLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(messageLang = lang)))
 
-  override def setRecordLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(recordLang = lang)))
+  override def setRecordLanguage(lang: Language): Option[ModeController] =
+    Some(this.copy(config = config.copy(recordLang = lang), gameInfo = getConvertedPlayerNames(config.recordLang, lang)))
 
   override def setPieceLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(pieceLang = lang)))
 
@@ -143,11 +146,17 @@ case class EditModeController(renderer: Renderer,
   override def setEditTurn(player: Player): Option[ModeController] =
     (player != turn).option(this.copy(turn = player))
 
-  override def setEditInitialState(initialState: State): Option[ModeController] = Some(this.copy(
-    turn = initialState.turn,
-    board = initialState.board,
-    hand = initialState.hand,
-    box = initialState.getUnusedPtypeCount
-  ))
+  override def setEditInitialState(initialState: State, isHandicap: Boolean): Option[ModeController] = {
+    Some(this.copy(
+      turn = initialState.turn,
+      board = initialState.board,
+      hand = initialState.hand,
+      box = initialState.getUnusedPtypeCount,
+      gameInfo = isHandicap.fold(GameInfo(Map(
+        'blackName -> handicapNames((config.recordLang, BLACK)),
+        'whiteName -> handicapNames((config.recordLang, WHITE))
+      )), GameInfo())
+    ))
+  }
 
 }

@@ -36,7 +36,7 @@ case class PlayModeController(renderer: Renderer,
     */
   override def invokeCursor(selected: Cursor, invoked: Cursor): Option[ModeController] = {
     if (invoked.isPlayer) {
-      // todo: open game settings
+      renderer.showGameInfoModal(config, game.gameInfo)
       None
     } else {
       val from = config.flip.when[Cursor](!_)(selected).moveFrom

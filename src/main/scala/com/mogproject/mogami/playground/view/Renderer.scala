@@ -4,6 +4,7 @@ import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami._
 import com.mogproject.mogami.core.Game.GameStatus
 import com.mogproject.mogami.core.Game.GameStatus.GameStatus
+import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller.mode.Mode
@@ -204,24 +205,20 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     layout.playerIconBlack.clear(ctx)
   }
 
-  def drawPlayerNames(config: Configuration): Unit = {
+  def drawPlayerNames(config: Configuration, blackName: String, whiteName: String): Unit = {
     drawPlayerIcon(config)
 
     val ctx = layer0
-    val (b, w, font) = config.recordLang match {
-      case Japanese => ("先手", "後手", layout.font.playerNameJapanese)
-      case English => ("Black", "White", layout.font.playerNameEnglish)
-    }
 
     // clear
     clearPlayerNames()
 
     // draw
     List(
-      (config.flip.fold(w, b), layout.playerNameBlack, false),
-      (config.flip.fold(b, w), layout.playerNameWhite, true)).foreach { case (t, r, rot) =>
-      TextRenderer(ctx, t, font, layout.color.fg, r.left, r.top, r.width, r.height)
-        .alignLeft.alignMiddle.withRotate(rot).render()
+      (config.flip.fold(whiteName, blackName), layout.playerNameBlack, false),
+      (config.flip.fold(blackName, whiteName), layout.playerNameWhite, true)).foreach { case (t, r, rot) =>
+      TextRenderer(ctx, t, layout.font.playerName, layout.color.fg, r.left, r.top, r.width, r.height)
+        .withTrim.alignLeft.alignMiddle.withRotate(rot).render()
     }
   }
 
@@ -402,6 +399,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   }
 
   def showMenuModal(): Unit = MenuDialog.show()
+
+  def showGameInfoModal(config: Configuration, gameInfo: GameInfo): Unit = GameInfoDialog(config, gameInfo).show()
 
   def updateSnapshotUrl(url: String): Unit = SnapshotCopyButton.updateValue(url)
 

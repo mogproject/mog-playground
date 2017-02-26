@@ -17,7 +17,7 @@ case class Arguments(game: Game = Game(),
     @tailrec
     def f(sofar: Arguments, ls: List[List[String]]): Arguments = ls match {
       case ("sfen" :: s :: Nil) :: xs => Game.parseSfenString(s) match {
-        case Some(g) => f(sofar.copy(game = g), xs)
+        case Some(g) => f(sofar.copy(game = g.copy(gameInfo = sofar.game.gameInfo)), xs)
         case None =>
           println(s"Invalid parameter: sfen=${s}")
           f(sofar, xs)
@@ -68,6 +68,10 @@ case class Arguments(game: Game = Game(),
           println(s"Invalid parameter: size=${s}")
           f(sofar, xs)
       }
+      case ("bn" :: s :: Nil) :: xs =>
+        f(sofar.copy(game = sofar.game.copy(gameInfo = sofar.game.gameInfo.updated('blackName, s))), xs)
+      case ("wn" :: s :: Nil) :: xs =>
+        f(sofar.copy(game = sofar.game.copy(gameInfo = sofar.game.gameInfo.updated('whiteName, s))), xs)
       case _ :: xs => f(sofar, xs)
       case Nil => sofar
     }
