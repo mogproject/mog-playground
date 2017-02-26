@@ -89,8 +89,8 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
 
     // indicators
     val active = "#2b5f91"
-    val win = "#339933"
-    val lose = "#ff5843"
+    val win = "#5cb85c"
+    val lose = "#d9534f"
     val draw = "#99877a"
 
     val cursor = "#E1B265"
