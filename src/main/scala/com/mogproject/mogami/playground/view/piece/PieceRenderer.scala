@@ -9,7 +9,7 @@ trait PieceRenderer {
 
   def layout: Layout
 
-  def drawPiece(ctx: CanvasRenderingContext2D, piece: Piece, left: Int, top: Int, scale: Int = 1): Unit
+  def drawPiece(ctx: CanvasRenderingContext2D, piece: Piece, left: Int, top: Int, scale: Double = 1.0): Unit
 
   def drawOnBoard(ctx: CanvasRenderingContext2D, piece: Piece, square: Square): Unit = {
     val left = layout.board.left + layout.PIECE_WIDTH * (9 - square.file)
@@ -19,7 +19,7 @@ trait PieceRenderer {
 
   private[this] def drawNumbers(ctx: CanvasRenderingContext2D, n: Int, left: Int, top: Int, rotated: Boolean): Unit = {
     if (n > 1) {
-      TextRenderer(ctx, n.toString, layout.font.numberOfPieces, layout.color.cursor, left, top, layout.PIECE_WIDTH, layout.PIECE_HEIGHT)
+      TextRenderer(ctx, n.toString, layout.font.numberOfPieces, layout.color.cursor, left, top, layout.HAND_PIECE_WIDTH, layout.HAND_PIECE_HEIGHT)
         .alignRight.alignBottom.withRotate(rotated).withStroke(layout.color.stroke, layout.strokeSize).render()
     }
   }
@@ -27,11 +27,11 @@ trait PieceRenderer {
   def drawInHand(ctx: CanvasRenderingContext2D, piece: Hand, numPieces: Int): Unit = {
     // piece type
     val (left, top) = if (piece.owner.isBlack) {
-      (layout.handBlack.left + layout.PIECE_WIDTH * (piece.ptype.sortId - 1), layout.handBlack.top)
+      (layout.handBlack.left + layout.HAND_PIECE_WIDTH * (piece.ptype.sortId - 1), layout.handBlack.top)
     } else {
-      (layout.handWhite.left + layout.PIECE_WIDTH * (7 - piece.ptype.sortId), layout.handWhite.top)
+      (layout.handWhite.left + layout.HAND_PIECE_WIDTH * (7 - piece.ptype.sortId), layout.handWhite.top)
     }
-    drawPiece(ctx, piece.toPiece, left, top)
+    drawPiece(ctx, piece.toPiece, left, top, 6.0 / 7)
 
     // number of pieces
     drawNumbers(ctx, numPieces, left, top, piece.owner.isWhite)

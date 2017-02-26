@@ -27,6 +27,8 @@ object GameMenuSection extends Section {
     label("Save to File"),
     p("to be implemented"),
     h4("Help"),
-    p("to be implemented")
+    ul(
+      li("Click on a player name to set the game information.")
+    )
   ).render
 }

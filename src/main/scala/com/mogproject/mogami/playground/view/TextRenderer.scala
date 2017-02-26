@@ -28,7 +28,12 @@ case class TextRenderer(ctx: CanvasRenderingContext2D,
   }
   lazy val textHeight: Int = textHeightHint.getOrElse(font.takeWhile(_.isDigit).toInt)
 
-  def shift(x: Int, y: Int) = this.copy(textBottomLeft = textBottomLeft + x, textBottomTop = textBottomTop + y)
+  def shift(x: Int, y: Int): TextRenderer = this.copy(textBottomLeft = textBottomLeft + x, textBottomTop = textBottomTop + y)
+
+  def alignLeft: TextRenderer = this.copy(
+    textBottomLeft = areaLeft,
+    textWidthHint = Some(textWidth)
+  )
 
   /**
     * x := x0 + (w - a) / 2

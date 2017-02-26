@@ -11,9 +11,9 @@ import org.scalajs.dom.CanvasRenderingContext2D
 case class EnglishPieceRenderer(layout: Layout) extends PieceRenderer {
   val yOffset: Int = layout.PIECE_HEIGHT * 40 / 1000
 
-  override def drawPiece(ctx: CanvasRenderingContext2D, piece: Piece, left: Int, top: Int, scale: Int = 1): Unit = {
-    val w = layout.PIECE_WIDTH * scale
-    val h = layout.PIECE_HEIGHT * scale
+  override def drawPiece(ctx: CanvasRenderingContext2D, piece: Piece, left: Int, top: Int, scale: Double = 1.0): Unit = {
+    val w = (layout.PIECE_WIDTH * scale).toInt
+    val h = (layout.PIECE_HEIGHT * scale).toInt
     val color = piece.isPromoted.fold(layout.color.red, layout.color.fg)
 
     TextRenderer(ctx, "☖", layout.font.pentagon(w), layout.color.fg, left, top, w, h)
