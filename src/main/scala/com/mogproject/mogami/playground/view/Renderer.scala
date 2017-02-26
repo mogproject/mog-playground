@@ -224,8 +224,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   def clearPlayerNames(): Unit = {
     val ctx = layer0
-    layout.playerNameWhite.clear(ctx)
-    layout.playerNameBlack.clear(ctx)
+    layout.playerNameWhite.clear(ctx, -1)
+    layout.playerNameBlack.clear(ctx, -1)
   }
 
   def drawIndexes(config: Configuration): Unit = {
