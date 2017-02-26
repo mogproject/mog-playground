@@ -17,10 +17,11 @@ trait PieceRenderer {
     drawPiece(ctx, piece, left, top)
   }
 
-  private[this] def drawNumbers(ctx: CanvasRenderingContext2D, n: Int, left: Int, top: Int, rotated: Boolean): Unit = {
+  private[this] def drawNumbers(ctx: CanvasRenderingContext2D, n: Int, left: Int, top: Int, rotated: Boolean, scale: Double = 1.0): Unit = {
     if (n > 1) {
-      TextRenderer(ctx, n.toString, layout.font.numberOfPieces, layout.color.cursor, left, top, layout.HAND_PIECE_WIDTH, layout.HAND_PIECE_HEIGHT)
-        .alignRight.alignBottom.withRotate(rotated).withStroke(layout.color.stroke, layout.strokeSize).render()
+      TextRenderer(ctx, n.toString, layout.font.numberOfPieces, layout.color.cursor,
+        left, top, (layout.PIECE_WIDTH * scale).toInt, (layout.PIECE_HEIGHT * scale).toInt
+      ).alignRight.alignBottom.withRotate(rotated).withStroke(layout.color.stroke, layout.strokeSize).render()
     }
   }
 
@@ -34,7 +35,7 @@ trait PieceRenderer {
     drawPiece(ctx, piece.toPiece, left, top, 6.0 / 7)
 
     // number of pieces
-    drawNumbers(ctx, numPieces, left, top, piece.owner.isWhite)
+    drawNumbers(ctx, numPieces, left, top, piece.owner.isWhite, 6.0 / 7)
   }
 
   def drawInBox(ctx: CanvasRenderingContext2D, ptype: Ptype, numPieces: Int): Unit = {

@@ -46,7 +46,7 @@ case class GameInfoDialog(config: Configuration, gameInfo: GameInfo) {
     gameInfo.copy(tags = tagNames.map { case (p, t) => t -> inputNames(p).value })
 
   private[this] val elem: Div =
-    div(cls := "modal face", tabindex := "-1", role := "dialog", data("backdrop") := "static",
+    div(cls := "modal face", tabindex := "-1", role := "dialog",
       div(cls := "modal-dialog", role := "document",
         div(cls := "modal-content",
           // header
@@ -80,7 +80,7 @@ case class GameInfoDialog(config: Configuration, gameInfo: GameInfo) {
                   button(
                     tpe := "submit", cls := "btn btn-default btn-block", data("dismiss") := "modal",
                     onclick := { () => Controller.setGameInfo(getGameInfo) },
-                    "OK"
+                    "Update"
                   )
                 )
               )

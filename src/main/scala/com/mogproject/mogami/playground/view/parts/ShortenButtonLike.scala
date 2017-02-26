@@ -36,10 +36,10 @@ trait ShortenButtonLike extends CopyButtonLike {
     )
   ).render
 
-  override def updateValue(value: String): Unit = {
-    super.updateValue(value)
-    shortenButton.disabled = value.nonEmpty
-    copyButton.disabled = value.isEmpty
+  def updateValue(value: String, completed: Boolean): Unit = {
+    updateValue(value)
+    shortenButton.disabled = completed
+    copyButton.disabled = !completed
   }
 
 }
