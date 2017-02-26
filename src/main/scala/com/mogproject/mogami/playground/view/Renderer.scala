@@ -440,10 +440,6 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   def updateEditResetLabel(lang: Language): Unit = EditReset.updateLabel(lang)
 
-  def updateEditTurnLabel(lang: Language): Unit = EditTurn.updateLabel(lang)
-
-  def updateEditTurnValue(newValue: Player): Unit = EditTurn.updateValue(newValue)
-
   // languages
   def updateMessageLang(lang: Language): Unit = MessageLanguageSelector.updateValue(lang)
 

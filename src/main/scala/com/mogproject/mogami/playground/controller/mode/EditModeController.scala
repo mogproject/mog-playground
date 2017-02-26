@@ -46,8 +46,6 @@ case class EditModeController(renderer: Renderer,
   override def renderAll(): Unit = {
     super.renderAll()
 
-    renderer.updateEditTurnLabel(config.messageLang)
-    renderer.updateEditTurnValue(turn)
     renderer.updateEditResetLabel(config.messageLang)
 
     renderer.drawIndicators(config, turn, GameStatus.Playing)

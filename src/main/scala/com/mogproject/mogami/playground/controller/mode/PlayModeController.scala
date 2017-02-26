@@ -35,31 +35,36 @@ case class PlayModeController(renderer: Renderer,
     * @param invoked  to
     */
   override def invokeCursor(selected: Cursor, invoked: Cursor): Option[ModeController] = {
-    val from = config.flip.when[Cursor](!_)(selected).moveFrom
+    if (invoked.isPlayer) {
+      // todo: open game settings
+      None
+    } else {
+      val from = config.flip.when[Cursor](!_)(selected).moveFrom
 
-    def f(to: Square, promote: Boolean) = {
-      getTruncatedGame.makeMove(MoveBuilderSfen(from, to, promote)).map(g => this.copy(game = g, displayPosition = -1))
-    }
+      def f(to: Square, promote: Boolean) = {
+        getTruncatedGame.makeMove(MoveBuilderSfen(from, to, promote)).map(g => this.copy(game = g, displayPosition = -1))
+      }
 
-    config.flip.when[Cursor](!_)(invoked) match {
-      case Cursor(Some(to), None, None, None) if selectedState.canAttack(from, to) =>
-        selectedState.getPromotionFlag(from, to) match {
-          case Some(PromotionFlag.CannotPromote) => f(to, promote = false)
-          case Some(PromotionFlag.CanPromote) =>
-            for {
-              s <- from.left.toOption
-              p <- selectedState.board.get(s)
-            } yield {
-              renderer.askPromote(config, p,
-                () => Controller.update(f(to, promote = false)),
-                () => Controller.update(f(to, promote = true))
-              )
-            }
-            None
-          case Some(PromotionFlag.MustPromote) => f(to, promote = true)
-          case None => None
-        }
-      case _ => None
+      config.flip.when[Cursor](!_)(invoked) match {
+        case Cursor(Some(to), None, None, None) if selectedState.canAttack(from, to) =>
+          selectedState.getPromotionFlag(from, to) match {
+            case Some(PromotionFlag.CannotPromote) => f(to, promote = false)
+            case Some(PromotionFlag.CanPromote) =>
+              for {
+                s <- from.left.toOption
+                p <- selectedState.board.get(s)
+              } yield {
+                renderer.askPromote(config, p,
+                  () => Controller.update(f(to, promote = false)),
+                  () => Controller.update(f(to, promote = true))
+                )
+              }
+              None
+            case Some(PromotionFlag.MustPromote) => f(to, promote = true)
+            case None => None
+          }
+        case _ => None
+      }
     }
   }
 
