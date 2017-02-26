@@ -217,8 +217,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     List(
       (config.flip.fold(whiteName, blackName), layout.playerNameBlack, false),
       (config.flip.fold(blackName, whiteName), layout.playerNameWhite, true)).foreach { case (t, r, rot) =>
-      TextRenderer(ctx, t, layout.font.playerNameJapanese, layout.color.fg, r.left, r.top, r.width, r.height)
-        .alignLeft.alignMiddle.withRotate(rot).render()
+      TextRenderer(ctx, t, layout.font.playerName, layout.color.fg, r.left, r.top, r.width, r.height)
+        .withTrim.alignLeft.alignMiddle.withRotate(rot).render()
     }
   }
 

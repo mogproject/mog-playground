@@ -1,6 +1,9 @@
 package com.mogproject.mogami.playground.view
 
+import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom.CanvasRenderingContext2D
+
+import scala.annotation.tailrec
 
 /**
   * Draw text on a canvas
@@ -109,6 +112,34 @@ case class TextRenderer(ctx: CanvasRenderingContext2D,
       },
       restoreRequired = true
     )
+  }
+
+  /**
+    * Trim text if it is too long for the space
+    *
+    * @return
+    */
+  def withTrim: TextRenderer =
+    (textWidth <= areaWidth).fold(
+      this.copy(textWidthHint = Some(textWidth)),
+      this.copy(text = binarySearchForTrim(text), textWidthHint = Some(textWidth))
+    )
+
+  private[this] def binarySearchForTrim(s: String): String = {
+    def f(s: String): Boolean = {
+      ctx.font = font
+      ctx.measureText(s).width <= areaWidth
+    }
+
+    @tailrec
+    def g(lo: Int, hi: Int): Int = if (lo < hi - 1) {
+      val m = (lo + hi) / 2
+      if (f(text.take(m))) g(m, hi) else g(lo, m)
+    } else {
+      lo
+    }
+
+    text.take(g(0, text.length + 1))
   }
 
   def render(): Unit = {
