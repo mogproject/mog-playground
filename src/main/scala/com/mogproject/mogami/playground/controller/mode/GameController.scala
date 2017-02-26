@@ -149,7 +149,7 @@ trait GameController extends ModeController {
     val configParams = config.toQueryParameters
     val moveParams = isLatestState.fold(List.empty, List(s"move=${realPosition}"))
     val gameInfoParams = List(("bn", 'blackName), ("wn", 'whiteName)).flatMap { case (q, k) =>
-        game.gameInfo.tags.get(k).map(s => s"${q}=${encodeURIComponent(s)}")
+      game.gameInfo.tags.get(k).map(s => s"${q}=${encodeURIComponent(s)}")
     }
 
     val instantGame = Game(selectedState)
@@ -168,23 +168,27 @@ trait GameController extends ModeController {
     val image = List("action=image", "sfen=" + encodeURIComponent(instantGameWithLastMove.toSfenString)) ++ gameInfoParams ++ configParams
 
     renderer.updateSnapshotUrl(s"${config.baseUrl}?${snapshot.mkString("&")}")
-    renderer.updateSnapshotShortUrl("")
+    renderer.updateSnapshotShortUrl("", completed = false)
     renderer.updateRecordUrl(s"${config.baseUrl}?${record.mkString("&")}")
-    renderer.updateRecordShortUrl("")
+    renderer.updateRecordShortUrl("", completed = false)
     renderer.updateImageLinkUrl(s"${config.baseUrl}?${image.mkString("&")}")
     renderer.updateSfenString(selectedState.toSfenString)
   }
 
   def shortenSnapshotUrl(shortener: URLShortener): Unit = {
     // todo: implement failure tooltip
-    shortener.makeShortenedURL(renderer.getSnapshotUrl, renderer.updateSnapshotShortUrl, s => {
+    renderer.updateSnapshotShortUrl("creating...", completed = false)
+    shortener.makeShortenedURL(renderer.getSnapshotUrl, renderer.updateSnapshotShortUrl(_, completed = true), s => {
+      renderer.updateSnapshotShortUrl("failed", completed = false)
       println(s)
     })
   }
 
   def shortenRecordUrl(shortener: URLShortener): Unit = {
     // todo: implement failure tooltip
-    shortener.makeShortenedURL(renderer.getRecordUrl, renderer.updateRecordShortUrl, s => {
+    renderer.updateRecordShortUrl("creating...", completed = false)
+    shortener.makeShortenedURL(renderer.getRecordUrl, renderer.updateRecordShortUrl(_, completed = true), s => {
+      renderer.updateRecordShortUrl("failed", completed = false)
       println(s)
     })
   }
