@@ -3,6 +3,7 @@ package com.mogproject.mogami.playground.view.parts
 import com.mogproject.mogami.core.State
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
 import org.scalajs.dom.html.{Button, Div}
+import org.scalajs.jquery.JQuery
 
 import scalatags.JsDom.all._
 
@@ -43,10 +44,13 @@ object EditReset extends ButtonLike[(State, Boolean), Button, Div] {
       "Three Pawns", "Naked King")
   )
 
+  override def initialize(): Unit = {}
+
+  def initialize(modal: JQuery): Unit = inputMap.foreach { case (k, e) => setModalClickEvent(e, modal, () => invoke(k)) }
+
   override protected def generateInput(key: (State, Boolean)): Button = button(
     tpe := "button",
-    cls := "btn btn-default btn-block",
-    data("dismiss") := "modal"
+    cls := "btn btn-default btn-block"
   ).render
 
   override protected def invoke(key: (State, Boolean)): Unit = Controller.setEditInitialState(key._1, key._2)

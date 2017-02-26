@@ -1,6 +1,7 @@
 package com.mogproject.mogami.playground.view.modal
 
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
+import com.mogproject.mogami.playground.view.parts.EditReset
 import com.mogproject.mogami.playground.view.section.{AboutSection, EditSection, GameMenuSection, LanguageSection}
 import org.scalajs.dom.html.Div
 import org.scalajs.jquery.jQuery
@@ -57,6 +58,10 @@ object MenuDialog {
       dialog.remove()
     })
 
+    // Close the modal when one of reset buttons is clicked
+    EditReset.initialize(dialog)
+
     dialog.asInstanceOf[BootstrapJQuery].modal("show")
   }
+
 }
