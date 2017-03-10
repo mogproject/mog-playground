@@ -1,6 +1,8 @@
 package com.mogproject.mogami.playground.view.modal
 
-import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
+import com.mogproject.mogami.playground.controller.Controller
+import com.mogproject.mogami.playground.view.Layout
+import com.mogproject.mogami.playground.view.bootstrap.{BootstrapJQuery, Tooltip}
 import com.mogproject.mogami.playground.view.parts.EditReset
 import com.mogproject.mogami.playground.view.section.{AboutSection, EditSection, GameMenuSection, LanguageSection}
 import org.scalajs.dom.html.Div
@@ -49,16 +51,17 @@ object MenuDialog {
       )
     ).render
 
-  def show(): Unit = {
+  def show(layout: Layout): Unit = {
     val dialog = jQuery(elem)
     dialog.on("hidden.bs.modal", () ⇒ {
-      // Hide all manual tooltips
-      jQuery("""[data-toggle="tooltip"][data-trigger="manual"]""").asInstanceOf[BootstrapJQuery].tooltip("hide").attr("data-original-title", "")
+      // Hide all tooltips
+      Tooltip.hideAllToolTip()
       // Remove from DOM
       dialog.remove()
     })
 
     dialog.asInstanceOf[BootstrapJQuery].modal("show")
+    Tooltip.enableHoverToolTip(layout)
   }
 
 }

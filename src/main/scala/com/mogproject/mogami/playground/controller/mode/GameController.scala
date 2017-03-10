@@ -5,6 +5,7 @@ import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.{Game, Move, State}
 import com.mogproject.mogami.playground.controller.{Configuration, Controller, Language}
 import com.mogproject.mogami.playground.api.google.URLShortener
+import com.mogproject.mogami.playground.io.FileWriter
 import com.mogproject.mogami.util.Implicits._
 
 import scala.scalajs.js.URIUtils.encodeURIComponent
@@ -188,4 +189,10 @@ trait GameController extends ModeController {
       renderer.updateRecordShortUrl(s, completed = false)
     })
   }
+
+  def saveRecordCsa(): Unit = FileWriter.saveTextFile(game.toCsaString, "record.csa")
+
+  def saveRecordKif(): Unit = ???
+
+  def saveRecordKi2(): Unit = ???
 }
