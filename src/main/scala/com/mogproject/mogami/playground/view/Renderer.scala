@@ -8,7 +8,7 @@ import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller.mode.Mode
-import com.mogproject.mogami.playground.view.bootstrap.{BootstrapJQuery, Tooltip, TooltipOptions}
+import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.playground.view.parts._
 import com.mogproject.mogami.playground.view.section._
@@ -16,9 +16,7 @@ import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.{CanvasRenderingContext2D, Element}
 import org.scalajs.dom.html.{Canvas, Div}
-import org.scalajs.jquery.jQuery
 
-import scala.scalajs.js
 import scalatags.JsDom.all._
 
 /**
@@ -65,15 +63,6 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     )
   )
 
-  private[this] def setTooltip(elem: Element, message: String): Unit = {
-    jQuery(elem).attr("data-original-title", message).asInstanceOf[BootstrapJQuery].tooltip("show")
-  }
-
-  private[this] def hideTooltip(elem: Element): Unit = {
-    val f = () => jQuery(elem).asInstanceOf[BootstrapJQuery].tooltip("hide").attr("data-original-title", "")
-    dom.window.setTimeout(f, 1000)
-  }
-
   private[this] val footer: Div = {
     val sections = List(LanguageSection, GameMenuSection, EditSection, AboutSection)
 
@@ -116,19 +105,14 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     FlipButton.initialize()
     MenuButton.initialize()
     controlSection.initialize()
+    GameMenuSection.initialize()
     LanguageSection.initialize()
     EditSection.initialize()
 
     // initialize clipboard.js
     val cp = new Clipboard(".btn")
-    cp.on("success", (e: Event) => {
-      setTooltip(e.trigger, "Copied!")
-      hideTooltip(e.trigger)
-    })
-    cp.on("error", (e: Event) => {
-      setTooltip(e.trigger, "Failed!")
-      hideTooltip(e.trigger)
-    })
+    cp.on("success", (e: Event) => Tooltip.display(e.trigger, "Copied!"))
+    cp.on("error", (e: Event) => Tooltip.display(e.trigger, "Failed!"))
 
     // initialize tooltips
     Tooltip.enableHoverToolTip(layout)
@@ -440,4 +424,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   def updateRecordLang(lang: Language): Unit = RecordLanguageSelector.updateValue(lang)
 
   def updatePieceLang(lang: Language): Unit = PieceLanguageSelector.updateValue(lang)
+
+  // tooltip messages
+  def displayTooltipRecordLoad(message: String): Unit = RecordLoadButton.displayMessage(message)
 }

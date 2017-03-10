@@ -137,4 +137,6 @@ object Controller {
     case Some(gc: GameController) => gc.saveRecordKi2()
     case _ =>
   }
+
+  def loadRecord(content: String): Unit = doAction(_.loadRecord(content), _.renderAll())
 }
