@@ -195,4 +195,15 @@ trait GameController extends ModeController {
   def saveRecordKif(): Unit = ???
 
   def saveRecordKi2(): Unit = ???
+
+  override def loadRecord(content: String): Option[ModeController] = {
+    // todo: implement
+    val result = Game.parseCsaString(content)
+    if (result.isEmpty) renderer.displayTooltipRecordLoad("Failed!")
+
+    result.map(g => {
+      renderer.displayTooltipRecordLoad("Loaded!")
+      this.copy(game = g, displayPosition = 0)
+    })
+  }
 }
