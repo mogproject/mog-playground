@@ -3,7 +3,6 @@ package com.mogproject.mogami.playground.view.parts
 import com.mogproject.mogami.core.State
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
 import org.scalajs.dom.html.{Button, Div}
-import org.scalajs.jquery.JQuery
 
 import scalatags.JsDom.all._
 

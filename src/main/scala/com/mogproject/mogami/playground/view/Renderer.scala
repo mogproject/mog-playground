@@ -8,7 +8,7 @@ import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller.mode.Mode
-import com.mogproject.mogami.playground.view.bootstrap.{BootstrapJQuery, TooltipOptions}
+import com.mogproject.mogami.playground.view.bootstrap.{BootstrapJQuery, Tooltip, TooltipOptions}
 import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.playground.view.parts._
 import com.mogproject.mogami.playground.view.section._
@@ -131,12 +131,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     })
 
     // initialize tooltips
-
-    jQuery("""[data-toggle="tooltip"]""").asInstanceOf[BootstrapJQuery].tooltip {
-      val r = js.Dynamic.literal()
-      r.trigger = layout.isMobile.fold("focus", "hover")
-      r.asInstanceOf[TooltipOptions]
-    }
+    Tooltip.enableHoverToolTip(layout)
   }
 
   private[this] def createCanvas(zIndexVal: Int): Canvas = {
@@ -398,7 +393,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     AlertDialog(lang, s).show()
   }
 
-  def showMenuModal(): Unit = MenuDialog.show()
+  def showMenuModal(): Unit = MenuDialog.show(layout)
 
   def showGameInfoModal(config: Configuration, gameInfo: GameInfo): Unit = GameInfoDialog(config, gameInfo).show()
 

@@ -122,4 +122,19 @@ object Controller {
     case Some(gc: GameController) => gc.shortenRecordUrl(urlShortener)
     case _ =>
   }
+
+  def saveRecordCsa(): Unit = modeController match {
+    case Some(gc: GameController) => gc.saveRecordCsa()
+    case _ =>
+  }
+
+  def saveRecordKif(): Unit = modeController match {
+    case Some(gc: GameController) => gc.saveRecordKif()
+    case _ =>
+  }
+
+  def saveRecordKi2(): Unit = modeController match {
+    case Some(gc: GameController) => gc.saveRecordKi2()
+    case _ =>
+  }
 }
