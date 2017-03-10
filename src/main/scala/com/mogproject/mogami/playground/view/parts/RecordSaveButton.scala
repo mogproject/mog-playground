@@ -8,9 +8,9 @@ import scalatags.JsDom.all._
 /**
   *
   */
-object SaveRecordButton {
+object RecordSaveButton {
   lazy val output: Div = div(
-    label("Save to File"),
+    label("Save to File (not supported for some mobile browsers)"),
     div(cls := "row", inputs.map(e => div(cls := "col-md-3 col-xs-4", e)))
   ).render
 

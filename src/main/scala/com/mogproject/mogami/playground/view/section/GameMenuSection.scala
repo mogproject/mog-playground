@@ -24,7 +24,7 @@ object GameMenuSection extends Section {
     h4("Manage"),
     label("Load from File"),
     p("to be implemented"),
-    SaveRecordButton.output,
+    RecordSaveButton.output,
     h4("Help"),
     ul(
       li("Click on a player name to set the game information.")
