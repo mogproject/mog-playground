@@ -57,7 +57,7 @@ object RecordLoadButton extends EventManageable {
   ).render
 
   def displayMessage(message: String): Unit = {
-    Tooltip.display(loadButton, message)
+    Tooltip.display(loadButton, message, 2000)
   }
 
   private[this] def readSingleFile(callback: String => Unit): Unit = {
