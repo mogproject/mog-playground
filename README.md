@@ -3,6 +3,7 @@
 ##### Development
 
 ```
+npm install jsdom
 sbt gen-idea  # workaround
 ```
 

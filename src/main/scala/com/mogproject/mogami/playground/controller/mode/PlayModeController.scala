@@ -1,6 +1,6 @@
 package com.mogproject.mogami.playground.controller.mode
 
-import com.mogproject.mogami.core.MoveBuilderSfen
+import com.mogproject.mogami._
 import com.mogproject.mogami.core.State.PromotionFlag
 import com.mogproject.mogami.{Game, Square}
 import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor}

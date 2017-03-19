@@ -37,7 +37,7 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
 
   def updateRecordContent(game: Game, lng: Language): Unit = {
     val f: Move => String = lng match {
-      case Japanese => _.toKifString
+      case Japanese => _.toJapaneseNotationString
       case English => _.toWesternNotationString
     }
 

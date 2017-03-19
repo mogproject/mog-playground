@@ -1,7 +1,6 @@
 package com.mogproject.mogami.playground.view
 
-import com.mogproject.mogami.{Hand, Ptype, Square}
-import com.mogproject.mogami.core._
+import com.mogproject.mogami._
 import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor}
 import org.scalajs.dom.html.Canvas
 import com.mogproject.mogami.util.Implicits._

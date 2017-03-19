@@ -27,7 +27,7 @@ object RecordSaveButton {
     data("placement") := "bottom",
     data("dismiss") := "modal",
     data("original-title") := {
-      if (title == "CSA") s"Save the record as ${title} Format" else "To be implemented..."
+      if (title != "KI2") s"Save the record as ${title} Format" else "To be implemented..."
     },
     onclick := f,
     title
