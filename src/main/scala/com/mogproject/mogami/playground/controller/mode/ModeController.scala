@@ -83,6 +83,8 @@ trait ModeController {
 
   def canSelect(cursor: Cursor): Boolean = false
 
+  def canInvokeWithoutSelection(cursor: Cursor): Boolean = cursor.isPlayer
+
   // cursor click
   def invokeCursor(selected: Cursor, cursor: Cursor): Option[ModeController] = None
 

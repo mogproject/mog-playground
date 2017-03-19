@@ -119,7 +119,7 @@ trait CursorManageable {
     val c = cursorToRect(cursor)
     c.draw(layer4, layout.color.flash, -2)
     val f = () => c.clear(layer4)
-    dom.window.setTimeout(f, 200)
+    dom.window.setTimeout(f, 300)
   }
 
   /**
@@ -190,7 +190,7 @@ trait CursorManageable {
   private[this] def mouseDown(cursor: Option[Cursor]): Unit = {
     cursor.foreach(c => if (Controller.canActivate(c)) flashCursor(c))
     (selectedCursor, cursor) match {
-      case (_, Some(invoked)) if invoked.isPlayer => Controller.invokeCursor(invoked, invoked)
+      case (_, Some(invoked)) if Controller.canInvokeWithoutSelection(invoked) => Controller.invokeCursor(invoked, invoked)
       case (Some(sel), Some(invoked)) => clearSelectedArea(); Controller.invokeCursor(sel, invoked)
       case (Some(sel), None) => clearSelectedArea()
       case (None, Some(sel)) if Controller.canSelect(sel) => drawSelectedArea(sel)

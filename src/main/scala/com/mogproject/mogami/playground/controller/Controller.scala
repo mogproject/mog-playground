@@ -87,6 +87,8 @@ object Controller {
 
   def canSelect(selected: Cursor): Boolean = modeController.get.canSelect(selected)
 
+  def canInvokeWithoutSelection(cursor: Cursor): Boolean = modeController.get.canInvokeWithoutSelection(cursor)
+
   def invokeCursor(selected: Cursor, invoked: Cursor): Unit = doAction(_.invokeCursor(selected, invoked), _.renderAll())
 
   // actions

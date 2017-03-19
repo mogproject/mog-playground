@@ -27,7 +27,8 @@ object GameMenuSection extends Section {
     RecordSaveButton.output,
     h4("Help"),
     ul(
-      li("Click on a player name to set the game information.")
+      li("Click on a player name to set the game information."),
+      li("In View Mode, you can move to the next position by clicking anywhere on the board.")
     )
   ).render
 
