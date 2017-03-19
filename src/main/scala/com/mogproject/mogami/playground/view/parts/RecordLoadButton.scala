@@ -60,7 +60,7 @@ object RecordLoadButton extends EventManageable {
     Tooltip.display(loadButton, message, 2000)
   }
 
-  private[this] def readSingleFile(callback: String => Unit): Unit = {
+  private[this] def readSingleFile(callback: (String, String) => Unit): Unit = {
     val head = (inputElem.files.length >= 0).option(inputElem.files(0))
     (for {
       f <- head
@@ -71,7 +71,7 @@ object RecordLoadButton extends EventManageable {
         if (ret.length >= 10 * 1024) {
           abort("[Error] File too large. (must be <= 10KB)")
         } else {
-          callback(ret)
+          callback(f.name.split('.').lastOption.mkString, ret)
           clear()
         }
       }

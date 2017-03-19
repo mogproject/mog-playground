@@ -138,5 +138,5 @@ object Controller {
     case _ =>
   }
 
-  def loadRecord(content: String): Unit = doAction(_.loadRecord(content), _.renderAll())
+  def loadRecord(fileType: String, content: String): Unit = doAction(_.loadRecord(fileType, content), _.renderAll())
 }
