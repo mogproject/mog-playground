@@ -32,6 +32,6 @@ object GameMenuSection extends Section {
   ).render
 
   override def initialize(): Unit = {
-    RecordLoadButton.initialize()
+
   }
 }

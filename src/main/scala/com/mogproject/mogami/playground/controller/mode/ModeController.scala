@@ -103,7 +103,7 @@ trait ModeController {
 
   def toggleFlip(): Option[ModeController] = None
 
-  def loadRecord(fileType: String, content: String): Option[ModeController] = None
+  def loadRecord(fileName: String, content: String): Option[ModeController] = None
 
   // actions for edit mode
   def setEditTurn(turn: Player): Option[ModeController] = None

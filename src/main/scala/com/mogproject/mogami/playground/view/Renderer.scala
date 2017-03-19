@@ -426,5 +426,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   def updatePieceLang(lang: Language): Unit = PieceLanguageSelector.updateValue(lang)
 
   // tooltip messages
-  def displayTooltipRecordLoad(message: String): Unit = RecordLoadButton.displayMessage(message)
+  def displayTooltipRecordLoad(message: String): Unit = RecordLoadButton.displayTooltip(message)
+
+  def displayMessageRecordLoad(message: String): Unit = RecordLoadButton.displayMessage(message)
 }

@@ -196,18 +196,23 @@ trait GameController extends ModeController {
 
   def saveRecordKi2(): Unit = ???
 
-  override def loadRecord(fileType: String, content: String): Option[ModeController] = {
+  override def loadRecord(fileName: String, content: String): Option[ModeController] = {
+    val fileType = fileName.split('.').lastOption.mkString
     val (result, msg) = fileType.toUpperCase match {
-      case "CSA" => (Game.parseCsaString(content), "Failed!")
-      case "KIF" => (Game.parseKifString(content), "Failed!")
-      case "KI2" => (None, "Not implemented.")
+      case "CSA" => (Game.parseCsaString(content), "[Error]")
+      case "KIF" => (Game.parseKifString(content), "[Error]")
+      case "KI2" => (None, "[Error] Not implemented.")
       case _ => (None, s"Unknown type: ${fileType}")
     }
-    if (result.isEmpty) renderer.displayTooltipRecordLoad(msg)
+    if (result.isEmpty) {
+      renderer.displayMessageRecordLoad(msg)
+      renderer.displayTooltipRecordLoad("Failed!")
+    }
 
     result.map(g => {
+      renderer.displayMessageRecordLoad(fileName)
       renderer.displayTooltipRecordLoad("Loaded!")
-      this.copy(game = g, displayPosition = 0)
+      ViewModeController(this.renderer, this.config, g, 0)
     })
   }
 }
