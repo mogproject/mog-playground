@@ -3,7 +3,7 @@ package com.mogproject.mogami.playground.controller.mode
 import com.mogproject.mogami.core.Game.GameStatus
 import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.{Game, Move, State}
-import com.mogproject.mogami.playground.controller.{Configuration, Controller, Language}
+import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor, Language}
 import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.io.FileWriter
 import com.mogproject.mogami.util.Implicits._
@@ -105,7 +105,12 @@ trait GameController extends ModeController {
     controlType match {
       case 0 => Some(this.copy(displayPosition = 0))
       case 1 => Some(this.copy(displayPosition = renderer.getSelectedIndex - 1))
-      case 2 => Some(this.copy(displayPosition = renderer.getSelectedIndex + 1))
+      case 2 =>
+        if (realPosition < game.moves.length) {
+          val sq = game.moves(realPosition).to
+          renderer.flashCursor(Cursor(config.flip.fold(!sq, sq)))
+        }
+        Some(this.copy(displayPosition = renderer.getSelectedIndex + 1))
       case 3 => Some(this.copy(displayPosition = -1))
       case _ => throw new IllegalArgumentException(s"Unexpected control: mode=${mode} controlType=${controlType}")
     }

@@ -1,7 +1,7 @@
 package com.mogproject.mogami.playground.controller.mode
 
 import com.mogproject.mogami.Game
-import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor}
+import com.mogproject.mogami.playground.controller.{Configuration, Cursor}
 import com.mogproject.mogami.playground.view.Renderer
 
 /**
@@ -23,9 +23,6 @@ case class ViewModeController(renderer: Renderer,
 
   override def invokeCursor(selected: Cursor, invoked: Cursor): Option[ModeController] = {
     if (invoked.isBoard) {
-      if (realPosition < game.moves.length) {
-        renderer.flashCursor(Cursor(game.moves(realPosition).to))
-      }
       setControl(2) // move next
     } else if (invoked.isPlayer) {
       renderer.showGameInfoModal(config, game.gameInfo)
