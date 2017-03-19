@@ -27,8 +27,7 @@ lazy val root = (project in file("."))
     skip in packageJSDependencies := false,
 
     jsDependencies ++= Seq(
-      RuntimeDOM,
-      "org.webjars" % "jquery" % "2.1.4" / "2.1.4/jquery.min.js"
+      RuntimeDOM
     )
   )
   .dependsOn(mogCore)
