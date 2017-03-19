@@ -1,8 +1,8 @@
 package com.mogproject.mogami.playground.controller.mode
 
-import com.mogproject.mogami.playground.controller.{Configuration, Cursor}
-import com.mogproject.mogami.playground.view.Renderer
 import com.mogproject.mogami.Game
+import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor}
+import com.mogproject.mogami.playground.view.Renderer
 
 /**
   * View mode
@@ -19,8 +19,19 @@ case class ViewModeController(renderer: Renderer,
 
   override def canActivate(cursor: Cursor): Boolean = cursor.isPlayer
 
+  override def canInvokeWithoutSelection(cursor: Cursor): Boolean = true
+
   override def invokeCursor(selected: Cursor, invoked: Cursor): Option[ModeController] = {
-    if (invoked.isPlayer) renderer.showGameInfoModal(config, game.gameInfo)
-    None
+    if (invoked.isBoard) {
+      if (realPosition < game.moves.length) {
+        renderer.flashCursor(Cursor(game.moves(realPosition).to))
+      }
+      setControl(2) // move next
+    } else if (invoked.isPlayer) {
+      renderer.showGameInfoModal(config, game.gameInfo)
+      None
+    } else {
+      None
+    }
   }
 }
