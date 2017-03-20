@@ -174,7 +174,7 @@ trait GameController extends ModeController {
 
   protected def renderUrls(): Unit = {
     val configParams = config.toQueryParameters
-    val moveParams = isLastStatusPosition.fold(List.empty, List(s"move=${statusPosition}"))
+    val moveParams = (statusPosition == 0).fold(List.empty, List(s"move=${statusPosition}"))
     val gameInfoParams = List(("bn", 'blackName), ("wn", 'whiteName)).flatMap { case (q, k) =>
       game.gameInfo.tags.get(k).map(s => s"${q}=${encodeURIComponent(s)}")
     }
