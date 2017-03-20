@@ -103,6 +103,7 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
     val pieceBox = "#cccccc" // background of the piece box
 
     // numbers
+    val number = "#f3f372"
     val stroke = "#333333"
   }
 

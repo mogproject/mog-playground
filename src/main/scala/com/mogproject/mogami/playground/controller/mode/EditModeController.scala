@@ -124,8 +124,8 @@ case class EditModeController(renderer: Renderer,
     Try(State(turn, board, hand, None)) match {
       case Success(st) =>
         nextMode match {
-          case Playing => Some(PlayModeController(renderer, config, Game(st, gameInfo = gameInfo), -1))
-          case Viewing => Some(ViewModeController(renderer, config, Game(st, gameInfo = gameInfo), -1))
+          case Playing => Some(PlayModeController(renderer, config, Game(st, gameInfo = gameInfo), 0))
+          case Viewing => Some(ViewModeController(renderer, config, Game(st, gameInfo = gameInfo), 0))
           case Editing => None
         }
       case Failure(e) =>

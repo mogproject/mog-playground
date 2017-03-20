@@ -19,7 +19,7 @@ trait PieceRenderer {
 
   private[this] def drawNumbers(ctx: CanvasRenderingContext2D, n: Int, left: Int, top: Int, rotated: Boolean, scale: Double = 1.0): Unit = {
     if (n > 1) {
-      TextRenderer(ctx, n.toString, layout.font.numberOfPieces, layout.color.cursor,
+      TextRenderer(ctx, n.toString, layout.font.numberOfPieces, layout.color.number,
         left, top, (layout.PIECE_WIDTH * scale).toInt, (layout.PIECE_HEIGHT * scale).toInt
       ).alignRight.alignBottom.withRotate(rotated).withStroke(layout.color.stroke, layout.strokeSize).render()
     }

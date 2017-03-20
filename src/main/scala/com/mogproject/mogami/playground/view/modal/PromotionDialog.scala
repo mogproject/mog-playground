@@ -21,14 +21,16 @@ case class PromotionDialog(config: Configuration,
                            callbackPromote: () => Unit
                           ) extends EventManageable {
 
+  private[this] val textScale: Double = 1.5
+
   private[this] val title = config.messageLang match {
     case Japanese => "成りますか?"
     case English => "Do you want to promote?"
   }
 
   private[this] def createCanvas: Canvas = canvas(
-    widthA := config.pieceRenderer.layout.PIECE_WIDTH * 2,
-    heightA := config.pieceRenderer.layout.PIECE_HEIGHT * 2,
+    widthA := config.pieceRenderer.layout.PIECE_WIDTH * textScale,
+    heightA := config.pieceRenderer.layout.PIECE_HEIGHT * textScale,
     marginLeft := "auto",
     marginRight := "auto",
     left := 0,
@@ -47,13 +49,13 @@ case class PromotionDialog(config: Configuration,
     canvasPromote.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
 
   private[this] val buttonUnpromote = button(tpe := "button", cls := "btn btn-default btn-block",
-    style := s"height: ${config.pieceRenderer.layout.PIECE_HEIGHT * 2}px !important",
+    style := s"height: ${config.pieceRenderer.layout.PIECE_HEIGHT * textScale}px !important",
     data("dismiss") := "modal",
     canvasUnpromote
   ).render
 
   private[this] val buttonPromote = button(tpe := "button", cls := "btn btn-default btn-block",
-    style := s"height: ${config.pieceRenderer.layout.PIECE_HEIGHT * 2}px !important",
+    style := s"height: ${config.pieceRenderer.layout.PIECE_HEIGHT * textScale}px !important",
     data("dismiss") := "modal",
     canvasPromote
   ).render
@@ -89,8 +91,8 @@ case class PromotionDialog(config: Configuration,
     setModalClickEvent(buttonPromote, dialog, callbackPromote)
 
     // draw large pieces
-    config.pieceRenderer.drawPiece(contextUnpromote, config.flip.when[Piece](!_)(piece), 0, 0, 2)
-    config.pieceRenderer.drawPiece(contextPromote, config.flip.when[Piece](!_)(piece.promoted), 0, 0, 2)
+    config.pieceRenderer.drawPiece(contextUnpromote, config.flip.when[Piece](!_)(piece), 0, 0, textScale)
+    config.pieceRenderer.drawPiece(contextPromote, config.flip.when[Piece](!_)(piece.promoted), 0, 0, textScale)
 
     // show the modal
     dialog.asInstanceOf[BootstrapJQuery].modal("show")

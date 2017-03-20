@@ -1,12 +1,14 @@
 package com.mogproject.mogami.playground.controller.mode
 
 import com.mogproject.mogami.core.Game.GameStatus
+import com.mogproject.mogami.core.Game.GameStatus.{Resigned, TimedUp}
 import com.mogproject.mogami.core.GameInfo
-import com.mogproject.mogami.{Game, Move, State}
-import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor, Language}
+import com.mogproject.mogami.core.move.IllegalMove
 import com.mogproject.mogami.playground.api.google.URLShortener
+import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor, Language}
 import com.mogproject.mogami.playground.io.FileWriter
 import com.mogproject.mogami.util.Implicits._
+import com.mogproject.mogami.{Game, Move, State}
 
 import scala.scalajs.js.URIUtils.encodeURIComponent
 
@@ -20,6 +22,8 @@ trait GameController extends ModeController {
   def game: Game
 
   def displayPosition: Int
+
+  require(displayPosition >= 0)
 
   override def gameInfo: GameInfo = game.gameInfo
 
@@ -39,18 +43,31 @@ trait GameController extends ModeController {
   //
   // helper functions
   //
-  protected val realPosition: Int = (displayPosition < 0).fold(game.moves.length, math.min(displayPosition, game.moves.length))
+  protected val lastDisplayPosition: Int = game.moves.length + (game.status match {
+    case GameStatus.IllegallyMoved => 2
+    case GameStatus.Playing => 0
+    case _ => 1
+  })
 
-  protected def getLastMove: Option[Move] = (realPosition > 0).option(game.moves(realPosition - 1))
+  protected val statusPosition: Int = math.min(displayPosition, game.moves.length)
 
-  protected def isLatestState: Boolean = realPosition == game.moves.length
+  protected val lastStatusPosition: Int = game.moves.length
 
-  protected def getTruncatedGame: Game = isLatestState.fold(
-    game,
-    game.copy(moves = game.moves.take(realPosition), givenHistory = Some(game.history.take(realPosition + 1)))
+  protected def getLastMove: Option[Move] = (displayPosition, game.finalAction) match {
+    case (x, Some(IllegalMove(mv))) if game.moves.length < x => Some(mv)
+    case (0, _) => None
+    case _ => Some(game.moves(statusPosition - 1))
+  }
+
+  protected def isLastStatusPosition: Boolean =
+    (game.status == GameStatus.IllegallyMoved).fold(lastStatusPosition < displayPosition, statusPosition == lastStatusPosition)
+
+  protected def getTruncatedGame: Game = (!isLastStatusPosition || Seq(Resigned, TimedUp).contains(game.status)).fold(
+    game.copy(moves = game.moves.take(statusPosition), finalAction = None, givenHistory = Some(game.history.take(statusPosition + 1))),
+    game
   )
 
-  protected def selectedState: State = game.history(realPosition)
+  protected def selectedState: State = game.history(statusPosition)
 
 
   /**
@@ -106,12 +123,12 @@ trait GameController extends ModeController {
       case 0 => Some(this.copy(displayPosition = 0))
       case 1 => Some(this.copy(displayPosition = renderer.getSelectedIndex - 1))
       case 2 =>
-        if (realPosition < game.moves.length) {
-          val sq = game.moves(realPosition).to
+        if (statusPosition < game.moves.length) {
+          val sq = game.moves(statusPosition).to
           renderer.flashCursor(Cursor(config.flip.fold(!sq, sq)))
         }
         Some(this.copy(displayPosition = renderer.getSelectedIndex + 1))
-      case 3 => Some(this.copy(displayPosition = -1))
+      case 3 => Some(this.copy(displayPosition = lastDisplayPosition))
       case _ => throw new IllegalArgumentException(s"Unexpected control: mode=${mode} controlType=${controlType}")
     }
   }
@@ -134,8 +151,12 @@ trait GameController extends ModeController {
   }
 
   protected def renderState(): Unit = {
-    renderer.drawPieces(config, selectedState)
-    renderer.drawIndicators(config, selectedState.turn, isLatestState.fold(game.status, GameStatus.Playing))
+    (lastStatusPosition < displayPosition, game.finalAction) match {
+      case (true, Some(IllegalMove(mv))) => renderer.drawIllegalStatePieces(config, selectedState, mv)
+      case _ => renderer.drawPieces(config, selectedState)
+    }
+
+    renderer.drawIndicators(config, selectedState.turn, isLastStatusPosition.fold(game.status, GameStatus.Playing))
     renderer.drawLastMove(config, getLastMove)
   }
 
@@ -153,20 +174,20 @@ trait GameController extends ModeController {
 
   protected def renderUrls(): Unit = {
     val configParams = config.toQueryParameters
-    val moveParams = isLatestState.fold(List.empty, List(s"move=${realPosition}"))
+    val moveParams = isLastStatusPosition.fold(List.empty, List(s"move=${statusPosition}"))
     val gameInfoParams = List(("bn", 'blackName), ("wn", 'whiteName)).flatMap { case (q, k) =>
       game.gameInfo.tags.get(k).map(s => s"${q}=${encodeURIComponent(s)}")
     }
 
     val instantGame = Game(selectedState)
     val instantGameWithLastMove =
-      if (realPosition == 0)
+      if (statusPosition == 0)
         instantGame
       else
         Game(
-          game.history(realPosition - 1),
-          game.moves.slice(realPosition - 1, realPosition),
-          givenHistory = Some(game.history.slice(realPosition - 1, realPosition + 1))
+          game.history(statusPosition - 1),
+          game.moves.slice(statusPosition - 1, statusPosition),
+          givenHistory = Some(game.history.slice(statusPosition - 1, statusPosition + 1))
         )
 
     val snapshot = List("sfen=" + encodeURIComponent(instantGame.toSfenString)) ++ gameInfoParams ++ configParams
@@ -204,10 +225,10 @@ trait GameController extends ModeController {
   override def loadRecord(fileName: String, content: String): Option[ModeController] = {
     val fileType = fileName.split('.').lastOption.mkString
     val (result, msg) = fileType.toUpperCase match {
-      case "CSA" => (Game.parseCsaString(content), "[Error]")
-      case "KIF" => (Game.parseKifString(content), "[Error]")
+      case "CSA" => (Game.parseCsaString(content), s"[Error] Failed to parse: ${fileName}")
+      case "KIF" => (Game.parseKifString(content), s"[Error] Failed to parse: ${fileName}")
       case "KI2" => (None, "[Error] Not implemented.")
-      case _ => (None, s"Unknown type: ${fileType}")
+      case _ => (None, s"[Error] Unknown file type: ${fileType}")
     }
     if (result.isEmpty) {
       renderer.displayMessageRecordLoad(msg)
