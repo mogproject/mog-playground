@@ -13,6 +13,7 @@ import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.playground.view.parts._
 import com.mogproject.mogami.playground.view.section._
 import com.mogproject.mogami.util.Implicits._
+import com.mogproject.mogami.util.MapUtil
 import org.scalajs.dom
 import org.scalajs.dom.html.{Canvas, Div}
 import org.scalajs.dom.{CanvasRenderingContext2D, Element}
@@ -239,12 +240,27 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     }
   }
 
-  def drawPieces(config: Configuration, state: State): Unit = {
+  private[this] def drawPieces(config: Configuration, board: BoardType, hand: HandType): Unit = {
     val pr = config.pieceRenderer
 
     clearPieces()
-    state.board.foreach { case (sq, pc) => pr.drawOnBoard(layer2, config.flip.when[Piece](!_)(pc), config.flip.when(flipSquare)(sq)) }
-    state.hand.withFilter(_._2 > 0).foreach { case (pc, n) => pr.drawInHand(layer2, config.flip.when[Hand](!_)(pc), n) }
+    board.foreach { case (sq, pc) => pr.drawOnBoard(layer2, config.flip.when[Piece](!_)(pc), config.flip.when(flipSquare)(sq)) }
+    hand.withFilter(_._2 > 0).foreach { case (pc, n) => pr.drawInHand(layer2, config.flip.when[Hand](!_)(pc), n) }
+  }
+
+  def drawPieces(config: Configuration, state: State): Unit = drawPieces(config, state.board, state.hand)
+
+  /**
+    * Draw illegal state
+    */
+  def drawIllegalStatePieces(config: Configuration, state: State, move: Move): Unit = {
+    val releaseBoard: BoardType => BoardType = move.from.when(sq => b => b - sq)
+    val releaseHand: HandType => HandType = move.isDrop.when(MapUtil.decrementMap(_, Hand(move.newPiece)))
+    val obtainHand: HandType => HandType = move.capturedPiece.when(p => h => MapUtil.incrementMap(h, Hand(!p.demoted)))
+
+    val board = releaseBoard(state.board) + (move.to -> move.newPiece)
+    val hand = (releaseHand andThen obtainHand) (state.hand)
+    drawPieces(config, board, hand)
   }
 
   def clearPieces(): Unit = {
