@@ -60,7 +60,7 @@ trait GameController extends ModeController {
   }
 
   protected def isLastStatusPosition: Boolean =
-    (game.status == GameStatus.IllegallyMoved).fold(lastStatusPosition < displayPosition, statusPosition == lastStatusPosition)
+    game.finalAction.isDefined.fold(lastStatusPosition < displayPosition, statusPosition == lastStatusPosition)
 
   protected def getTruncatedGame: Game = (!isLastStatusPosition || Seq(Resigned, TimedUp).contains(game.status)).fold(
     game.copy(moves = game.moves.take(statusPosition), finalAction = None, givenHistory = Some(game.history.take(statusPosition + 1))),
