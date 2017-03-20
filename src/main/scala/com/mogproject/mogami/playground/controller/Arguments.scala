@@ -10,7 +10,7 @@ import scala.util.{Success, Try}
   * stores parameters
   */
 case class Arguments(game: Game = Game(),
-                     currentMove: Int = -1,
+                     currentMove: Int = 0,
                      action: Action = PlayAction,
                      config: Configuration = Configuration()) {
   def parseQueryString(query: String): Arguments = {
