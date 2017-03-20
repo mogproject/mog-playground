@@ -42,7 +42,7 @@ case class PlayModeController(renderer: Renderer,
       val from = config.flip.when[Cursor](!_)(selected).moveFrom
 
       def f(to: Square, promote: Boolean) = {
-        getTruncatedGame.makeMove(MoveBuilderSfen(from, to, promote)).map(g => this.copy(game = g, displayPosition = -1))
+        getTruncatedGame.makeMove(MoveBuilderSfen(from, to, promote)).map(g => this.copy(game = g, displayPosition = displayPosition + 1))
       }
 
       config.flip.when[Cursor](!_)(invoked) match {

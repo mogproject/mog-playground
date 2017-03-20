@@ -22,7 +22,7 @@ object RecordLoadButton extends EventManageable {
     onchange := { () =>
       displayMessage("Loading...")
       browseButton.disabled = true
-      dom.window.setTimeout(() => readSingleFile(Controller.loadRecord), 100)
+      dom.window.setTimeout(() => readSingleFile(Controller.loadRecord), 500)
     }
   ).render
 
@@ -51,9 +51,6 @@ object RecordLoadButton extends EventManageable {
         browseButton
       ),
       textElem
-      //      div(cls := "input-group-btn",
-      //        loadButton
-      //      )
     )
   ).render
 
@@ -78,11 +75,11 @@ object RecordLoadButton extends EventManageable {
         if (ret.length >= 10 * 1024) {
           abort("[Error] File too large. (must be <= 10KB)")
         } else {
-          callback(f.name, ret.replace("\r", ""))
+          callback(f.name, ret.replace("\r", "")) // remove carriage return
           clear()
         }
       }
-      val t = Try(r.readAsText(f))
+      val t = Try(r.readAsText(f)) // todo: @see https://github.com/polygonplanet/encoding.js
       if (t.isFailure) {
         abort("[Error] Failed to open the file.")
       }

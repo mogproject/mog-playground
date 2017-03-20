@@ -1,12 +1,12 @@
 package com.mogproject.mogami.playground.view
 
-import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami._
 import com.mogproject.mogami.core.Game.GameStatus
 import com.mogproject.mogami.core.Game.GameStatus.GameStatus
 import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
+import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.modal._
@@ -14,8 +14,8 @@ import com.mogproject.mogami.playground.view.parts._
 import com.mogproject.mogami.playground.view.section._
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
-import org.scalajs.dom.{CanvasRenderingContext2D, Element}
 import org.scalajs.dom.html.{Canvas, Div}
+import org.scalajs.dom.{CanvasRenderingContext2D, Element}
 
 import scalatags.JsDom.all._
 
@@ -275,26 +275,23 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
         .alignCenter.alignMiddle.withRotate(rotated).render()
     }
 
+    def drawWinLose(turnWins: Boolean): Unit = {
+      val winner = (t.isBlack ^ turnWins).fold(layout.indicatorWhite, layout.indicatorBlack)
+      val loser = (t.isBlack ^ turnWins).fold(layout.indicatorBlack, layout.indicatorWhite)
+      winner.drawFill(layer0, layout.color.win)
+      f(winner, "WIN", t.isBlack ^ turnWins)
+      loser.drawFill(layer0, layout.color.lose)
+      f(loser, "LOSE", t.isWhite ^ turnWins)
+    }
+
     status match {
       case GameStatus.Playing =>
         (if (t.isBlack) layout.indicatorWhite else layout.indicatorBlack).clear(layer0, -1)
         val r = if (t.isBlack) layout.indicatorBlack else layout.indicatorWhite
         r.drawFill(layer0, layout.color.active)
         f(r, "TURN", t.isWhite)
-      case GameStatus.Mated =>
-        val winner = t.isBlack.fold(layout.indicatorWhite, layout.indicatorBlack)
-        val loser = t.isBlack.fold(layout.indicatorBlack, layout.indicatorWhite)
-        winner.drawFill(layer0, layout.color.win)
-        f(winner, "WIN", t.isBlack)
-        loser.drawFill(layer0, layout.color.lose)
-        f(loser, "LOSE", t.isWhite)
-      case GameStatus.PerpetualCheck | GameStatus.Uchifuzume =>
-        val winner = t.isBlack.fold(layout.indicatorBlack, layout.indicatorWhite)
-        val loser = t.isBlack.fold(layout.indicatorWhite, layout.indicatorBlack)
-        winner.drawFill(layer0, layout.color.win)
-        f(winner, "WIN", t.isWhite)
-        loser.drawFill(layer0, layout.color.lose)
-        f(loser, "LOSE", t.isBlack)
+      case GameStatus.Mated | GameStatus.Resigned | GameStatus.TimedUp | GameStatus.IllegallyMoved => drawWinLose(false)
+      case GameStatus.PerpetualCheck | GameStatus.Uchifuzume => drawWinLose(true)
       case GameStatus.Drawn =>
         layout.indicatorWhite.drawFill(layer0, layout.color.draw)
         layout.indicatorBlack.drawFill(layer0, layout.color.draw)

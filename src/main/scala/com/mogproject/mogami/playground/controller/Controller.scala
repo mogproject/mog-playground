@@ -37,7 +37,7 @@ object Controller {
     // update mode
     modeController = Some(game.moves.nonEmpty.fold(
       ViewModeController(renderer, config, game, args.currentMove),
-      PlayModeController(renderer, config, game, -1)
+      PlayModeController(renderer, config, game, 0)
     ))
 
     // render all parts
