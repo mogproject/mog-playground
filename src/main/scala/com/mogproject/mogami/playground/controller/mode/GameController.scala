@@ -53,9 +53,9 @@ trait GameController extends ModeController {
 
   protected val lastStatusPosition: Int = game.moves.length
 
-  protected def getLastMove: Option[Move] = (displayPosition, game.finalAction) match {
-    case (x, Some(IllegalMove(mv))) if game.moves.length < x => Some(mv)
-    case (0, _) => None
+  protected def getLastMove: Option[Move] = (displayPosition, statusPosition, game.finalAction) match {
+    case (x, _, Some(IllegalMove(mv))) if lastStatusPosition < x => Some(mv)
+    case (_, 0, _) => None
     case _ => Some(game.moves(statusPosition - 1))
   }
 
@@ -180,19 +180,19 @@ trait GameController extends ModeController {
     }
 
     val instantGame = Game(selectedState)
-    val instantGameWithLastMove =
+    val (instantGameWithLastMove, moveParamsImage) =
       if (statusPosition == 0)
-        instantGame
+        (instantGame, Nil)
       else
-        Game(
+        (Game(
           game.history(statusPosition - 1),
           game.moves.slice(statusPosition - 1, statusPosition),
           givenHistory = Some(game.history.slice(statusPosition - 1, statusPosition + 1))
-        )
+        ), List("move=1"))
 
     val snapshot = List("sfen=" + encodeURIComponent(instantGame.toSfenString)) ++ gameInfoParams ++ configParams
     val record = List("sfen=" + encodeURIComponent(game.toSfenString)) ++ gameInfoParams ++ configParams ++ moveParams
-    val image = List("action=image", "sfen=" + encodeURIComponent(instantGameWithLastMove.toSfenString)) ++ gameInfoParams ++ configParams
+    val image = List("action=image", "sfen=" + encodeURIComponent(instantGameWithLastMove.toSfenString)) ++ gameInfoParams ++ configParams ++ moveParamsImage
 
     renderer.updateSnapshotUrl(s"${config.baseUrl}?${snapshot.mkString("&")}")
     renderer.updateSnapshotShortUrl("", completed = false)
