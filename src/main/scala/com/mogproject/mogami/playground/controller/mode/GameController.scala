@@ -180,19 +180,19 @@ trait GameController extends ModeController {
     }
 
     val instantGame = Game(selectedState)
-    val instantGameWithLastMove =
+    val (instantGameWithLastMove, moveParamsImage) =
       if (statusPosition == 0)
-        instantGame
+        (instantGame, Nil)
       else
-        Game(
+        (Game(
           game.history(statusPosition - 1),
           game.moves.slice(statusPosition - 1, statusPosition),
           givenHistory = Some(game.history.slice(statusPosition - 1, statusPosition + 1))
-        )
+        ), List("move=1"))
 
     val snapshot = List("sfen=" + encodeURIComponent(instantGame.toSfenString)) ++ gameInfoParams ++ configParams
     val record = List("sfen=" + encodeURIComponent(game.toSfenString)) ++ gameInfoParams ++ configParams ++ moveParams
-    val image = List("action=image", "sfen=" + encodeURIComponent(instantGameWithLastMove.toSfenString)) ++ gameInfoParams ++ configParams
+    val image = List("action=image", "sfen=" + encodeURIComponent(instantGameWithLastMove.toSfenString)) ++ gameInfoParams ++ configParams ++ moveParamsImage
 
     renderer.updateSnapshotUrl(s"${config.baseUrl}?${snapshot.mkString("&")}")
     renderer.updateSnapshotShortUrl("", completed = false)
