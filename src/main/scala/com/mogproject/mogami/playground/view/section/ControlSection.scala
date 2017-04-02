@@ -55,7 +55,7 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
   def updateRecordContent(game: Game, lng: Language): Unit = {
     // moves
     val xs = getMoves(game, lng).zipWithIndex.map { case (m, i) =>
-      s"${i + 1}: ${game.history(i).turn.toSymbolString}${m}"
+      s"${i + 1}: ${game.history(i).turn.toSymbolString()}${m}"
     }
     val prefix = lng match {
       case Japanese => "初期局面"

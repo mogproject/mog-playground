@@ -11,6 +11,7 @@ import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.{Game, Move, State}
 
 import scala.scalajs.js.URIUtils.encodeURIComponent
+import scala.util.{Failure, Success, Try}
 
 /**
   * used for Play and View mode
@@ -220,25 +221,26 @@ trait GameController extends ModeController {
 
   def saveRecordKif(): Unit = FileWriter.saveTextFile(game.toKifString, "record.kif")
 
-  def saveRecordKi2(): Unit = ???
+  def saveRecordKi2(): Unit = FileWriter.saveTextFile(game.toKi2String, "record.ki2")
 
   override def loadRecord(fileName: String, content: String): Option[ModeController] = {
     val fileType = fileName.split('.').lastOption.mkString
-    val (result, msg) = fileType.toUpperCase match {
-      case "CSA" => (Game.parseCsaString(content), s"[Error] Failed to parse: ${fileName}")
-      case "KIF" => (Game.parseKifString(content), s"[Error] Failed to parse: ${fileName}")
-      case "KI2" => (None, "[Error] Not implemented.")
-      case _ => (None, s"[Error] Unknown file type: ${fileType}")
-    }
-    if (result.isEmpty) {
-      renderer.displayMessageRecordLoad(msg)
-      renderer.displayTooltipRecordLoad("Failed!")
+    val result = fileType.toUpperCase match {
+      case "CSA" => Try(Game.parseCsaString(content))
+      case "KIF" => Try(Game.parseKifString(content))
+      case "KI2" => Try(Game.parseKi2String(content))
+      case _ => Failure(new RuntimeException(s"Unknown file type: ${fileType}"))
     }
 
-    result.map(g => {
-      renderer.displayMessageRecordLoad(fileName)
-      renderer.displayTooltipRecordLoad("Loaded!")
-      ViewModeController(this.renderer, this.config, g, 0)
-    })
+    result match {
+      case Success(g) =>
+        renderer.displayMessageRecordLoad(fileName)
+        renderer.displayTooltipRecordLoad(s"Loaded! (${g.moves.length} moves)")
+        Some(ViewModeController(this.renderer, this.config, g, 0))
+      case Failure(e) =>
+        renderer.displayMessageRecordLoad(s"Error: ${e.getMessage}")
+        renderer.displayTooltipRecordLoad("Failed!")
+        None
+    }
   }
 }

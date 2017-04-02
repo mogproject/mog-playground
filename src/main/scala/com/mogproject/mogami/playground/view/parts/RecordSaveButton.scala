@@ -26,9 +26,7 @@ object RecordSaveButton {
     data("toggle") := "tooltip",
     data("placement") := "bottom",
     data("dismiss") := "modal",
-    data("original-title") := {
-      if (title != "KI2") s"Save the record as ${title} Format" else "To be implemented..."
-    },
+    data("original-title") := s"Save the record as ${title} Format",
     onclick := f,
     title
   ).render

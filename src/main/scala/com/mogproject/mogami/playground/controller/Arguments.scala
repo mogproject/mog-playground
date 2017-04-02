@@ -4,7 +4,7 @@ import com.mogproject.mogami.Game
 
 import scala.annotation.tailrec
 import scala.scalajs.js.URIUtils.decodeURIComponent
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 
 /**
   * stores parameters
@@ -16,9 +16,10 @@ case class Arguments(game: Game = Game(),
   def parseQueryString(query: String): Arguments = {
     @tailrec
     def f(sofar: Arguments, ls: List[List[String]]): Arguments = ls match {
-      case ("sfen" :: s :: Nil) :: xs => Game.parseSfenString(s) match {
-        case Some(g) => f(sofar.copy(game = g.copy(gameInfo = sofar.game.gameInfo)), xs)
-        case None =>
+      case ("sfen" :: s :: Nil) :: xs => Try(Game.parseSfenString(s)) match {
+        case Success(g) => f(sofar.copy(game = g.copy(gameInfo = sofar.game.gameInfo)), xs)
+        case Failure(e) =>
+          println(s"Failed to create a game: ${e}")
           println(s"Invalid parameter: sfen=${s}")
           f(sofar, xs)
       }
