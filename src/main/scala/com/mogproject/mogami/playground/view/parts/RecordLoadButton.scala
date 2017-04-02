@@ -64,6 +64,8 @@ object RecordLoadButton extends EventManageable {
   }
 
   private[this] def readSingleFile(callback: (String, String) => Unit): Unit = {
+    val maxFileSizeKB = 20
+
     displayMessage("Loading...")
     val head = (inputElem.files.length >= 0).option(inputElem.files(0))
     (for {
@@ -72,8 +74,8 @@ object RecordLoadButton extends EventManageable {
       val r = new FileReader()
       r.onload = evt => {
         val ret: String = evt.target.asInstanceOf[FileReader].result.toString
-        if (ret.length >= 10 * 1024) {
-          abort("[Error] File too large. (must be <= 10KB)")
+        if (ret.length >= maxFileSizeKB * 1024) {
+          abort(s"[Error] File too large. (must be <= ${maxFileSizeKB}KB)")
         } else {
           callback(f.name, ret.replace("\r", "")) // remove carriage return
           clear()
