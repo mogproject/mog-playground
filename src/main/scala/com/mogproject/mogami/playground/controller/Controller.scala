@@ -6,6 +6,7 @@ import com.mogproject.mogami._
 import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller.mode._
+import com.mogproject.mogami.playground.io.RecordFormat
 import org.scalajs.dom.Element
 
 /**
@@ -141,4 +142,6 @@ object Controller {
   }
 
   def loadRecord(fileName: String, content: String): Unit = doAction(_.loadRecord(fileName, content), _.renderAll())
+
+  def loadRecordText(format: RecordFormat, content: String): Unit = doAction(_.loadRecordText(format, content), _.renderAll())
 }

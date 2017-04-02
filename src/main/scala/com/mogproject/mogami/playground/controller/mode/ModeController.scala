@@ -4,6 +4,7 @@ import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.core.Player.{BLACK, WHITE}
 import com.mogproject.mogami.{Player, State}
 import com.mogproject.mogami.playground.controller._
+import com.mogproject.mogami.playground.io.RecordFormat
 import com.mogproject.mogami.playground.view.Renderer
 
 
@@ -106,6 +107,8 @@ trait ModeController {
   def toggleFlip(): Option[ModeController] = None
 
   def loadRecord(fileName: String, content: String): Option[ModeController] = None
+
+  def loadRecordText(format: RecordFormat, content: String): Option[ModeController] = None
 
   // actions for edit mode
   def setEditTurn(turn: Player): Option[ModeController] = None

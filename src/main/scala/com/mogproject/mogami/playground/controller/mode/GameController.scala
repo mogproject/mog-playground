@@ -6,7 +6,7 @@ import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.core.move.IllegalMove
 import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor, Language}
-import com.mogproject.mogami.playground.io.FileWriter
+import com.mogproject.mogami.playground.io._
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.{Game, Move, State}
 
@@ -240,6 +240,25 @@ trait GameController extends ModeController {
       case Failure(e) =>
         renderer.displayMessageRecordLoad(s"Error: ${e.getMessage}")
         renderer.displayTooltipRecordLoad("Failed!")
+        None
+    }
+  }
+
+  override def loadRecordText(format: RecordFormat, content: String): Option[ModeController] = {
+    val result = format match {
+      case CSA => Try(Game.parseCsaString(content))
+      case KIF => Try(Game.parseKifString(content))
+      case KI2 => Try(Game.parseKi2String(content))
+    }
+
+    result match {
+      case Success(g) =>
+        renderer.displayMessageRecordLoadText("")
+        renderer.displayTooltipRecordLoadText(s"Loaded! (${g.moves.length} moves)")
+        Some(ViewModeController(this.renderer, this.config, g, 0))
+      case Failure(e) =>
+        renderer.displayMessageRecordLoadText(s"Error: ${e.getMessage}")
+        renderer.displayTooltipRecordLoadText("Failed!")
         None
     }
   }
