@@ -1,15 +1,14 @@
 package com.mogproject.mogami.playground.view.parts
 
 import com.mogproject.mogami.playground.controller.Controller
-import com.mogproject.mogami.playground.io.RecordFormat
+import com.mogproject.mogami.playground.io.{RecordFormat, TextReader}
 import com.mogproject.mogami.playground.view.EventManageable
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.html._
-import org.scalajs.dom.raw.FileReader
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 import scalatags.JsDom.all._
 
 /**
@@ -23,7 +22,7 @@ object RecordLoadButton extends EventManageable {
     onchange := { () =>
       displayMessage("Loading...")
       browseButton.disabled = true
-      dom.window.setTimeout(() => readSingleFile(Controller.loadRecord), 500)
+      dom.window.setTimeout(() => readSingleFile(fileName => content => Controller.loadRecord(fileName, content)), 500)
     }
   ).render
 
@@ -111,27 +110,23 @@ object RecordLoadButton extends EventManageable {
     Tooltip.display(textBoxElem, message, 2000)
   }
 
-  private[this] def readSingleFile(callback: (String, String) => Unit): Unit = {
+  private[this] def readSingleFile(callback: String => String => Unit): Unit = {
     val maxFileSizeKB = 20
 
-    displayMessage("Loading...")
     val head = (inputElem.files.length >= 0).option(inputElem.files(0))
     (for {
       f <- head
     } yield {
-      val r = new FileReader()
-      r.onload = evt => {
-        val ret: String = evt.target.asInstanceOf[FileReader].result.toString
-        if (ret.length >= maxFileSizeKB * 1024) {
-          abort(s"[Error] File too large. (must be <= ${maxFileSizeKB}KB)")
-        } else {
-          callback(f.name, ret.replace("\r", "")) // remove carriage return
-          clear()
-        }
+      def sizeChecker(sz: Int): Boolean = if (sz <= maxFileSizeKB * 1024) {
+        false
+      } else {
+        abort(s"[Error] File too large. (must be <= ${maxFileSizeKB}KB)")
+        true
       }
-      val t = Try(r.readAsText(f)) // todo: @see https://github.com/polygonplanet/encoding.js
-      if (t.isFailure) {
-        abort("[Error] Failed to open the file.")
+
+      Try(TextReader.readTextFile(f, callback(f.name), sizeChecker)) match {
+        case Success(_) => // do nothing
+        case Failure(_) => abort("[Error] Failed to open the file.")
       }
     }).getOrElse {
       abort("[Error] Failed to select the file.")

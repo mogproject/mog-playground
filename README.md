@@ -1,3 +1,9 @@
+### Dependencies
+
+| Library       | Purpose      | URL  |
+|:--------------|:-------------|:-----|
+|ecl_new.js     |Japanese character set decoder|http://www.drk7.jp/MT/archives/001324.html |
+
 ### For developers
 
 ##### Development

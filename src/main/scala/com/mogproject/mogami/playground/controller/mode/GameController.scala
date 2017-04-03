@@ -240,6 +240,9 @@ trait GameController extends ModeController {
       case Failure(e) =>
         renderer.displayMessageRecordLoad(s"Error: ${e.getMessage}")
         renderer.displayTooltipRecordLoad("Failed!")
+
+        println("hoge")
+        println(s"""${content.toCharArray.toList.map(_.toInt)}""")
         None
     }
   }
