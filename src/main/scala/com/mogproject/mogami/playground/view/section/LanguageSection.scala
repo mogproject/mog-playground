@@ -15,7 +15,7 @@ object LanguageSection extends Section {
     PieceLanguageSelector.initialize()
   }
 
-  val output: Div = div(
+  override val output: Div = div(
     h4("Language"),
     MessageLanguageSelector.output,
     RecordLanguageSelector.output,

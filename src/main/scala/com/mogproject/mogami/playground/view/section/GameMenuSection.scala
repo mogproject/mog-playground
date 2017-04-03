@@ -9,7 +9,7 @@ import scalatags.JsDom.all._
   *
   */
 object GameMenuSection extends Section {
-  val output: Div = div(
+  override val output: Div = div(
     h4("Share"),
     SnapshotCopyButton.output,
     SnapshotShortenButton.output,

@@ -105,6 +105,14 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
     // numbers
     val number = "#f3f372"
     val stroke = "#333333"
+
+    // bootstrap
+    val bsPrimary = "#337ab7;"
+    val bsDefault = "#f8f8f8"
+    val bsSuccess = "#dff0d8"
+    val bsInfo = "#d9edf7"
+    val bsWarning = "#fcf8e3"
+    val bsDanger = "#f2dede"
   }
 
   lazy val strokeSize: Int = scaleByCanvas(10)
