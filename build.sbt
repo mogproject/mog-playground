@@ -27,7 +27,8 @@ lazy val root = (project in file("."))
     skip in packageJSDependencies := false,
 
     jsDependencies ++= Seq(
-      RuntimeDOM
+      RuntimeDOM,
+      ProvidedJS / "assets/js/ecl_new.js"
     )
   )
   .dependsOn(mogCore)
