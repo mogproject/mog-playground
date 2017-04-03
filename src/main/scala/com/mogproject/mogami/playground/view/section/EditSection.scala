@@ -13,7 +13,7 @@ object EditSection extends Section {
     EditReset.initialize()
   }
 
-  val output: Div = div(display := "none",
+  override val output: Div = div(display := "none",
     EditReset.output,
     h4("Help"),
     ul(

@@ -39,6 +39,10 @@
     whilte-space: nowrap;
 }
 
+.navbar>div {
+    height: 100%;
+}
+
 .navbar-nav>li>a {
     padding-top: 4px !important;
     padding-bottom: 4px !important;

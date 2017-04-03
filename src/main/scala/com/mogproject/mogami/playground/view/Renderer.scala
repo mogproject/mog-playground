@@ -7,7 +7,7 @@ import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller._
-import com.mogproject.mogami.playground.controller.mode.Mode
+import com.mogproject.mogami.playground.controller.mode.{Editing, Mode, Playing, Viewing}
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.playground.view.parts._
@@ -46,24 +46,11 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     canvases
   ).render
 
+  private[this] val navigatorSection = NavigatorSection(layout)
+
   private[this] val controlSection = ControlSection(layout.canvasWidth)
 
   // forms
-  private[this] val navigator = tag("nav")(cls := "navbar navbar-default navbar-fixed-top",
-    div(cls := "container", padding := 0,
-      div(cls := "row")(
-        div(cls := "navbar-header col-md-10 col-md-offset-1", width := "100%",
-          ul(cls := "nav navbar-nav",
-            li(cls := "navbar-brand hidden-xs hidden-sm", "Shogi Playground"),
-            li(ModeSelector.output),
-            FlipButton.output,
-            li(cls := "pull-right visible-xs visible-sm", MenuButton.output)
-          )
-        )
-      )
-    )
-  )
-
   private[this] val footer: Div = {
     val sections = List(LanguageSection, GameMenuSection, EditSection, AboutSection)
 
@@ -79,7 +66,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
   private[this] def initialize(): Unit = {
     elem.appendChild(div(cls := "container",
       div(cls := "row navbar",
-        navigator
+        tag("nav")(cls := "navbar navbar-default navbar-fixed-top", navigatorSection.output)
       ),
       div(cls := "row",
         div(cls := "col-md-6",
@@ -410,7 +397,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
   def updateSfenString(sfen: String): Unit = SfenStringCopyButton.updateValue(sfen)
 
-  def updateMode(mode: Mode): Unit = ModeSelector.updateValue(mode)
+  def updateMode(mode: Mode): Unit = navigatorSection.updateMode(mode)
 
   def updateFlip(config: Configuration): Unit = FlipButton.updateValue(config.flip)
 

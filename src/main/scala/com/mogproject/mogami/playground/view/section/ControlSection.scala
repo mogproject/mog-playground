@@ -92,7 +92,7 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
     span(cls := s"glyphicon glyphicon-${glyph}", aria.hidden := true)
   ).render
 
-  val output: Div = div(
+  override val output: Div = div(
     label("Control"),
     div(cls := "btn-toolbar", role := "toolbar",
       div(cls := "btn-group", role := "group", aria.label := "...",
