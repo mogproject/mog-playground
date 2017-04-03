@@ -13,7 +13,7 @@ case object KIF extends RecordFormat
 case object KI2 extends RecordFormat
 
 object RecordFormat {
-  def guessFormat(s: String): RecordFormat = {
+  def detect(s: String): RecordFormat = {
     val ls = s.split("\n")
     if (ls.exists(x => x.startsWith("▲") || x.startsWith("△")))
       KI2

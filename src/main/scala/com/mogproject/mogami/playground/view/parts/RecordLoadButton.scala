@@ -61,7 +61,7 @@ object RecordLoadButton extends EventManageable {
     data("original-title") := s"Load a record from the text area",
     onclick := { () =>
       val text = textBoxElem.value
-      val format = RecordFormat.guessFormat(text)
+      val format = RecordFormat.detect(text)
       displayMessageRecordLoadText(s"Loading as ${format} Format...")
       loadButton.disabled = true
       dom.window.setTimeout(() => readRecordText(format, text), 500)
