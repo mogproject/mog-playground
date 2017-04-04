@@ -86,6 +86,7 @@ trait GameController extends ModeController {
         renderer.askConfirm(config.messageLang, () => Controller.update(mc))
         None
       })
+    case _ => throw new RuntimeException("never happens")
   }
 
   /**
