@@ -92,6 +92,8 @@ object Controller {
 
   def invokeCursor(selected: Cursor, invoked: Cursor): Unit = doAction(_.invokeCursor(selected, invoked), _.renderAll())
 
+  def invokeHoldEvent(invoked: Cursor): Unit = doAction(_.invokeHoldEvent(invoked), _.renderAll())
+
   // actions
   def setMode(mode: Mode): Unit = doAction(_.setMode(mode), _ => {})
 

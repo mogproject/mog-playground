@@ -82,8 +82,8 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
 
   override def initialize(): Unit = {
     setClickEvent(controlInput0, () => Controller.setControl(0))
-    setClickEvent(controlInput1, () => Controller.setControl(1))
-    setClickEvent(controlInput2, () => Controller.setControl(2))
+    setClickEvent(controlInput1, () => Controller.setControl(1), Some(() => Controller.setControl(1)), Some(() => controlInput1.disabled == true))
+    setClickEvent(controlInput2, () => Controller.setControl(2), Some(() => Controller.setControl(2)), Some(() => controlInput2.disabled == true))
     setClickEvent(controlInput3, () => Controller.setControl(3))
   }
 

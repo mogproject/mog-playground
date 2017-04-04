@@ -107,7 +107,7 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
     val stroke = "#333333"
 
     // bootstrap
-    val bsPrimary = "#337ab7;"
+    val bsPrimary = "#337ab7"
     val bsDefault = "#f8f8f8"
     val bsSuccess = "#dff0d8"
     val bsInfo = "#d9edf7"
