@@ -95,7 +95,7 @@ object Controller {
   def invokeHoldEvent(invoked: Cursor): Unit = doAction(_.invokeHoldEvent(invoked), _.renderAll())
 
   // actions
-  def setMode(mode: Mode): Unit = doAction(_.setMode(mode), _ => {})
+  def setMode(mode: Mode): Unit = if (!modeController.exists(_.mode == mode)) doAction(_.setMode(mode), _ => {})
 
   def setMessageLanguage(lang: Language): Unit = doAction(_.setMessageLanguage(lang), _.renderAll())
 
