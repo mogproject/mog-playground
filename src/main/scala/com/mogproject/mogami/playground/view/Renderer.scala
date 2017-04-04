@@ -7,7 +7,7 @@ import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller._
-import com.mogproject.mogami.playground.controller.mode.{Editing, Mode, Playing, Viewing}
+import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.playground.view.parts._
@@ -16,6 +16,7 @@ import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.util.MapUtil
 import org.scalajs.dom
 import org.scalajs.dom.html.{Canvas, Div}
+import org.scalajs.dom.raw.UIEvent
 import org.scalajs.dom.{CanvasRenderingContext2D, Element}
 
 import scalatags.JsDom.all._
@@ -84,9 +85,12 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     // register events
     if (hasTouchEvent) {
       setEventListener("touchstart", touchStart)
+      setEventListener("touchend", {_: UIEvent => clearHoldEvent()})
+      setEventListener("touchcancel", {_: UIEvent => clearHoldEvent()})
     } else {
       setEventListener("mousemove", mouseMove)
       setEventListener("mousedown", mouseDown)
+      setEventListener("mouseup", {_: UIEvent => clearHoldEvent()})
     }
 
     ModeSelector.initialize()

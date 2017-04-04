@@ -10,7 +10,7 @@ import org.scalajs.dom.{CanvasRenderingContext2D, MouseEvent, TouchEvent}
 /**
   *
   */
-trait CursorManageable {
+trait CursorManageable extends EventManageable {
   // variables
   private[this] var activeCursor: Option[Cursor] = None
   private[this] var selectedCursor: Option[Cursor] = None
@@ -183,7 +183,10 @@ trait CursorManageable {
   /**
     * Detect the left click. (button == 0)
     */
-  def mouseDown(evt: MouseEvent): Unit = if (evt.button == 0) mouseDown(evt.clientX, evt.clientY)
+  def mouseDown(evt: MouseEvent): Unit = if (evt.button == 0) {
+    evt.preventDefault()
+    mouseDown(evt.clientX, evt.clientY)
+  }
 
   private[this] def mouseDown(x: Double, y: Double): Unit = mouseDown(getCursor(x, y))
 
@@ -196,6 +199,10 @@ trait CursorManageable {
       case (None, Some(sel)) if Controller.canSelect(sel) => drawSelectedArea(sel)
       case _ => // do nothing
     }
+    // set hold event timer
+    cursor.foreach { invoked =>
+      activeHoldEvent = Some(dom.window.setInterval(() => invokeHoldEvent(invoked), holdInterval))
+    }
   }
 
   //
@@ -207,4 +214,10 @@ trait CursorManageable {
     case _ => clearActiveCursor()
   }
 
+  //
+  // mouseHoldDown
+  //
+  def invokeHoldEvent(invoked: Cursor): Unit = if (activeHoldEvent.isDefined) {
+    Controller.invokeHoldEvent(invoked)
+  }
 }

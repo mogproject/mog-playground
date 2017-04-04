@@ -122,7 +122,7 @@ trait GameController extends ModeController {
   override def setControl(controlType: Int): Option[ModeController] = {
     controlType match {
       case 0 => Some(this.copy(displayPosition = 0))
-      case 1 => Some(this.copy(displayPosition = renderer.getSelectedIndex - 1))
+      case 1 => Some(this.copy(displayPosition = math.max(0, renderer.getSelectedIndex - 1)))
       case 2 =>
         if (statusPosition < game.moves.length) {
           val sq = game.moves(statusPosition).to

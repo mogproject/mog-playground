@@ -89,6 +89,9 @@ trait ModeController {
   // cursor click
   def invokeCursor(selected: Cursor, cursor: Cursor): Option[ModeController] = None
 
+  // cursor hold
+  def invokeHoldEvent(cursor: Cursor): Option[ModeController] = None
+
   // actions
   def setMode(nextMode: Mode): Option[ModeController]
 

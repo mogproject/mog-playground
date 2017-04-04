@@ -31,4 +31,12 @@ case class ViewModeController(renderer: Renderer,
       None
     }
   }
+
+  override def invokeHoldEvent(invoked: Cursor): Option[ModeController] = {
+    if (invoked.isBoard) {
+      setControl(2) // move next
+    } else {
+      None
+    }
+  }
 }

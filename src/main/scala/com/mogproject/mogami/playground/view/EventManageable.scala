@@ -3,8 +3,7 @@ package com.mogproject.mogami.playground.view
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import org.scalajs.dom
 import org.scalajs.dom.{MouseEvent, TouchEvent}
-import com.mogproject.mogami.util.Implicits._
-import org.scalajs.dom.raw.HTMLElement
+import org.scalajs.dom.raw.{HTMLElement, UIEvent}
 import org.scalajs.jquery.JQuery
 
 /**
@@ -12,24 +11,78 @@ import org.scalajs.jquery.JQuery
   */
 trait EventManageable {
 
+  // variables
+  protected var activeHoldEvent: Option[Int] = None
+
+  // constants
+  protected val holdInterval: Double = 1000
+
   def hasTouchEvent: Boolean = dom.window.hasOwnProperty("ontouchstart")
 
-  def setClickEvent(elem: HTMLElement, f: () => Unit): Unit = {
-    val t = hasTouchEvent.fold("touchstart", "mousedown")
-    val g = if (hasTouchEvent) {
-      evt: TouchEvent => {
-        if (elem.disabled.forall(_ != true) && evt.changedTouches.length == 1) {
+  def setClickEvent(elem: HTMLElement, onClick: () => Unit, onHold: Option[() => Unit] = None, checker: Option[() => Boolean] = None): Unit = {
+    // todo: refactor
+
+    if (hasTouchEvent) {
+      // touch
+      def f(evt: TouchEvent): Unit = if (elem.disabled.forall(_ != true) && evt.changedTouches.length == 1) {
+        clearHoldEvent()
+        evt.preventDefault()
+        onClick()
+        onHold.foreach { g => activeHoldEvent = Some(dom.window.setInterval(() => invokeHoldEvent(g, checker), holdInterval)) }
+      }
+
+      elem.addEventListener("touchstart", f, useCapture = false)
+      if (onHold.isDefined) {
+        elem.addEventListener("touchend", { _: UIEvent => clearHoldEvent() }, useCapture = false)
+        elem.addEventListener("touchcancel", { _: UIEvent => clearHoldEvent() }, useCapture = false)
+      }
+    } else {
+      // mouse
+      def f(evt: MouseEvent): Unit = {
+        if (evt.button == 0 /* left click */ ) {
+          clearHoldEvent()
           evt.preventDefault()
-          f()
+          onClick()
+          onHold.foreach { g => activeHoldEvent = Some(dom.window.setInterval(() => invokeHoldEvent(g, checker), holdInterval)) }
         }
       }
-    } else { evt: MouseEvent => if (evt.button == 0 /* left click */ ) f() }
-    elem.addEventListener(t, g, useCapture = false)
+
+      elem.addEventListener("mousedown", f, useCapture = false)
+      if (onHold.isDefined) {
+        elem.addEventListener("mouseup", { evt: MouseEvent =>
+          if (evt.button == 0) clearHoldEvent()
+        }, useCapture = false)
+      }
+    }
+
   }
 
   def setModalClickEvent(elem: HTMLElement, modal: JQuery, f: () => Unit): Unit = {
-    setClickEvent(elem, () => { f(); modal.asInstanceOf[BootstrapJQuery].modal("hide") })
+    setClickEvent(elem, () => {
+      f()
+      modal.asInstanceOf[BootstrapJQuery].modal("hide")
+    })
   }
 
+  //
+  // mouseHoldDown
+  //
+  def clearHoldEvent(): Unit = activeHoldEvent.foreach { handle =>
+    dom.window.clearInterval(handle)
+    activeHoldEvent = None
+  }
 
+  /**
+    * @param f hold action
+    * @param checker if it is defined and returns true, cancels all future hold events
+    */
+  def invokeHoldEvent(f: () => Unit, checker: Option[() => Boolean] = None): Unit = {
+    if (activeHoldEvent.isDefined) {
+      if (checker.exists(_ ())) {
+        clearHoldEvent()
+      } else {
+        f()
+      }
+    }
+  }
 }
