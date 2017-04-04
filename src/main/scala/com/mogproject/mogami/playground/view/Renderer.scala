@@ -231,7 +231,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
     val pr = config.pieceRenderer
 
     clearPieces()
-    board.foreach { case (sq, pc) => pr.drawOnBoard(layer2, config.flip.when[Piece](!_)(pc), config.flip.when(flipSquare)(sq)) }
+    board.foreach { case (sq, pc) => pr.drawOnBoard(layer2, config.flip.when[Piece](!_)(pc), config.flip.when[Square](!_)(sq)) }
     hand.withFilter(_._2 > 0).foreach { case (pc, n) => pr.drawInHand(layer2, config.flip.when[Hand](!_)(pc), n) }
   }
 
@@ -261,7 +261,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
 
     clearPieces()
     clearPiecesInBox()
-    board.foreach { case (sq, pc) => pr.drawOnBoard(layer2, config.flip.when[Piece](!_)(pc), config.flip.when(flipSquare)(sq)) }
+    board.foreach { case (sq, pc) => pr.drawOnBoard(layer2, config.flip.when[Piece](!_)(pc), config.flip.when[Square](!_)(sq)) }
     hand.withFilter(_._2 > 0).foreach { case (pc, n) => pr.drawInHand(layer2, config.flip.when[Hand](!_)(pc), n) }
     box.withFilter(_._2 > 0).foreach { case (pt, n) => pr.drawInBox(layer2, pt, n) }
   }

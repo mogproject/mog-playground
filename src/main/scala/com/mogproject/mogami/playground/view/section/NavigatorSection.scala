@@ -25,7 +25,7 @@ case class NavigatorSection(layout: Layout) extends Section {
       )
     )
   ).render
-  
+
   def updateMode(mode: Mode): Unit = {
     ModeSelector.updateValue(mode)
     updateBackground(mode)
@@ -33,7 +33,7 @@ case class NavigatorSection(layout: Layout) extends Section {
 
   private[this] def updateBackground(mode: Mode): Unit = output.style.backgroundColor = mode match {
     case Playing => layout.color.bsDefault
-    case Viewing => layout.color.bsSuccess
+    case Viewing => layout.color.bsInfo
     case Editing => layout.color.bsWarning
   }
 }

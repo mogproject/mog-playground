@@ -207,9 +207,4 @@ trait CursorManageable {
     case _ => clearActiveCursor()
   }
 
-  //
-  // utilities
-  //
-  protected def flipSquare(square: Square): Square = Square(10 - square.file, 10 - square.rank)
-
 }
