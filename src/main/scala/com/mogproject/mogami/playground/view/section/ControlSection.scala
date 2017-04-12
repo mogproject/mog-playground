@@ -16,7 +16,8 @@ import scalatags.JsDom.all._
   */
 case class ControlSection(canvasWidth: Int) extends Section with EventManageable {
 
-  val CONTROL_WIDTH = 48
+  private[this] val CONTROL_WIDTH = 48
+  private[this] val LONG_LIST_SIZE = 36
 
   private[this] val controlInput0 = createControlInput("step-backward")
   private[this] val controlInput1 = createControlInput("backward")
@@ -30,9 +31,9 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
   ).render
 
   private[this] val recordSelectorLong: HTMLSelectElement = select(
-    cls := "form-control visible-md visible-lg",
+    cls := "form-control",
     width := "100%",
-    size := 40,
+    size := LONG_LIST_SIZE,
     onchange := (() => Controller.setRecord(recordSelectorLong.selectedIndex))
   ).render
 
