@@ -34,8 +34,8 @@
 
 .nav>li {
     display: inline-block;
-    margin-left: 5px !important;
-    margin-right: 5px !important;
+    margin-left: 3px !important;
+    margin-right: 3px !important;
     whilte-space: nowrap;
 }
 
@@ -56,6 +56,11 @@
     padding-right: 10px !important;
     padding-left: 10px !important;
     height: 24px !important;
+}
+
+.menu-btn {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
 }
 
 .small-padding {

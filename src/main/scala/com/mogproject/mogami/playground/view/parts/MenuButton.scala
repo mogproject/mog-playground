@@ -17,7 +17,7 @@ object MenuButton extends ButtonLike[Boolean, Button, Div] {
 
   override protected def generateInput(key: Boolean): Button = button(
     tpe := "button",
-    cls := "btn btn-default thin-btn",
+    cls := "btn btn-default thin-btn menu-btn",
     "Menu ",
     span(cls := s"glyphicon glyphicon-menu-hamburger", aria.hidden := true)
   ).render

@@ -61,16 +61,16 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
         tag("nav")(cls := "navbar navbar-default navbar-fixed-top", navigatorSection.output)
       ),
       div(cls := "row",
-        div(cls := "col-md-6 col-lg-5", paddingRight := 0,
+        div(cls := "col-md-6 col-lg-5", paddingLeft := 0, paddingRight := 0,
           div(margin := "auto", padding := 0, width := layout.canvasWidth,
             canvasContainer,
             controlSection.output
           )
         ),
-        div(cls := "col-md-6 col-lg-7", paddingLeft := 0,
+        div(cls := "col-md-6 col-lg-7 hidden-xs hidden-sm", paddingLeft := 0,
           div(cls := "row",
             div(cls := "col-md-4 col-lg-3", paddingLeft := 0, controlSection.outputLongSelector),
-            div(cls := "col-md-8 col-lg-9 hidden-xs hidden-sm", menuElements.map(_.output))
+            div(cls := "col-md-8 col-lg-9", menuElements.map(_.output))
           )
         )
       ),

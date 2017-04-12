@@ -70,7 +70,7 @@ object RecordLoadButton extends EventManageable {
   ).render
 
   private[this] lazy val messageArea: Div = div(
-    cls := "col-md-9 col-xs-9 text-muted",
+    cls := "col-md-9 col-xs-8 text-muted",
     marginTop := 6
   ).render
 
@@ -89,7 +89,7 @@ object RecordLoadButton extends EventManageable {
     br(),
     div(
       cls := "row",
-      div(cls := "col-md-3 col-xs-3", loadButton),
+      div(cls := "col-md-3 col-xs-4", loadButton),
       messageArea
     )
   ).render
