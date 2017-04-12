@@ -15,6 +15,7 @@ import scalatags.JsDom.all._
   *
   */
 case class ControlSection(canvasWidth: Int) extends Section with EventManageable {
+
   val CONTROL_WIDTH = 48
 
   private[this] val controlInput0 = createControlInput("step-backward")
@@ -28,13 +29,24 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
     onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
   ).render
 
+  private[this] val recordSelectorLong: HTMLSelectElement = select(
+    cls := "form-control visible-md visible-lg",
+    width := "100%",
+    size := 40,
+    onchange := (() => Controller.setRecord(recordSelectorLong.selectedIndex))
+  ).render
+
   def getMaxRecordIndex: Int = recordSelector.options.length - 1
 
   def getSelectedIndex: Int = recordSelector.selectedIndex
 
   def getRecordIndex(index: Int): Int = (index < 0).fold(getMaxRecordIndex, math.min(index, getMaxRecordIndex))
 
-  def updateRecordIndex(index: Int): Unit = recordSelector.selectedIndex = getRecordIndex(index)
+  def updateRecordIndex(index: Int): Unit = {
+    val x = getRecordIndex(index)
+    recordSelector.selectedIndex = x
+    recordSelectorLong.selectedIndex = x
+  }
 
   private[this] def getMoves(game: Game, lng: Language): List[String] = {
     val f: Move => String = lng match {
@@ -75,9 +87,9 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
       case _ => Nil
     }
     val ys = prefix :: xs ++ suffix
-
-    recordSelector.innerHTML = ys.map(s => option(s)).mkString
-//    updateRecordIndex(-1)
+    val s = ys.map(s => option(s)).mkString
+    recordSelector.innerHTML = s
+    recordSelectorLong.innerHTML = s
   }
 
   override def initialize(): Unit = {
@@ -104,6 +116,8 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
       )
     )
   ).render
+
+  val outputLongSelector: HTMLSelectElement = recordSelectorLong
 
   def updateLabels(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean): Unit = {
     controlInput0.disabled = !stepBackwardEnabled
