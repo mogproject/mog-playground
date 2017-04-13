@@ -5,7 +5,7 @@ import org.scalajs.dom.html.{Button, Div, Input}
 import scalatags.JsDom.all._
 
 /**
-  *
+  * Create a textbox and a copy button that copies the value of the text box.
   */
 trait CopyButtonLike {
   protected def ident: String
