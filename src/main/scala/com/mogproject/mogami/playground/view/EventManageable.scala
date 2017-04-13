@@ -12,7 +12,7 @@ import org.scalajs.jquery.JQuery
 trait EventManageable {
 
   // variables
-  protected var activeHoldEvent: Option[Int] = None
+  private[this] var activeHoldEvent: Option[Int] = None
 
   // constants
   protected val holdInterval: Double = 1000
@@ -28,7 +28,7 @@ trait EventManageable {
         clearHoldEvent()
         evt.preventDefault()
         onClick()
-        onHold.foreach { g => activeHoldEvent = Some(dom.window.setInterval(() => invokeHoldEvent(g, checker), holdInterval)) }
+        onHold.foreach(g => registerHoldEvent(g, checker))
       }
 
       elem.addEventListener("touchstart", f, useCapture = false)
@@ -43,7 +43,7 @@ trait EventManageable {
           clearHoldEvent()
           evt.preventDefault()
           onClick()
-          onHold.foreach { g => activeHoldEvent = Some(dom.window.setInterval(() => invokeHoldEvent(g, checker), holdInterval)) }
+          onHold.foreach(g => registerHoldEvent(g, checker))
         }
       }
 
@@ -72,8 +72,13 @@ trait EventManageable {
     activeHoldEvent = None
   }
 
+  def registerHoldEvent(f: () => Unit, checker: Option[() => Boolean] = None): Unit = {
+    if (activeHoldEvent.isDefined) clearHoldEvent() // prevent double registrations
+    activeHoldEvent = Some(dom.window.setInterval(() => invokeHoldEvent(f, checker), holdInterval))
+  }
+
   /**
-    * @param f hold action
+    * @param f       hold action
     * @param checker if it is defined and returns true, cancels all future hold events
     */
   def invokeHoldEvent(f: () => Unit, checker: Option[() => Boolean] = None): Unit = {

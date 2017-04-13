@@ -24,7 +24,7 @@ import scalatags.JsDom.all._
 /**
   * controls canvas rendering
   */
-case class Renderer(elem: Element, layout: Layout) extends CursorManageable with EventManageable {
+case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   // main canvas
   protected val canvas0: Canvas = createCanvas(0)
@@ -78,7 +78,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       small(p(textAlign := "right", "Shogi Playground © 2017 ", a(href := "http://mogproject.com", target := "_blank", "mogproject")))
     ).render)
 
-    // register events
+    // register events to the canvas
     if (hasTouchEvent) {
       setEventListener("touchstart", touchStart)
       setEventListener("touchend", { _: UIEvent => clearHoldEvent() })
@@ -87,6 +87,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable with
       setEventListener("mousemove", mouseMove)
       setEventListener("mousedown", mouseDown)
       setEventListener("mouseup", { _: UIEvent => clearHoldEvent() })
+      setEventListener("mouseout", { _: UIEvent => clearHoldEvent() })
     }
 
     ModeSelector.initialize()

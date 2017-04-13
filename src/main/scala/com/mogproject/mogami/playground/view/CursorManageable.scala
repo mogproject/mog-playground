@@ -193,15 +193,19 @@ trait CursorManageable extends EventManageable {
   private[this] def mouseDown(cursor: Option[Cursor]): Unit = {
     cursor.foreach(c => if (Controller.canActivate(c)) flashCursor(c))
     (selectedCursor, cursor) match {
-      case (_, Some(invoked)) if Controller.canInvokeWithoutSelection(invoked) => Controller.invokeCursor(invoked, invoked)
-      case (Some(sel), Some(invoked)) => clearSelectedArea(); Controller.invokeCursor(sel, invoked)
-      case (Some(sel), None) => clearSelectedArea()
-      case (None, Some(sel)) if Controller.canSelect(sel) => drawSelectedArea(sel)
+      case (_, Some(invoked)) if Controller.canInvokeWithoutSelection(invoked) =>
+        Controller.invokeCursor(invoked, invoked)
+        registerHoldEvent(() => Controller.invokeHoldEvent(invoked))
+      case (Some(sel), Some(invoked)) =>
+        clearSelectedArea()
+        Controller.invokeCursor(sel, invoked)
+        clearHoldEvent()
+      case (Some(sel), None) =>
+        clearSelectedArea()
+      case (None, Some(sel)) if Controller.canSelect(sel) =>
+        drawSelectedArea(sel)
+        registerHoldEvent(() => Controller.invokeHoldEvent(sel))
       case _ => // do nothing
-    }
-    // set hold event timer
-    cursor.foreach { invoked =>
-      activeHoldEvent = Some(dom.window.setInterval(() => invokeHoldEvent(invoked), holdInterval))
     }
   }
 
@@ -210,14 +214,8 @@ trait CursorManageable extends EventManageable {
   //
   def mouseMove(evt: MouseEvent): Unit = getCursor(evt.clientX, evt.clientY) match {
     case x if x == activeCursor => // do nothing
-    case x@Some(cursor) if Controller.canActivate(cursor) => drawActiveCursor(cursor)
+    case Some(cursor) if Controller.canActivate(cursor) => drawActiveCursor(cursor)
     case _ => clearActiveCursor()
   }
 
-  //
-  // mouseHoldDown
-  //
-  def invokeHoldEvent(invoked: Cursor): Unit = if (activeHoldEvent.isDefined) {
-    Controller.invokeHoldEvent(invoked)
-  }
 }
