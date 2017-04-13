@@ -12,7 +12,7 @@ import scala.scalajs.js
 object FileWriter {
   def saveTextFile(content: String, fileName: String): Unit = {
     val data = new Blob(js.Array(content.asInstanceOf[js.Any]), BlobPropertyBag("text/plain;charset=utf-8"))
-    FileSaver.saveAs(data, fileName)
+    FileSaver.saveAs(data, fileName, noAutoBOM = true)
   }
 
   def saveImageFile(canvas: Canvas, fileName: String): Unit = ???
