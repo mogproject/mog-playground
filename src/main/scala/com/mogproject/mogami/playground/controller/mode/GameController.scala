@@ -218,11 +218,13 @@ trait GameController extends ModeController {
     })
   }
 
-  def saveRecordCsa(): Unit = FileWriter.saveTextFile(game.toCsaString, "record.csa")
+  def getRecord(format: RecordFormat): String = format match {
+    case CSA => game.toCsaString
+    case KIF => game.toKifString
+    case KI2 => game.toKi2String
+  }
 
-  def saveRecordKif(): Unit = FileWriter.saveTextFile(game.toKifString, "record.kif")
-
-  def saveRecordKi2(): Unit = FileWriter.saveTextFile(game.toKi2String, "record.ki2")
+  def saveRecord(format: RecordFormat, fileName: String): Unit = FileWriter.saveTextFile(getRecord(format), fileName)
 
   override def loadRecord(fileName: String, content: String): Option[ModeController] = {
     val fileType = fileName.split('.').lastOption.mkString

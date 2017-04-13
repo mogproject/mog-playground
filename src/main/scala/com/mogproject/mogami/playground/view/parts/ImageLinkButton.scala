@@ -8,11 +8,26 @@ import scalatags.JsDom.all._
 
 object ImageLinkButton extends CopyButtonLike {
 
+  /**
+    * definitions of image sizes
+    */
+  sealed abstract class ImageSize(val w: Int)
+
+  case object Small extends ImageSize(240)
+
+  case object Medium extends ImageSize(320)
+
+  case object Large extends ImageSize(400)
+
+
+  /**
+    * Image link buttons
+    */
   override protected val ident = "image-link-copy"
 
   override protected val labelString = "Snapshot Image"
 
-  private[this] val sizeButton = DropdownMenu(Vector("Small", "Medium", "Large"), 1, _ => updateValueWithSize())
+  private[this] val sizeButton = DropdownMenu(Vector(Small, Medium, Large), 1, "Image Size", _ => updateValueWithSize())
 
   private[this] val viewButton = a(
     cls := "btn btn-default",
@@ -37,13 +52,7 @@ object ImageLinkButton extends CopyButtonLike {
   override def updateValue(value: String): Unit = updateValueWithSize(Some(value))
 
   private[this] def updateValueWithSize(baseUrl: Option[String] = None): Unit = {
-    val sizeParams = sizeButton.getValue match {
-      case 0 => "&size=240"
-      case 1 => "&size=320"
-      case 2 => "&size=400"
-      case _ => ""
-    }
-
+    val sizeParams = s"&size=${sizeButton.getValue.w}"
     val base = baseUrl.getOrElse(getValue)
     val url = base.replaceAll("[&]size=\\d+", "") + sizeParams
 

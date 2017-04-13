@@ -8,7 +8,7 @@ import scalatags.JsDom.all._
   * Dropdown menu
   */
 
-case class DropdownMenu(items: Vector[String], default: Int, onChange: Int => Unit) {
+case class DropdownMenu[A](items: Vector[A], default: Int, header: String, onChange: Int => Unit) {
   private[this] var value: Int = 0
 
   private[this] val labelButton = button(
@@ -26,8 +26,8 @@ case class DropdownMenu(items: Vector[String], default: Int, onChange: Int => Un
     labelButton,
     ul(
       cls := "dropdown-menu",
-      h6(cls := "dropdown-header", "Image Size"),
-      items.zipWithIndex.map { case (s, i) => li(a(onclick := { () => updateValue(i); onChange(i) }, s)) }
+      h6(cls := "dropdown-header", header),
+      items.zipWithIndex.map { case (s, i) => li(a(onclick := { () => updateValue(i); onChange(i) }, s.toString)) }
     )
   ).render
 
@@ -39,5 +39,5 @@ case class DropdownMenu(items: Vector[String], default: Int, onChange: Int => Un
     value = index
   }
 
-  def getValue: Int = value
+  def getValue: A = items(value)
 }

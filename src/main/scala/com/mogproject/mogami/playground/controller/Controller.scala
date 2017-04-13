@@ -128,19 +128,14 @@ object Controller {
     case _ =>
   }
 
-  def saveRecordCsa(): Unit = modeController match {
-    case Some(gc: GameController) => gc.saveRecordCsa()
+  def saveRecord(format: RecordFormat, fileName: String): Unit = modeController match {
+    case Some(gc: GameController) => gc.saveRecord(format, fileName)
     case _ =>
   }
 
-  def saveRecordKif(): Unit = modeController match {
-    case Some(gc: GameController) => gc.saveRecordKif()
-    case _ =>
-  }
-
-  def saveRecordKi2(): Unit = modeController match {
-    case Some(gc: GameController) => gc.saveRecordKi2()
-    case _ =>
+  def getRecord(format: RecordFormat): String = modeController match {
+    case Some(gc: GameController) => gc.getRecord(format)
+    case _ => ""
   }
 
   def loadRecord(fileName: String, content: String): Unit = doAction(_.loadRecord(fileName, content), _.renderAll())
