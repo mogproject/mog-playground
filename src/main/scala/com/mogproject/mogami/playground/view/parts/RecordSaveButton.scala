@@ -75,8 +75,14 @@ object RecordSaveButton {
     val opts = r.asInstanceOf[Clipboard.Options]
 
     val cp = new Clipboard(".btn", opts)
-    cp.on("success", (e: Event) => Tooltip.display(e.trigger, "Copied!"))
-    cp.on("error", (e: Event) => Tooltip.display(e.trigger, "Failed!"))
+
+    def f(message: String)(e: Event) = {
+      Tooltip.display(e.trigger, message)
+      cp.destroy()
+    }
+
+    cp.on("success", f("Copied!") _)
+    cp.on("error", f("Failed!") _)
   }
 
 }
