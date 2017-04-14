@@ -213,10 +213,8 @@ trait CursorManageable extends EventManageable {
   // mouseUp
   //
   protected def touchEnd(evt: TouchEvent): Unit = {
-    if (evt.touches.length == 1) {
-      evt.preventDefault()
-      mouseUp(evt.touches(0).clientX, evt.changedTouches(0).clientY)
-    }
+    evt.preventDefault()
+    mouseUp(evt.changedTouches(0).clientX, evt.changedTouches(0).clientY)
   }
 
   protected def mouseUp(evt: MouseEvent): Unit = if (evt.button == 0) {
