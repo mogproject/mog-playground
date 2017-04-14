@@ -1,6 +1,7 @@
 package com.mogproject.mogami.playground.controller
 
 import com.mogproject.mogami._
+import com.mogproject.mogami.util.Implicits._
 
 /**
   * cursor
@@ -28,10 +29,12 @@ case class Cursor(board: Option[Square], hand: Option[Hand], box: Option[Ptype],
     case Cursor(_, _, _, Some(p)) => Cursor(None, None, None, Some(!p))
     case _ => this
   }
+
+  def toSquare(isFlipped: Boolean): Option[Square] = isFlipped.when[Cursor](!_)(this).board
 }
 
 object Cursor {
-  def apply(square: Square): Cursor = Cursor(Some(square), None, None, None)
+  def apply(square: Square, isFlipped: Boolean = false): Cursor = Cursor(Some(isFlipped.when[Square](!_)(square)), None, None, None)
 
   def apply(hand: Hand): Cursor = Cursor(None, Some(hand), None, None)
 

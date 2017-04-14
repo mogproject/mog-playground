@@ -14,7 +14,7 @@ case class PlayModeController(renderer: Renderer,
                               config: Configuration,
                               game: Game,
                               displayPosition: Int
-                             ) extends GameController {
+                             ) extends GameController with CursorAdjustable {
   val mode: Mode = Playing
 
   override def copy(config: Configuration, game: Game, displayPosition: Int): GameController =
@@ -65,6 +65,20 @@ case class PlayModeController(renderer: Renderer,
           }
         case _ => None
       }
+    }
+  }
+
+  def processMouseUp(selected: Cursor, released: Cursor): Option[Cursor] = {
+    (selected.isBoard, selected.isHand, released.isBoard) match {
+      case (true, false, true) =>
+        for {
+          from <- selected.toSquare(config.flip)
+          to <- released.toSquare(config.flip)
+          p <- selectedState.board.get(from)
+          sq <- adjustMovement(p, from, to)
+        } yield Cursor(sq, config.flip)
+      case (false, true, true) => Some(released) // no adjustment for hand pieces
+      case _ => None
     }
   }
 

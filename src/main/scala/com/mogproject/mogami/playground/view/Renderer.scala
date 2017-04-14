@@ -81,12 +81,12 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     // register events to the canvas
     if (hasTouchEvent) {
       setEventListener("touchstart", touchStart)
-      setEventListener("touchend", { _: UIEvent => clearHoldEvent() })
+      setEventListener("touchend", touchEnd)
       setEventListener("touchcancel", { _: UIEvent => clearHoldEvent() })
     } else {
       setEventListener("mousemove", mouseMove)
       setEventListener("mousedown", mouseDown)
-      setEventListener("mouseup", { _: UIEvent => clearHoldEvent() })
+      setEventListener("mouseup", mouseUp)
       setEventListener("mouseout", { _: UIEvent => clearHoldEvent() })
     }
 

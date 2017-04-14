@@ -94,6 +94,11 @@ object Controller {
 
   def invokeHoldEvent(invoked: Cursor): Unit = doAction(_.invokeHoldEvent(invoked), _.renderAll())
 
+  def processMouseUp(selected: Cursor, released: Cursor): Option[Cursor] = modeController match {
+    case Some(pc: PlayModeController) => pc.processMouseUp(selected, released)
+    case _ => None
+  }
+
   // actions
   def setMode(mode: Mode): Unit = if (!modeController.exists(_.mode == mode)) doAction(_.setMode(mode), _ => {})
 
