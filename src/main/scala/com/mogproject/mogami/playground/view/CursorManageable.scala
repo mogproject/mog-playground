@@ -173,7 +173,7 @@ trait CursorManageable extends EventManageable {
   //
   // mouseDown
   //
-  def touchStart(evt: TouchEvent): Unit = {
+  protected def touchStart(evt: TouchEvent): Unit = {
     if (evt.changedTouches.length == 1) {
       evt.preventDefault()
       mouseDown(evt.changedTouches(0).clientX, evt.changedTouches(0).clientY)
@@ -183,7 +183,7 @@ trait CursorManageable extends EventManageable {
   /**
     * Detect the left click. (button == 0)
     */
-  def mouseDown(evt: MouseEvent): Unit = if (evt.button == 0) {
+  protected def mouseDown(evt: MouseEvent): Unit = if (evt.button == 0) {
     evt.preventDefault()
     mouseDown(evt.clientX, evt.clientY)
   }
@@ -210,9 +210,37 @@ trait CursorManageable extends EventManageable {
   }
 
   //
+  // mouseUp
+  //
+  protected def touchEnd(evt: TouchEvent): Unit = {
+    if (evt.touches.length == 1) {
+      evt.preventDefault()
+      mouseUp(evt.touches(0).clientX, evt.changedTouches(0).clientY)
+    }
+  }
+
+  protected def mouseUp(evt: MouseEvent): Unit = if (evt.button == 0) {
+    evt.preventDefault()
+    mouseUp(evt.clientX, evt.clientY)
+  }
+
+  private[this] def mouseUp(x: Double, y: Double): Unit = mouseUp(getCursor(x, y))
+
+  private[this] def mouseUp(cursor: Option[Cursor]): Unit = {
+    (cursor, selectedCursor) match {
+      case (Some(released), Some(selected)) if released != selected => Controller.processMouseUp(selected, released) match {
+        case Some(adjusted) => mouseDown(Some(adjusted))
+        case _ =>
+      }
+      case _ =>
+    }
+    clearHoldEvent()
+  }
+
+  //
   // mouseMove
   //
-  def mouseMove(evt: MouseEvent): Unit = getCursor(evt.clientX, evt.clientY) match {
+  protected def mouseMove(evt: MouseEvent): Unit = getCursor(evt.clientX, evt.clientY) match {
     case x if x == activeCursor => // do nothing
     case Some(cursor) if Controller.canActivate(cursor) => drawActiveCursor(cursor)
     case _ => clearActiveCursor()

@@ -28,6 +28,7 @@ object GameMenuSection extends Section {
     h4("Help"),
     ul(
       li("Click on a player name to set the game information."),
+      li("In Play Mode, you can move pieces by a flick."),
       li("In View Mode, you can move to the next position by clicking anywhere on the board."),
       li("If you click and hold 'forward' or 'backward' button, the position changes continuously.")
     )
