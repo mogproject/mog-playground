@@ -81,7 +81,7 @@ trait GameController extends ModeController {
     case Viewing if mode == Playing => Some(ViewModeController(renderer, config, game, displayPosition))
     case Editing =>
       val st = selectedState
-      val mc = Some(EditModeController(renderer, config, st.turn, st.board, st.hand, st.getUnusedPtypeCount, game.gameInfo))
+      val mc = Some(EditModeController(renderer, config, st.turn, st.board, st.hand, st.unusedPtypeCount, game.gameInfo))
       game.moves.isEmpty.fold(mc, {
         renderer.askConfirm(config.messageLang, () => Controller.update(mc))
         None

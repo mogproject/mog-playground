@@ -151,7 +151,7 @@ case class EditModeController(renderer: Renderer,
       turn = initialState.turn,
       board = initialState.board,
       hand = initialState.hand,
-      box = initialState.getUnusedPtypeCount,
+      box = initialState.unusedPtypeCount,
       gameInfo = isHandicap.fold(GameInfo(Map(
         'blackName -> handicapNames((config.recordLang, BLACK)),
         'whiteName -> handicapNames((config.recordLang, WHITE))
