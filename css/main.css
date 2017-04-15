@@ -105,6 +105,5 @@ canvas {
 }
 
 .modal {
-    overflow-y: auto;
-    max-height: 90%;
+    overflow-y: scroll;
 }
