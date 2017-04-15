@@ -94,8 +94,6 @@ body {
     -moz-user-select: none; /* Firefox */
     -webkit-user-select: none; /* Safari/Chrome */
     -ms-user-select: none; /* IE10 */
-
-    -webkit-overflow-scrolling: touch; /* fixes issue#105 */
 }
 
 div {
@@ -115,10 +113,14 @@ canvas {
     padding-right: 0px !important;
 }
 
+.panel {
+    height: calc(100% + 1px); /* fixes issue#105 */
+}
+
 .panel-heading {
     cursor: pointer;
 }
 
 .modal {
-    height: calc(100% + 1px);
+    -webkit-overflow-scrolling: touch;
 }
