@@ -41,7 +41,7 @@ case class AccordionMenu(ident: String, title: String, isExpanded: Boolean, isVi
       data("toggle") := "collapse",
       data("target") := s"#collapse${ident}",
       h4(cls := "panel-title",
-        a(
+        span(
           cls := "accordion-toggle",
           glyph,
           " ",
