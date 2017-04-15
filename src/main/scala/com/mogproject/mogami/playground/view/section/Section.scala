@@ -19,7 +19,7 @@ trait Section {
 
   def outputs: Seq[Div] = accordions.map(_.output)
 
-  def show(): Unit = outputs.foreach(_.style.display = "block")
+  def show(): Unit = outputs.foreach(_.style.display = display.block.v)
 
-  def hide(): Unit = outputs.foreach(_.style.display = "none")
+  def hide(): Unit = outputs.foreach(_.style.display = display.none.v)
 }
