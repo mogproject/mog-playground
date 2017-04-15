@@ -126,4 +126,14 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
     controlInput2.disabled = !forwardEnabled
     controlInput3.disabled = !stepForwardEnabled
   }
+
+  override def show(): Unit = {
+    output.style.display = "block"
+    outputLongSelector.style.visibility = "visible"
+  }
+
+  override def hide(): Unit = {
+    output.style.display = "none"
+    outputLongSelector.style.visibility = "hidden"
+  }
 }

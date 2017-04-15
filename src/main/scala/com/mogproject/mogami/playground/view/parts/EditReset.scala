@@ -55,7 +55,7 @@ object EditReset extends ButtonLike[(State, Boolean), Button, Div] {
   override protected def invoke(key: (State, Boolean)): Unit = Controller.setEditInitialState(key._1, key._2)
 
   override val output: Div = div(
-    cls := "row", inputs.map(e => div(cls := "col-md-4 col-xs-6", e))
+    cls := "row", inputs.map(e => div(cls := "col-lg-4 col-xs-6", e))
   ).render
 
 }
