@@ -11,6 +11,14 @@
     margin-bottom: 10px;
 }
 
+.navbar-header {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+    padding-left: 5px;
+    padding-right: 5px;
+    width: 100%;
+}
+
 .navbar-nav {
     width: 100% !important;
     margin-top: 0;
@@ -90,6 +98,11 @@ body {
 
 div {
     position: relative;
+}
+
+hr {
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
 }
 
 canvas {
