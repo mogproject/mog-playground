@@ -103,3 +103,8 @@ canvas {
 .panel-heading {
     cursor: pointer;
 }
+
+.modal {
+    overflow-y: auto;
+    max-height: 90%;
+}
