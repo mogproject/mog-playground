@@ -117,11 +117,8 @@ canvas {
     cursor: pointer;
 }
 
-/* connected to issue#105 */
-.panel-body {
-    height: 100%;
-}
-
 .modal {
     overflow-y: scroll;
+
+    -webkit-overflow-scrolling: touch; /* fixes issue#105 */
 }
