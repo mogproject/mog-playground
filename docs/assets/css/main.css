@@ -105,10 +105,5 @@ canvas {
 }
 
 .modal {
-  height: 100vt;
-
-  .modal-body {
-    height: 100vt;
     overflow-y: scroll;
-  }
 }
