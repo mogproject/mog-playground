@@ -1,16 +1,25 @@
 package com.mogproject.mogami.playground.view.section
 
+import com.mogproject.mogami.playground.view.parts.common.AccordionMenu
 import org.scalajs.dom.html.Div
+
+import scalatags.JsDom.all._
 
 /**
   *
   */
 trait Section {
-  def initialize(): Unit = {}
+  def initialize(): Unit = {
+    accordions.foreach(_.initialize())
+  }
 
-  def output: Div
+  def output: Div = div().render
 
-  def show(): Unit = output.style.display = "block"
+  val accordions: Seq[AccordionMenu] = Seq.empty
 
-  def hide(): Unit = output.style.display = "none"
+  def outputs: Seq[Div] = accordions.map(_.output)
+
+  def show(): Unit = outputs.foreach(_.style.display = "block")
+
+  def hide(): Unit = outputs.foreach(_.style.display = "none")
 }
