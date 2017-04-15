@@ -99,3 +99,7 @@ canvas {
 .modal-open {
     padding-right: 0px !important;
 }
+
+.panel-heading {
+    cursor: pointer;
+}

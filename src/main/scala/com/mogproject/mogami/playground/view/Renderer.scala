@@ -49,8 +49,6 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   private[this] val navigatorSection = NavigatorSection(layout)
 
-  private[this] val menuElements = List(LanguageSection, GameMenuSection, EditSection, AboutSection)
-
   private[this] lazy val controlSection = ControlSection(layout.canvasWidth)
 
   initialize()
@@ -70,7 +68,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
         div(cls := "col-md-6 col-lg-7 hidden-xs hidden-sm", paddingLeft := 0,
           div(cls := "row",
             div(cls := "col-md-4 col-lg-3", paddingLeft := 0, controlSection.outputLongSelector),
-            div(cls := "col-md-8 col-lg-9", menuElements.map(_.output))
+            div(cls := "col-md-8 col-lg-9", MenuPane.output)
           )
         )
       ),
@@ -94,9 +92,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     FlipButton.initialize()
     MenuButton.initialize()
     controlSection.initialize()
-    GameMenuSection.initialize()
-    LanguageSection.initialize()
-    EditSection.initialize()
+    MenuPane.initialize()
 
     // initialize clipboard.js
     val cp = new Clipboard(".btn")

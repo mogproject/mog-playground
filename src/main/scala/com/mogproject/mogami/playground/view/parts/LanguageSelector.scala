@@ -17,7 +17,7 @@ sealed trait LanguageSelector extends ButtonLike[Language, Anchor, Div] {
     English -> Seq("Japanese", "English")
   )
 
-  override protected def generateInput(key: Language): Anchor = a(cls := "btn btn-primary").render
+  override protected def generateInput(key: Language): Anchor = a(cls := "btn btn-sm btn-primary").render
 
   override val output: Div = div(cls := "form-group",
     marginBottom := 3,

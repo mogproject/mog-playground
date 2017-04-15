@@ -1,10 +1,8 @@
 package com.mogproject.mogami.playground.view.modal
 
-import com.mogproject.mogami.playground.controller.Controller
 import com.mogproject.mogami.playground.view.Layout
 import com.mogproject.mogami.playground.view.bootstrap.{BootstrapJQuery, Tooltip}
-import com.mogproject.mogami.playground.view.parts.EditReset
-import com.mogproject.mogami.playground.view.section.{AboutSection, EditSection, GameMenuSection, LanguageSection}
+import com.mogproject.mogami.playground.view.section._
 import org.scalajs.dom.html.Div
 import org.scalajs.jquery.jQuery
 
@@ -33,10 +31,7 @@ object MenuDialog {
 
           // body
           div(cls := "modal-body",
-            LanguageSection.output,
-            GameMenuSection.output,
-            EditSection.output,
-            AboutSection.output
+            MenuPane.output
           ),
 
           // footer
@@ -56,8 +51,6 @@ object MenuDialog {
     dialog.on("hidden.bs.modal", () ⇒ {
       // Hide all tooltips
       Tooltip.hideAllToolTip()
-      // Remove from DOM
-      dialog.remove()
     })
 
     dialog.asInstanceOf[BootstrapJQuery].modal("show")
