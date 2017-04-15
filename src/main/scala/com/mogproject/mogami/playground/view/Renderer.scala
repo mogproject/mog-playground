@@ -51,13 +51,12 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   private[this] lazy val controlSection = ControlSection(layout.canvasWidth)
 
-  initialize()
-
-  private[this] def initialize(): Unit = {
-    elem.appendChild(div(cls := "container",
-      div(cls := "row navbar",
-        tag("nav")(cls := "navbar navbar-default navbar-fixed-top", navigatorSection.output)
-      ),
+  private[this] lazy val mainPane = div(
+    div(cls := "navbar",
+      tag("nav")(cls := "navbar navbar-default navbar-fixed-top", navigatorSection.output)
+    ),
+    div(cls := "container",
+      layout.isMobile.fold(Seq(position := "fixed", width := "100%"), ""),
       div(cls := "row",
         div(cls := "col-md-6 col-lg-5", paddingLeft := 0, paddingRight := 0,
           div(margin := "auto", padding := 0, width := layout.canvasWidth,
@@ -74,7 +73,13 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
       ),
       hr(),
       small(p(textAlign := "right", "Shogi Playground © 2017 ", a(href := "http://mogproject.com", target := "_blank", "mogproject")))
-    ).render)
+    )
+  ).render
+
+  initialize()
+
+  private[this] def initialize(): Unit = {
+    elem.appendChild(mainPane)
 
     // register events to the canvas
     if (hasTouchEvent) {
