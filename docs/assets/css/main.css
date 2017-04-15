@@ -118,7 +118,5 @@ canvas {
 }
 
 .modal {
-    overflow-y: scroll;
-
-    -webkit-overflow-scrolling: touch; /* fixes issue#105 */
+    overflow-y: auto !important;
 }
