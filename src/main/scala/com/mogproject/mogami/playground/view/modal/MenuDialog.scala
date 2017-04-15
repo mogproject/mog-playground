@@ -3,6 +3,7 @@ package com.mogproject.mogami.playground.view.modal
 import com.mogproject.mogami.playground.view.Layout
 import com.mogproject.mogami.playground.view.bootstrap.{BootstrapJQuery, Tooltip}
 import com.mogproject.mogami.playground.view.section._
+import org.scalajs.dom
 import org.scalajs.dom.html.Div
 import org.scalajs.jquery.jQuery
 
@@ -46,13 +47,21 @@ object MenuDialog {
       )
     ).render
 
-  def show(layout: Layout): Unit = {
-    val dialog = jQuery(elem)
-    dialog.on("hidden.bs.modal", () ⇒ {
+  private[this] lazy val dialog = {
+    val e = jQuery(elem)
+
+    e.on("hidden.bs.modal", () ⇒ {
       // Hide all tooltips
       Tooltip.hideAllToolTip()
+
+      // Reset scroll
+      dom.window.scrollTo(0, 0)
     })
 
+    e
+  }
+
+  def show(layout: Layout): Unit = {
     dialog.asInstanceOf[BootstrapJQuery].modal("show")
     Tooltip.enableHoverToolTip(layout)
   }
