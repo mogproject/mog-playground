@@ -44,7 +44,7 @@
     display: inline-block;
     margin-left: 3px !important;
     margin-right: 3px !important;
-    whilte-space: nowrap;
+    white-space: nowrap;
 }
 
 .navbar>div {
@@ -94,6 +94,8 @@ body {
     -moz-user-select: none; /* Firefox */
     -webkit-user-select: none; /* Safari/Chrome */
     -ms-user-select: none; /* IE10 */
+
+    -webkit-overflow-scrolling: touch; /* fixes issue#105 */
 }
 
 div {
@@ -118,5 +120,5 @@ canvas {
 }
 
 .modal {
-    overflow-y: auto !important;
+    height: calc(100% + 1px);
 }
