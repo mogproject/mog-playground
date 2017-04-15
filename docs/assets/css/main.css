@@ -107,4 +107,5 @@ canvas {
 .modal {
     position: absolute;
     overflow-y: scroll;
+    max-height: 100%;
 }
