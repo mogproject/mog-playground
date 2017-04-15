@@ -106,7 +106,7 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
   ).render
 
   override val output: Div = div(
-    label("Control"),
+    paddingTop := "5px",
     div(cls := "btn-toolbar", role := "toolbar",
       div(cls := "btn-group", role := "group", aria.label := "...",
         div(cls := "btn-group", role := "group", controlInput0),

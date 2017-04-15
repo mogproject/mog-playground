@@ -53,9 +53,6 @@ object MenuDialog {
     e.on("hidden.bs.modal", () ⇒ {
       // Hide all tooltips
       Tooltip.hideAllToolTip()
-
-      // Reset scroll
-      dom.window.scrollTo(0, 0)
     })
 
     e
