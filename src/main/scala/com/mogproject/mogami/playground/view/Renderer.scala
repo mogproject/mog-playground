@@ -351,9 +351,15 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     dom.window.document.body.innerHTML = elem.toString
   }
 
-  def showEditSection(): Unit = EditSection.show()
+  def showEditSection(): Unit = {
+    controlSection.hide()
+    EditSection.show()
+  }
 
-  def hideEditSection(): Unit = EditSection.hide()
+  def hideEditSection(): Unit = {
+    controlSection.show()
+    EditSection.hide()
+  }
 
   def showControlSection(): Unit = List(controlSection, GameMenuSection).foreach(_.show())
 
