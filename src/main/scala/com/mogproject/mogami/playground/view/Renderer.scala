@@ -56,7 +56,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
       tag("nav")(cls := "navbar navbar-default navbar-fixed-top", navigatorSection.output)
     ),
     div(cls := "container",
-      layout.isMobile.fold(Seq(position := "fixed", width := "100%"), ""),
+      layout.isMobile.fold(Seq(position := position.fixed.v, width := "100%"), ""),
       div(cls := "row",
         div(cls := "col-md-6 col-lg-5", paddingLeft := 0, paddingRight := 0,
           div(margin := "auto", padding := 0, width := layout.canvasWidth,
