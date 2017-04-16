@@ -27,7 +27,7 @@ trait EventManageable {
       def f(evt: TouchEvent): Unit = if (elem.disabled.forall(_ != true) && evt.changedTouches.length == 1) {
         clearHoldEvent()
         evt.preventDefault()
-        onClick()
+        elem.click()
         onHold.foreach(g => registerHoldEvent(g, checker))
       }
 
@@ -42,7 +42,7 @@ trait EventManageable {
         if (evt.button == 0 /* left click */ ) {
           clearHoldEvent()
           evt.preventDefault()
-          onClick()
+          elem.click()
           onHold.foreach(g => registerHoldEvent(g, checker))
         }
       }
@@ -54,6 +54,7 @@ trait EventManageable {
         }, useCapture = false)
       }
     }
+    elem.onclick = { _ => onClick() }
 
   }
 

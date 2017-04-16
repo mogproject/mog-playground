@@ -43,13 +43,10 @@ object EditReset extends ButtonLike[(State, Boolean), Button, Div] {
       "Three Pawns", "Naked King")
   )
 
-  override def initialize(): Unit = {}
-
   override protected def generateInput(key: (State, Boolean)): Button = button(
     tpe := "button",
     cls := "btn btn-default btn-block",
-    data("dismiss") := "modal",
-    onclick := { () => invoke(key) }
+    data("dismiss") := "modal"
   ).render
 
   override protected def invoke(key: (State, Boolean)): Unit = Controller.setEditInitialState(key._1, key._2)
