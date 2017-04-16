@@ -351,19 +351,13 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     dom.window.document.body.innerHTML = elem.toString
   }
 
-  def showEditSection(): Unit = {
-    controlSection.hide()
-    EditSection.show()
-  }
+  def showEditSection(): Unit = EditSection.show()
 
-  def hideEditSection(): Unit = {
-    controlSection.show()
-    EditSection.hide()
-  }
+  def hideEditSection(): Unit = EditSection.hide()
 
-  def showControlSection(): Unit = List(controlSection, GameMenuSection).foreach(_.show())
+  def showControlSection(): Unit = List(controlSection, GameMenuSection, GameHelpSection).foreach(_.show())
 
-  def hideControlSection(): Unit = List(controlSection, GameMenuSection).foreach(_.hide())
+  def hideControlSection(): Unit = List(controlSection, GameMenuSection, GameHelpSection).foreach(_.hide())
 
   def askPromote(config: Configuration, piece: Piece, callbackUnpromote: () => Unit, callbackPromote: () => Unit): Unit = {
     PromotionDialog(config, piece, callbackUnpromote, callbackPromote).show()
