@@ -1,7 +1,10 @@
 package com.mogproject.mogami.playground.controller.mode
 
 import com.mogproject.mogami._
+import com.mogproject.mogami.core.Game.GameStatus
+import com.mogproject.mogami.core.Game.GameStatus.Mated
 import com.mogproject.mogami.core.State.PromotionFlag
+import com.mogproject.mogami.core.move.Resign
 import com.mogproject.mogami.{Game, Square}
 import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor}
 import com.mogproject.mogami.playground.view.Renderer
@@ -20,12 +23,36 @@ case class PlayModeController(renderer: Renderer,
   override def copy(config: Configuration, game: Game, displayPosition: Int): GameController =
     PlayModeController(renderer, config, game, displayPosition)
 
+  /**
+    * Initialization
+    */
+  override def initialize(): Unit = {
+    super.initialize()
+    renderer.showActionSection()
+  }
+
+  override def terminate(): Unit = {
+    super.terminate()
+    renderer.hideActionSection()
+  }
+
+  override def renderAll(): Unit = {
+    super.renderAll()
+    renderer.updateActionSection(config.messageLang, canResign)
+  }
+
   override def canActivate(cursor: Cursor): Boolean = !cursor.isBox
 
   override def canSelect(cursor: Cursor): Boolean = config.flip.when[Cursor](!_)(cursor) match {
     case Cursor(Some(sq), None, None, None) => selectedState.board.get(sq).exists(selectedState.turn == _.owner)
     case Cursor(None, Some(h), None, None) => h.owner == selectedState.turn && selectedState.hand.get(h).exists(_ > 0)
     case _ => false
+  }
+
+  private[this] def canResign: Boolean = (game.finalAction, game.status, displayPosition - game.moves.length) match {
+    case (Some(_), _, n) => n <= 0
+    case (_, Mated | GameStatus.Playing, _) => true
+    case (_, _, n) => n < 0
   }
 
   /**
@@ -80,6 +107,13 @@ case class PlayModeController(renderer: Renderer,
       case (false, true, true) => Some(released) // no adjustment for hand pieces
       case _ => None
     }
+  }
+
+  // Action Section
+  def setResign(): Option[ModeController] = {
+    Some(this.copy(
+      game = getTruncatedGame.copy(finalAction = Some(Resign())),
+      displayPosition = displayPosition + 1))
   }
 
 }
