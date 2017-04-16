@@ -12,16 +12,18 @@ object MenuPane {
     cls := "panel-group", id := "accordion", role := "tablist", aria.multiselectable := true,
     LanguageSection.outputs,
     GameMenuSection.outputs,
-    EditSection.outputs,
     ActionSection.outputs,
+    GameHelpSection.outputs,
+    EditSection.outputs,
     AboutSection.outputs
   ).render
 
   def initialize(): Unit = {
     LanguageSection.initialize()
     GameMenuSection.initialize()
-    EditSection.initialize()
     ActionSection.initialize()
+    GameHelpSection.initialize()
+    EditSection.initialize()
     AboutSection.initialize()
   }
 

@@ -30,7 +30,7 @@ object ActionSection extends Section {
     )
   )
 
-  def update(lang: Language, enabled: Boolean): Unit = {
-    ResignButton.update(lang, enabled)
+  def update(lang: Language, canResign: Boolean): Unit = {
+    ResignButton.update(lang, canResign)
   }
 }

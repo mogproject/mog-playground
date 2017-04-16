@@ -1,6 +1,8 @@
 package com.mogproject.mogami.playground.controller.mode
 
 import com.mogproject.mogami._
+import com.mogproject.mogami.core.Game.GameStatus
+import com.mogproject.mogami.core.Game.GameStatus.Mated
 import com.mogproject.mogami.core.State.PromotionFlag
 import com.mogproject.mogami.core.move.Resign
 import com.mogproject.mogami.{Game, Square}
@@ -36,8 +38,7 @@ case class PlayModeController(renderer: Renderer,
 
   override def renderAll(): Unit = {
     super.renderAll()
-
-    renderer.updateActionSection(config.messageLang, game.finalAction.isEmpty || displayPosition <= game.moves.length)
+    renderer.updateActionSection(config.messageLang, canResign)
   }
 
   override def canActivate(cursor: Cursor): Boolean = !cursor.isBox
@@ -46,6 +47,12 @@ case class PlayModeController(renderer: Renderer,
     case Cursor(Some(sq), None, None, None) => selectedState.board.get(sq).exists(selectedState.turn == _.owner)
     case Cursor(None, Some(h), None, None) => h.owner == selectedState.turn && selectedState.hand.get(h).exists(_ > 0)
     case _ => false
+  }
+
+  private[this] def canResign: Boolean = (game.finalAction, game.status, displayPosition - game.moves.length) match {
+    case (Some(_), _, n) => n <= 0
+    case (_, Mated | GameStatus.Playing, _) => true
+    case (_, _, n) => n < 0
   }
 
   /**

@@ -447,5 +447,5 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def hideActionSection(): Unit = ActionSection.hide()
 
-  def updateActionSection(lang: Language, enabled: Boolean): Unit = ActionSection.update(lang, enabled)
+  def updateActionSection(lang: Language, canResign: Boolean): Unit = ActionSection.update(lang, canResign)
 }

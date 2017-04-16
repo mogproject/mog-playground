@@ -23,11 +23,11 @@ object ResignButton extends EventManageable {
     setClickEvent(output, () => Controller.setResign())
   }
 
-  def update(lang: Language, enabled: Boolean): Unit = {
+  def update(lang: Language, canResign: Boolean): Unit = {
     output.innerHTML = lang match {
       case Japanese => "投了"
       case English => "Resign"
     }
-    output.disabled = !enabled
+    output.disabled = !canResign
   }
 }
