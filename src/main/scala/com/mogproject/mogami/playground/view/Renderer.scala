@@ -441,4 +441,11 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
   def displayTooltipRecordLoadText(message: String): Unit = RecordLoadButton.displayTooltipRecordLoadText(message)
 
   def displayMessageRecordLoadText(message: String): Unit = RecordLoadButton.displayMessageRecordLoadText(message)
+
+  // action section
+  def showActionSection(): Unit = ActionSection.show()
+
+  def hideActionSection(): Unit = ActionSection.hide()
+
+  def updateActionSection(lang: Language, enabled: Boolean): Unit = ActionSection.update(lang, enabled)
 }

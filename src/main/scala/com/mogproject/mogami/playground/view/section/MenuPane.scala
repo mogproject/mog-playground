@@ -13,6 +13,7 @@ object MenuPane {
     LanguageSection.outputs,
     GameMenuSection.outputs,
     EditSection.outputs,
+    ActionSection.outputs,
     AboutSection.outputs
   ).render
 
@@ -20,6 +21,7 @@ object MenuPane {
     LanguageSection.initialize()
     GameMenuSection.initialize()
     EditSection.initialize()
+    ActionSection.initialize()
     AboutSection.initialize()
   }
 

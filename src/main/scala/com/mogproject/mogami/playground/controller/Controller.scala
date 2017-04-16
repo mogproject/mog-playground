@@ -146,4 +146,10 @@ object Controller {
   def loadRecord(fileName: String, content: String): Unit = doAction(_.loadRecord(fileName, content), _.renderAll())
 
   def loadRecordText(format: RecordFormat, content: String): Unit = doAction(_.loadRecordText(format, content), _.renderAll())
+
+  // Action Section
+  def setResign(): Unit = doAction({
+    case pc: PlayModeController => pc.setResign()
+    case _ => None
+  }, _.renderAll())
 }

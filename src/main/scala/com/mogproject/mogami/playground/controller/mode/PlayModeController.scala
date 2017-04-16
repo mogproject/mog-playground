@@ -2,6 +2,7 @@ package com.mogproject.mogami.playground.controller.mode
 
 import com.mogproject.mogami._
 import com.mogproject.mogami.core.State.PromotionFlag
+import com.mogproject.mogami.core.move.Resign
 import com.mogproject.mogami.{Game, Square}
 import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor}
 import com.mogproject.mogami.playground.view.Renderer
@@ -19,6 +20,25 @@ case class PlayModeController(renderer: Renderer,
 
   override def copy(config: Configuration, game: Game, displayPosition: Int): GameController =
     PlayModeController(renderer, config, game, displayPosition)
+
+  /**
+    * Initialization
+    */
+  override def initialize(): Unit = {
+    super.initialize()
+    renderer.showActionSection()
+  }
+
+  override def terminate(): Unit = {
+    super.terminate()
+    renderer.hideActionSection()
+  }
+
+  override def renderAll(): Unit = {
+    super.renderAll()
+
+    renderer.updateActionSection(config.messageLang, game.finalAction.isEmpty || displayPosition <= game.moves.length)
+  }
 
   override def canActivate(cursor: Cursor): Boolean = !cursor.isBox
 
@@ -80,6 +100,13 @@ case class PlayModeController(renderer: Renderer,
       case (false, true, true) => Some(released) // no adjustment for hand pieces
       case _ => None
     }
+  }
+
+  // Action Section
+  def setResign(): Option[ModeController] = {
+    Some(this.copy(
+      game = getTruncatedGame.copy(finalAction = Some(Resign())),
+      displayPosition = displayPosition + 1))
   }
 
 }

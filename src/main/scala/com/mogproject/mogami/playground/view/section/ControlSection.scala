@@ -1,7 +1,7 @@
 package com.mogproject.mogami.playground.view.section
 
 import com.mogproject.mogami.core.Game.GameStatus
-import com.mogproject.mogami.core.move.SpecialMove
+import com.mogproject.mogami.core.move.{IllegalMove, Resign, SpecialMove}
 import com.mogproject.mogami.{Game, Move}
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
 import com.mogproject.mogami.playground.view.EventManageable
