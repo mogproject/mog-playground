@@ -447,8 +447,5 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def hideActionSection(): Unit = ActionSection.hide()
 
-  def updateActionSection(lang: Language, canResign: Boolean): Unit = {
-    // @note setTimeout is necessary for data-dismiss modal closing
-    dom.window.setTimeout(() => ActionSection.update(lang, canResign), 0)
-  }
+  def updateActionSection(lang: Language, canResign: Boolean): Unit = ActionSection.update(lang, canResign)
 }
