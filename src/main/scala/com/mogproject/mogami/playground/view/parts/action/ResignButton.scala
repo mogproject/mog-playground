@@ -16,12 +16,9 @@ object ResignButton extends EventManageable {
     data("toggle") := "tooltip",
     data("placement") := "bottom",
     data("original-title") := "Resign this game",
-    data("dismiss") := "modal"
+    data("dismiss") := "modal",
+    onclick := { () => Controller.setResign() }
   ).render
-
-  def initialize(): Unit = {
-    setClickEvent(output, () => Controller.setResign())
-  }
 
   def update(lang: Language, canResign: Boolean): Unit = {
     output.innerHTML = lang match {

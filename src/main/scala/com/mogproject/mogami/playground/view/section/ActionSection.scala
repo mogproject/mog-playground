@@ -13,7 +13,6 @@ object ActionSection extends Section {
 
   override def initialize(): Unit = {
     super.initialize()
-    ResignButton.initialize()
   }
 
   override val accordions: Seq[AccordionMenu] = Seq(

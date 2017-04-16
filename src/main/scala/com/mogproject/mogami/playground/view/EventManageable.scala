@@ -24,7 +24,6 @@ trait EventManageable {
       clearHoldEvent()
       evt.preventDefault()
       onClick()
-      elem.click()
       onHold.foreach(g => registerHoldEvent(g, checker))
     }
 
