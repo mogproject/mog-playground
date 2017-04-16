@@ -20,42 +20,34 @@ trait EventManageable {
   def hasTouchEvent: Boolean = dom.window.hasOwnProperty("ontouchstart")
 
   def setClickEvent(elem: HTMLElement, onClick: () => Unit, onHold: Option[() => Unit] = None, checker: Option[() => Boolean] = None): Unit = {
-    // todo: refactor
+    def onClickEvent(evt: UIEvent): Unit = {
+      clearHoldEvent()
+      evt.preventDefault()
+      onClick()
+      elem.click()
+      onHold.foreach(g => registerHoldEvent(g, checker))
+    }
 
     if (hasTouchEvent) {
       // touch
-      def f(evt: TouchEvent): Unit = if (elem.disabled.forall(_ != true) && evt.changedTouches.length == 1) {
-        clearHoldEvent()
-        evt.preventDefault()
-        elem.click()
-        onHold.foreach(g => registerHoldEvent(g, checker))
-      }
+      val f = (evt: TouchEvent) => if (elem.disabled.forall(_ != true) && evt.changedTouches.length == 1) onClickEvent(evt)
+      val g = (_: TouchEvent) => clearHoldEvent()
 
       elem.addEventListener("touchstart", f, useCapture = false)
       if (onHold.isDefined) {
-        elem.addEventListener("touchend", { _: UIEvent => clearHoldEvent() }, useCapture = false)
-        elem.addEventListener("touchcancel", { _: UIEvent => clearHoldEvent() }, useCapture = false)
+        elem.addEventListener("touchend", g, useCapture = false)
+        elem.addEventListener("touchcancel", g, useCapture = false)
       }
     } else {
       // mouse
-      def f(evt: MouseEvent): Unit = {
-        if (evt.button == 0 /* left click */ ) {
-          clearHoldEvent()
-          evt.preventDefault()
-          elem.click()
-          onHold.foreach(g => registerHoldEvent(g, checker))
-        }
-      }
+      val f = (evt: MouseEvent) => if (evt.button == 0 /* left click */ ) onClickEvent(evt)
+      val g = (evt: MouseEvent) => if (evt.button == 0) clearHoldEvent()
 
       elem.addEventListener("mousedown", f, useCapture = false)
       if (onHold.isDefined) {
-        elem.addEventListener("mouseup", { evt: MouseEvent =>
-          if (evt.button == 0) clearHoldEvent()
-        }, useCapture = false)
+        elem.addEventListener("mouseup", g, useCapture = false)
       }
     }
-    elem.onclick = { _ => onClick() }
-
   }
 
   def setModalClickEvent(elem: HTMLElement, modal: JQuery, f: () => Unit): Unit = {
