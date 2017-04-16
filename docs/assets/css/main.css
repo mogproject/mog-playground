@@ -120,8 +120,14 @@ canvas {
   cursor: pointer;
 }
 
-.panel-collapse {
-  /* issue #105 */
-  /*height: calc(100% + 1px) !important;*/
-  min-height: 100% !important;
+.collapsing {
+  /* fixes issue#105 */
+  height: 100% !important;
+
+  /* disable transition */
+  -webkit-transition: height 0.01s;
+  -moz-transition: height 0.01s;
+  -ms-transition: height 0.01s;
+  -o-transition: height 0.01s;
+  transition: height 0.01s;
 }
