@@ -1,126 +1,127 @@
 @media screen and (min-width: 768px) {
-    html {
-        overflow-y: scroll;
-    }
+  html {
+    overflow-y: scroll;
+  }
 }
 
 .navbar {
-    display: block;
-    height: 29px;
-    min-height:29px !important;
-    margin-bottom: 10px;
+  display: block;
+  height: 29px;
+  min-height:29px !important;
+  margin-bottom: 10px;
 }
 
 .navbar-header {
-    margin-left: 0px !important;
-    margin-right: 0px !important;
-    padding-left: 5px;
-    padding-right: 5px;
-    width: 100%;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+  padding-left: 5px;
+  padding-right: 5px;
+  width: 100%;
 }
 
 .navbar-nav {
-    width: 100% !important;
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: 0;
-    margin-right: 0;
+  width: 100% !important;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
 }
 .navbar-brand {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 20px;
-    padding-right: 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .navbar-form {
-    border: 0;
-    margin-top: 0;
-    margin-bottom: 0;
-    padding: 0;
+  border: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0;
 }
 
 .nav>li {
-    display: inline-block;
-    margin-left: 3px !important;
-    margin-right: 3px !important;
-    white-space: nowrap;
+  display: inline-block;
+  margin-left: 3px !important;
+  margin-right: 3px !important;
+  white-space: nowrap;
 }
 
 .navbar>div {
-    height: 100%;
+  height: 100%;
 }
 
 .navbar-nav>li>a {
-    padding-top: 4px !important;
-    padding-bottom: 4px !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
 }
 
 .thin-btn {
-    margin-top: 2px !important;
-    margin-bottom: 2px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-    padding-right: 10px !important;
-    padding-left: 10px !important;
-    height: 24px !important;
+  margin-top: 2px !important;
+  margin-bottom: 2px !important;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  padding-right: 10px !important;
+  padding-left: 10px !important;
+  height: 24px !important;
 }
 
 .menu-btn {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
 }
 
 .small-padding {
-    padding-top: 0px !important;
-    padding-bottom: 0px !important;
-    padding-right: 3px !important;
-    padding-left: 3px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  padding-right: 3px !important;
+  padding-left: 3px !important;
 }
 
 .rect-select {
-    border-radius: 0 !important;
-    -webkit-appearance:none;
+  border-radius: 0 !important;
+  -webkit-appearance:none;
 }
 
 .notActive{
-    color: #3276b1;
-    background-color: #fff;
+  color: #3276b1;
+  background-color: #fff;
 }
 
 body {
-    /* disables selection */
-    user-select: none; /* CSS3 */
-    -moz-user-select: none; /* Firefox */
-    -webkit-user-select: none; /* Safari/Chrome */
-    -ms-user-select: none; /* IE10 */
+  /* disables selection */
+  user-select: none; /* CSS3 */
+  -moz-user-select: none; /* Firefox */
+  -webkit-user-select: none; /* Safari/Chrome */
+  -ms-user-select: none; /* IE10 */
+
+  /* scrolling */
+  -webkit-overflow-scrolling: touch;
 }
 
 div {
-    position: relative;
+  position: relative;
 }
 
 hr {
-    margin-top: 10px !important;
-    margin-bottom: 10px !important;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
 }
 
 canvas {
-    position: absolute;
+  position: absolute;
 }
 
 .modal-open {
-    padding-right: 0px !important;
-}
-
-.panel {
-    height: calc(100% + 1px); /* fixes issue#105 */
+  padding-right: 0px !important;
 }
 
 .panel-heading {
-    cursor: pointer;
+  cursor: pointer;
 }
 
-.modal {
-    -webkit-overflow-scrolling: touch;
+.panel-collapse {
+  /* issue #105 */
+  /*height: calc(100% + 1px) !important;*/
+  min-height: 100% !important;
 }

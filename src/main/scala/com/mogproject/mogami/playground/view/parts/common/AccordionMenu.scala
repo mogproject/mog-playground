@@ -33,7 +33,7 @@ case class AccordionMenu(ident: String, title: String, isExpanded: Boolean, isVi
 
   val output: Div = div(
     cls := "panel",
-    if (isVisible) "" else display := "none",
+    if (isVisible) "" else display := display.none.v,
     div(
       cls := "panel-heading",
       id := s"heading${ident}",
@@ -47,7 +47,7 @@ case class AccordionMenu(ident: String, title: String, isExpanded: Boolean, isVi
           " ",
           title
         )
-      ).render
+      )
     ),
     mainElem
   ).render
