@@ -15,7 +15,7 @@ object ResignButton extends EventManageable {
     cls := "btn btn-default btn-block",
     data("toggle") := "tooltip",
     data("placement") := "bottom",
-    data("original-title") := "Resign this game",
+    data("original-title") := s"Resign this game",
     data("dismiss") := "modal"
   ).render
 
