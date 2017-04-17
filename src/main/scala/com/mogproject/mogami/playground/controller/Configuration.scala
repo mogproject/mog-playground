@@ -13,7 +13,7 @@ import scala.scalajs.js.UndefOr
 case class Configuration(screenWidth: Double = 375.0,
                          layoutSize: Int = 0,
                          messageLang: Language = Configuration.browserLanguage,
-                         recordLang: Language = Japanese,
+                         recordLang: Language = Configuration.browserLanguage,
                          pieceLang: Language = Japanese,
                          flip: Boolean = false,
                          baseUrl: String = ""
@@ -47,7 +47,8 @@ case class Configuration(screenWidth: Double = 375.0,
     }
 
     val parseRecordLang: Parser = xs => recordLang match {
-      case Japanese => xs
+      case Configuration.browserLanguage => xs
+      case Japanese => "rlang=ja" :: xs
       case English => "rlang=en" :: xs
     }
 
