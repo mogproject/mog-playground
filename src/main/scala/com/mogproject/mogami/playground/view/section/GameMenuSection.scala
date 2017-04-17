@@ -14,7 +14,7 @@ object GameMenuSection extends Section {
     AccordionMenu(
       "Share",
       "Share",
-      isExpanded =  true,
+      isExpanded = true,
       isVisible = true,
       div(
         SnapshotCopyButton.output,
@@ -31,8 +31,8 @@ object GameMenuSection extends Section {
     AccordionMenu(
       "Manage",
       "Manage",
-      isExpanded =  false,
-      isVisible =  true,
+      isExpanded = false,
+      isVisible = true,
       div(
         SaveLoadButton.output
       )
