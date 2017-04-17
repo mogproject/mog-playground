@@ -15,14 +15,22 @@ case class NavigatorSection(layout: Layout) extends Section {
     div(cls := "container", padding := 0,
       div(cls := "navbar-header",
         ul(cls := "nav navbar-nav",
-          li(cls := "navbar-brand hidden-xs hidden-sm", "Shogi Playground"),
+          li(cls := "navbar-brand hidden-xs", "Shogi Playground"),
           li(ModeSelector.output),
-          FlipButton.output,
-          li(cls := "pull-right visible-xs visible-sm", MenuButton.output)
+          li(FlipButton.output),
+          li(paddingLeft := "10px", div(cls := "visible-xs", MenuButton.output))
         )
       )
     )
   ).render
+
+  override def initialize(): Unit = {
+    super.initialize()
+
+    ModeSelector.initialize()
+    FlipButton.initialize()
+    MenuButton.initialize()
+  }
 
   def updateMode(mode: Mode): Unit = {
     ModeSelector.updateValue(mode)
