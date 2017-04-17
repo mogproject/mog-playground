@@ -23,11 +23,11 @@ clean:
 local:
 	${COPY_DEV} && ${OPEN} http://localhost:8083/test/index-dev.html
 
-publish_css:
-	 ${COPY_PROD}
-
 publish: test
 	sbt fullOptJS && ${COPY_PROD}
 
-.PHONY: build test console clean local publish
+publish_css:
+	${COPY_PROD}
+
+.PHONY: build test console clean local publish publish_css
 
