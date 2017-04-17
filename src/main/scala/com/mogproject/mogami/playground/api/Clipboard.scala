@@ -8,8 +8,8 @@ import js.|
 
 @js.native
 @JSName("Clipboard")
-class Clipboard protected() extends js.Object {
-  def this(selector: String | Element | NodeListOf[Element], options: Clipboard.Options = ???) = this()
+class Clipboard(selector: String | Element | NodeListOf[Element] = js.native,
+                options: Clipboard.Options = js.native) extends js.Object {
 
   def on(`type`: String, handler: js.Function): Clipboard = js.native
 

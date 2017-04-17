@@ -11,6 +11,7 @@ import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.playground.view.parts._
+import com.mogproject.mogami.playground.view.parts.manage.SaveLoadButton
 import com.mogproject.mogami.playground.view.section._
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.util.MapUtil
@@ -381,6 +382,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def showMenuModal(): Unit = MenuDialog.show(layout)
 
+  def hideMenuModal(timeout: Double): Unit = dom.window.setTimeout({ () => MenuDialog.hide() }, timeout)
+
   def showGameInfoModal(config: Configuration, gameInfo: GameInfo): Unit = GameInfoDialog(config, gameInfo).show()
 
   def updateSnapshotUrl(url: String): Unit = SnapshotCopyButton.updateValue(url)
@@ -428,13 +431,13 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
   def updatePieceLang(lang: Language): Unit = PieceLanguageSelector.updateValue(lang)
 
   // tooltip messages
-  def displayTooltipRecordLoad(message: String): Unit = RecordLoadButton.displayTooltip(message)
+  def displayFileLoadMessage(message: String): Unit = SaveLoadButton.displayFileLoadMessage(message)
 
-  def displayMessageRecordLoad(message: String): Unit = RecordLoadButton.displayMessage(message)
+  def displayFileLoadTooltip(message: String): Unit = SaveLoadButton.displayFileLoadTooltip(message)
 
-  def displayTooltipRecordLoadText(message: String): Unit = RecordLoadButton.displayTooltipRecordLoadText(message)
+  def displayTextLoadMessage(message: String): Unit = SaveLoadButton.displayTextLoadMessage(message)
 
-  def displayMessageRecordLoadText(message: String): Unit = RecordLoadButton.displayMessageRecordLoadText(message)
+  def displayTextLoadTooltip(message: String): Unit = SaveLoadButton.displayTextLoadTooltip(message)
 
   // action section
   def showActionSection(): Unit = ActionSection.show()

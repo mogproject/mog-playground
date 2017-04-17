@@ -237,12 +237,13 @@ trait GameController extends ModeController {
 
     result match {
       case Success(g) =>
-        renderer.displayMessageRecordLoad(fileName)
-        renderer.displayTooltipRecordLoad(s"Loaded! (${g.moves.length} moves)")
+        renderer.displayFileLoadMessage(s"Loaded: ${fileName}")
+        renderer.displayFileLoadTooltip(s"Loaded! (${g.moves.length} moves)")
+        renderer.hideMenuModal(1000)
         Some(ViewModeController(this.renderer, this.config, g, 0))
       case Failure(e) =>
-        renderer.displayMessageRecordLoad(s"Error: ${e.getMessage}")
-        renderer.displayTooltipRecordLoad("Failed!")
+        renderer.displayFileLoadMessage(s"Error: ${e.getMessage}")
+        renderer.displayFileLoadTooltip("Failed!")
         None
     }
   }
@@ -256,12 +257,14 @@ trait GameController extends ModeController {
 
     result match {
       case Success(g) =>
-        renderer.displayMessageRecordLoadText("")
-        renderer.displayTooltipRecordLoadText(s"Loaded! (${g.moves.length} moves)")
+        renderer.displayFileLoadMessage("")
+        renderer.displayTextLoadMessage("")
+        renderer.displayTextLoadTooltip(s"Loaded! (${g.moves.length} moves)")
+        renderer.hideMenuModal(1000)
         Some(ViewModeController(this.renderer, this.config, g, 0))
       case Failure(e) =>
-        renderer.displayMessageRecordLoadText(s"Error: ${e.getMessage}")
-        renderer.displayTooltipRecordLoadText("Failed!")
+        renderer.displayTextLoadMessage(s"Error: ${e.getMessage}")
+        renderer.displayTextLoadTooltip("Failed!")
         None
     }
   }
