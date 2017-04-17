@@ -381,6 +381,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def showMenuModal(): Unit = MenuDialog.show(layout)
 
+  def hideMenuModal(timeout: Double): Unit = dom.window.setTimeout({ () => MenuDialog.hide() }, timeout)
+
   def showGameInfoModal(config: Configuration, gameInfo: GameInfo): Unit = GameInfoDialog(config, gameInfo).show()
 
   def updateSnapshotUrl(url: String): Unit = SnapshotCopyButton.updateValue(url)

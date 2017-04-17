@@ -239,6 +239,7 @@ trait GameController extends ModeController {
       case Success(g) =>
         renderer.displayMessageRecordLoad(fileName)
         renderer.displayTooltipRecordLoad(s"Loaded! (${g.moves.length} moves)")
+        renderer.hideMenuModal(1000)
         Some(ViewModeController(this.renderer, this.config, g, 0))
       case Failure(e) =>
         renderer.displayMessageRecordLoad(s"Error: ${e.getMessage}")
@@ -258,6 +259,7 @@ trait GameController extends ModeController {
       case Success(g) =>
         renderer.displayMessageRecordLoadText("")
         renderer.displayTooltipRecordLoadText(s"Loaded! (${g.moves.length} moves)")
+        renderer.hideMenuModal(1000)
         Some(ViewModeController(this.renderer, this.config, g, 0))
       case Failure(e) =>
         renderer.displayMessageRecordLoadText(s"Error: ${e.getMessage}")
