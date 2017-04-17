@@ -59,15 +59,15 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     div(cls := "container",
       layout.isMobile.fold(Seq(position := position.fixed.v, width := "100%"), ""),
       div(cls := "row",
-        div(cls := "col-md-6 col-lg-5", paddingLeft := 0, paddingRight := 0,
+        div(cls := "col-sm-7 col-md-6 col-lg-5", paddingLeft := 0, paddingRight := 0,
           div(margin := "auto", padding := 0, width := layout.canvasWidth,
             canvasContainer,
             controlSection.output
           )
         ),
-        div(cls := "col-md-6 col-lg-7 hidden-xs hidden-sm", paddingLeft := 0,
+        div(cls := "col-sm-5 col-md-6 col-lg-7 hidden-xs", paddingLeft := 0,
           div(cls := "row",
-            div(cls := "col-md-4 col-lg-3", paddingLeft := 0, controlSection.outputLongSelector),
+            div(cls := "col-md-4 col-lg-3 hidden-sm", paddingLeft := 0, controlSection.outputLongSelector),
             div(cls := "col-md-8 col-lg-9", MenuPane.output)
           )
         )
@@ -94,9 +94,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
       setEventListener("mouseout", { _: UIEvent => clearHoldEvent() })
     }
 
-    ModeSelector.initialize()
-    FlipButton.initialize()
-    MenuButton.initialize()
+    navigatorSection.initialize()
     controlSection.initialize()
     MenuPane.initialize()
 

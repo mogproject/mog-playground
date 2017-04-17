@@ -1,14 +1,14 @@
 package com.mogproject.mogami.playground.view.parts
 
 import com.mogproject.mogami.playground.controller.{Controller, English, Language}
-import org.scalajs.dom.html.{Button, LI}
+import org.scalajs.dom.html.{Button, Div, LI}
 
 import scalatags.JsDom.all._
 
 /**
   *
   */
-object FlipButton extends ButtonLike[Boolean, Button, LI] {
+object FlipButton extends ButtonLike[Boolean, Button, Div] {
   override protected val keys = Seq(true)
 
   override protected val labels: Map[Language, Seq[String]] = Map(
@@ -22,10 +22,8 @@ object FlipButton extends ButtonLike[Boolean, Button, LI] {
     span(cls := s"glyphicon glyphicon-retweet", aria.hidden := true)
   ).render
 
-  override val output: LI = li(
-    div(cls := "input-group",
-      inputs
-    )
+  override val output: Div = div(cls := "input-group",
+    inputs
   ).render
 
   override def updateLabel(lang: Language): Unit = ???
