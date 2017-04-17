@@ -2,6 +2,7 @@ package com.mogproject.mogami.playground.view.section
 
 import com.mogproject.mogami.playground.view.parts._
 import com.mogproject.mogami.playground.view.parts.common.AccordionMenu
+import com.mogproject.mogami.playground.view.parts.manage.SaveLoadButton
 
 import scalatags.JsDom.all._
 
@@ -13,8 +14,8 @@ object GameMenuSection extends Section {
     AccordionMenu(
       "Share",
       "Share",
-      true,
-      true,
+      isExpanded =  true,
+      isVisible = true,
       div(
         SnapshotCopyButton.output,
         SnapshotShortenButton.output,
@@ -30,12 +31,10 @@ object GameMenuSection extends Section {
     AccordionMenu(
       "Manage",
       "Manage",
-      false,
-      true,
+      isExpanded =  false,
+      isVisible =  true,
       div(
-        RecordLoadButton.output,
-        br(),
-        RecordSaveButton.output
+        SaveLoadButton.output
       )
     )
   )
