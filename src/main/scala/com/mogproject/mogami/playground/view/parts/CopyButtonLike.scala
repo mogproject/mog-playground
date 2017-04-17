@@ -1,5 +1,6 @@
 package com.mogproject.mogami.playground.view.parts
 
+import org.scalajs.dom
 import org.scalajs.dom.html.{Button, Div, Input}
 
 import scalatags.JsDom.all._
@@ -23,6 +24,7 @@ trait CopyButtonLike {
     data("toggle") := "tooltip",
     data("trigger") := "manual",
     data("placement") := "bottom",
+    onclick := { () => dom.window.setTimeout({ () => copyButton.focus() }, 0) },
     "Copy"
   ).render
 

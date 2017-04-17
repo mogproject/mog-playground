@@ -130,6 +130,7 @@ object SaveLoadButton {
     onclick := { () =>
       displayTextLoadMessage("")
       textLoadInput.value = Controller.getRecord(fileSaveFormat.getValue)
+      dom.window.setTimeout(() => textCopyButton.focus(), 0)
     },
     "Copy"
   ).render
