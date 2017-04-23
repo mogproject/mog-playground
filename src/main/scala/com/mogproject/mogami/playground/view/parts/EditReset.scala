@@ -1,6 +1,6 @@
 package com.mogproject.mogami.playground.view.parts
 
-import com.mogproject.mogami.core.State
+import com.mogproject.mogami.State
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
 import org.scalajs.dom.html.{Button, Div}
 

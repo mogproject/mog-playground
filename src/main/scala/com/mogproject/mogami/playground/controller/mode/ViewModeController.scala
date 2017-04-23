@@ -1,6 +1,7 @@
 package com.mogproject.mogami.playground.controller.mode
 
-import com.mogproject.mogami.Game
+import com.mogproject.mogami._
+import com.mogproject.mogami.core.game.Game.BranchNo
 import com.mogproject.mogami.playground.controller.{Configuration, Cursor}
 import com.mogproject.mogami.playground.view.Renderer
 
@@ -10,12 +11,16 @@ import com.mogproject.mogami.playground.view.Renderer
 case class ViewModeController(renderer: Renderer,
                               config: Configuration,
                               game: Game,
+                              displayBranchNo: BranchNo,
                               displayPosition: Int
                              ) extends GameController {
   val mode: Mode = Viewing
 
-  override def copy(config: Configuration, game: Game, displayPosition: Int): GameController =
-    ViewModeController(renderer, config, game, displayPosition)
+  override def copy(config: Configuration,
+                    game: Game,
+                    displayBranchNo: BranchNo,
+                    displayPosition: Int): GameController =
+    ViewModeController(renderer, config, game, displayBranchNo, displayPosition)
 
   override def canActivate(cursor: Cursor): Boolean = cursor.isPlayer
 

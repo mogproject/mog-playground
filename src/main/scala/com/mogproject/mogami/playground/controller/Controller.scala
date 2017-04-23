@@ -3,7 +3,6 @@ package com.mogproject.mogami.playground.controller
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.view.Renderer
 import com.mogproject.mogami._
-import com.mogproject.mogami.core.GameInfo
 import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller.mode._
 import com.mogproject.mogami.playground.io.RecordFormat
@@ -37,8 +36,8 @@ object Controller {
 
     // update mode
     modeController = Some(game.moves.nonEmpty.fold(
-      ViewModeController(renderer, config, game, args.currentMove),
-      PlayModeController(renderer, config, game, 0)
+      ViewModeController(renderer, config, game, args.gamePosition.branch, args.gamePosition.position),
+      PlayModeController(renderer, config, game, 0, 0)
     ))
 
     // render all parts

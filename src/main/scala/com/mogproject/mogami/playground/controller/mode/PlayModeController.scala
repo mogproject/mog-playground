@@ -1,14 +1,16 @@
 package com.mogproject.mogami.playground.controller.mode
 
 import com.mogproject.mogami._
-import com.mogproject.mogami.core.Game.GameStatus
-import com.mogproject.mogami.core.Game.GameStatus.Mated
-import com.mogproject.mogami.core.State.PromotionFlag
+import com.mogproject.mogami.GameStatus._
+import com.mogproject.mogami.core.game.Game.{BranchNo, GamePosition}
 import com.mogproject.mogami.core.move.Resign
+import com.mogproject.mogami.core.state.State.PromotionFlag
 import com.mogproject.mogami.{Game, Square}
 import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor}
 import com.mogproject.mogami.playground.view.Renderer
 import com.mogproject.mogami.util.Implicits._
+import com.mogproject.mogami.core.state.StateCache.Implicits._
+
 
 /**
   * Play mode
@@ -16,12 +18,13 @@ import com.mogproject.mogami.util.Implicits._
 case class PlayModeController(renderer: Renderer,
                               config: Configuration,
                               game: Game,
+                              displayBranchNo: BranchNo,
                               displayPosition: Int
                              ) extends GameController with CursorAdjustable {
   val mode: Mode = Playing
 
-  override def copy(config: Configuration, game: Game, displayPosition: Int): GameController =
-    PlayModeController(renderer, config, game, displayPosition)
+  override def copy(config: Configuration, game: Game, displayBranchNo: BranchNo, displayPosition: Int): GameController =
+    PlayModeController(renderer, config, game, displayBranchNo, displayPosition)
 
   /**
     * Initialization
@@ -49,7 +52,7 @@ case class PlayModeController(renderer: Renderer,
     case _ => false
   }
 
-  private[this] def canResign: Boolean = (game.finalAction, game.status, displayPosition - game.moves.length) match {
+  private[this] def canResign: Boolean = (displayBranch.finalAction, game.status, displayPosition - game.moves.length) match {
     case (Some(_), _, n) => n <= 0
     case (_, Mated | GameStatus.Playing, _) => true
     case (_, _, n) => n < 0
@@ -68,8 +71,11 @@ case class PlayModeController(renderer: Renderer,
     } else {
       val from = config.flip.when[Cursor](!_)(selected).moveFrom
 
-      def f(to: Square, promote: Boolean) = {
-        getTruncatedGame.makeMove(MoveBuilderSfen(from, to, promote)).map(g => this.copy(game = g, displayPosition = displayPosition + 1))
+      def f(to: Square, promote: Boolean): Option[GameController] = {
+        game
+          .truncated(gamePosition)
+          .updateBranch(displayBranchNo)(_.makeMove(MoveBuilderSfen(from, to, promote)))
+          .map(g => this.copy(game = g, displayPosition = displayPosition + 1))
       }
 
       config.flip.when[Cursor](!_)(invoked) match {
@@ -112,7 +118,9 @@ case class PlayModeController(renderer: Renderer,
   // Action Section
   def setResign(): Option[ModeController] = {
     Some(this.copy(
-      game = getTruncatedGame.copy(finalAction = Some(Resign())),
+      game = game.updateBranch(displayBranchNo)(br =>
+        Some(br.truncated(statusPosition + br.offset).copy(finalAction = Some(Resign())))
+      ).get,
       displayPosition = displayPosition + 1))
   }
 

@@ -1,16 +1,18 @@
 package com.mogproject.mogami.playground.controller
 
-import com.mogproject.mogami.Game
+import com.mogproject.mogami._
+import com.mogproject.mogami.util.Implicits._
+import com.mogproject.mogami.core.state.StateCache.Implicits._
 
 import scala.annotation.tailrec
-import scala.scalajs.js.URIUtils.decodeURIComponent
+import scala.scalajs.js.URIUtils.{decodeURIComponent, encodeURIComponent}
 import scala.util.{Failure, Success, Try}
 
 /**
   * stores parameters
   */
 case class Arguments(game: Game = Game(),
-                     currentMove: Int = 0,
+                     gamePosition: GamePosition = GamePosition(0, 0),
                      action: Action = PlayAction,
                      config: Configuration = Configuration()) {
   def parseQueryString(query: String): Arguments = {
@@ -44,8 +46,8 @@ case class Arguments(game: Game = Game(),
           println(s"Invalid parameter: plang=${s}")
           f(sofar, xs)
       }
-      case ("move" :: s :: Nil) :: xs => Try(s.toInt) match {
-        case Success(n) if n >= 0 => f(sofar.copy(currentMove = n), xs)
+      case ("move" :: s :: Nil) :: xs => parseGamePosition(s) match {
+        case Some(gp) => f(sofar.copy(gamePosition = gp), xs)
         case _ =>
           println(s"Invalid parameter: move=${s}")
           f(sofar, xs)
@@ -78,5 +80,61 @@ case class Arguments(game: Game = Game(),
     }
 
     f(this, query.stripPrefix("?").split("&").map(s => decodeURIComponent(s).split("=", 2).toList).toList)
+  }
+
+  private[this] def parseGamePosition(s: String): Option[GamePosition] = {
+    val pattern = raw"(?:([\d])+[.])?([\d]+)".r
+
+    s match {
+      case pattern(null, y) => for {yy <- Try(y.toInt).toOption} yield GamePosition(0, yy)
+      case pattern(x, y) => for {xx <- Try(x.toInt).toOption; yy <- Try(y.toInt).toOption} yield GamePosition(xx, yy)
+      case _ => None
+    }
+  }
+
+  private[this] lazy val exg = game.toSfenExtendedGame
+
+  private[this] lazy val instantGame = Game(Branch(game.getState(gamePosition).get))
+
+  def toRecordUrl: String = {
+    createUrl(branchParams ++ finalActionParams ++ commentParams ++ gameInfoParams ++ positionParams)
+  }
+
+  def toSnapshotUrl: String = {
+    createUrl(("sfen", instantGame.toSfenString) +: gameInfoParams)
+  }
+
+  def toImageLinkUrl: String = {
+    createUrl(imageActionParams ++ branchParams ++ finalActionParams ++ gameInfoParams ++ positionParams)
+  }
+
+  private[this] def branchParams: Seq[(String, String)] = {
+    Seq(("sfen", exg.trunk.moves)) ++ exg.branches.zipWithIndex.map { case (br, n) => (s"br${n}", br.moves) }
+  }
+
+  private[this] def finalActionParams: Seq[(String, String)] = {
+    exg.trunk.finalAction.map(("fin", _)).toSeq ++
+      exg.branches.zipWithIndex.flatMap { case (br, n) => br.finalAction.map((s"fin${n}", _)) }
+  }
+
+  private[this] def commentParams: Seq[(String, String)] = {
+    exg.trunk.comments.map { case (i, s) => (s"c${i}", s) }.toSeq ++
+      exg.branches.zipWithIndex.flatMap { case (br, n) => br.comments.map { case (i, s) => (s"c${n}.${i}", s) } }
+  }
+
+  private[this] def gameInfoParams: Seq[(String, String)] = {
+    val params = List(("bn", 'blackName), ("wn", 'whiteName))
+    params.flatMap { case (q, k) => game.gameInfo.tags.get(k).map((q, _)) }
+  }
+
+  private[this] def positionParams: Seq[(String, String)] = {
+    val prefix = (gamePosition.branch == 0).fold("", s"${gamePosition.branch}.")
+    (gamePosition.branch != 0 || gamePosition.position != 0).option(("move", s"${prefix}${gamePosition.position}")).toSeq
+  }
+
+  private[this] def imageActionParams: Seq[(String, String)] = Seq(("action", "image"))
+
+  private[this] def createUrl(params: Seq[(String, String)]) = {
+    config.baseUrl + "?" + (params.map { case (k, v) => k + "=" + encodeURIComponent(v) } ++ config.toQueryParameters).mkString("&")
   }
 }

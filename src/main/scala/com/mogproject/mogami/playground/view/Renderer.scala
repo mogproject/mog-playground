@@ -1,9 +1,7 @@
 package com.mogproject.mogami.playground.view
 
 import com.mogproject.mogami._
-import com.mogproject.mogami.core.Game.GameStatus
-import com.mogproject.mogami.core.Game.GameStatus.GameStatus
-import com.mogproject.mogami.core.GameInfo
+import com.mogproject.mogami.core.game.Game.BranchNo
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller._
@@ -405,7 +403,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
   def updateFlip(config: Configuration): Unit = FlipButton.updateValue(config.flip)
 
   // record
-  def updateRecordContent(game: Game, lng: Language): Unit = controlSection.updateRecordContent(game, lng)
+  def updateRecordContent(game: Game, branchNo: BranchNo, lng: Language): Unit = controlSection.updateRecordContent(game, branchNo, lng)
 
   def updateRecordIndex(index: Int): Unit = controlSection.updateRecordIndex(index)
 

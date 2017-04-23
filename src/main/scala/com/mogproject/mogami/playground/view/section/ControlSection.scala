@@ -1,8 +1,8 @@
 package com.mogproject.mogami.playground.view.section
 
-import com.mogproject.mogami.core.Game.GameStatus
 import com.mogproject.mogami.core.move.{IllegalMove, Resign, SpecialMove}
-import com.mogproject.mogami.{Game, Move}
+import com.mogproject.mogami._
+import com.mogproject.mogami.core.game.Game.BranchNo
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
 import com.mogproject.mogami.playground.view.EventManageable
 import org.scalajs.dom.html.Div
@@ -49,7 +49,15 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
     recordSelectorLong.selectedIndex = x
   }
 
-  private[this] def getMoves(game: Game, lng: Language): List[String] = {
+  /**
+    * Create move description
+    *
+    * @param game     Game instance
+    * @param branchNo branch number (trunk:0)
+    * @param lng      language
+    * @return
+    */
+  private[this] def getMoves(game: Game, branchNo: BranchNo, lng: Language): List[String] = {
     val f: Move => String = lng match {
       case Japanese => _.toJapaneseNotationString
       case English => _.toWesternNotationString
@@ -58,39 +66,49 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
       case Japanese => _.toJapaneseNotationString
       case English => _.toWesternNotationString
     }
-    (game.moves.map(f) ++ (game.status match {
-      case GameStatus.Resigned | GameStatus.TimedUp => List(g(game.finalAction.get))
-      case GameStatus.IllegallyMoved => g(game.finalAction.get).split("\n").toList.take(1)
-      case _ => Nil
-    })).toList
+    game.withBranch(branchNo) { br =>
+      (br.moves.map(f) ++ (br.status match {
+        case GameStatus.Resigned | GameStatus.TimedUp => List(g(br.finalAction.get))
+        case GameStatus.IllegallyMoved => g(br.finalAction.get).split("\n").toList.take(1)
+        case _ => Nil
+      })).toList
+    }.getOrElse(Nil)
   }
 
-  def updateRecordContent(game: Game, lng: Language): Unit = {
-    // moves
-    val xs = getMoves(game, lng).zipWithIndex.map { case (m, i) =>
-      s"${i + 1}: ${game.history(i).turn.toSymbolString()}${m}"
-    }
+  def updateRecordContent(game: Game, branchNo: BranchNo, lng: Language): Unit = {
     val prefix = lng match {
       case Japanese => "初期局面"
       case English => "Start"
     }
-    val suffix = (game.status, lng) match {
-      case (GameStatus.Mated, Japanese) => List("詰み")
-      case (GameStatus.Mated, English) => List("Mated")
-      case (GameStatus.Drawn, Japanese) => List("千日手")
-      case (GameStatus.Drawn, English) => List("Drawn")
-      case (GameStatus.PerpetualCheck, Japanese) => List("連続王手の千日手")
-      case (GameStatus.PerpetualCheck, English) => List("Perpetual Check")
-      case (GameStatus.Uchifuzume, Japanese) => List("打ち歩詰め")
-      case (GameStatus.Uchifuzume, English) => List("Uchifuzume")
-      case (GameStatus.IllegallyMoved, Japanese) => game.finalAction.get.toJapaneseNotationString.split("\n").toList.drop(1)
-      case (GameStatus.IllegallyMoved, English) => game.finalAction.get.toWesternNotationString.split("\n").toList.drop(1)
-      case _ => Nil
+
+    game.withBranch(branchNo) { br =>
+      // moves
+      val initTurn = br.initialState.turn
+
+      val xs = getMoves(game, branchNo, lng).zipWithIndex.map { case (m, i) =>
+        val commentMark = if (br.hasComment(i + br.offset)) "*" else " "
+        f"${commentMark}${i + 1}%3d: ${(i % 2 == 0).fold(initTurn, !initTurn).toSymbolString()}${m}"
+      }
+
+      val suffix = (game.status, lng) match {
+        case (GameStatus.Mated, Japanese) => List("詰み")
+        case (GameStatus.Mated, English) => List("Mated")
+        case (GameStatus.Drawn, Japanese) => List("千日手")
+        case (GameStatus.Drawn, English) => List("Drawn")
+        case (GameStatus.PerpetualCheck, Japanese) => List("連続王手の千日手")
+        case (GameStatus.PerpetualCheck, English) => List("Perpetual Check")
+        case (GameStatus.Uchifuzume, Japanese) => List("打ち歩詰め")
+        case (GameStatus.Uchifuzume, English) => List("Uchifuzume")
+        case (GameStatus.IllegallyMoved, Japanese) => br.finalAction.get.toJapaneseNotationString.split("\n").toList.drop(1)
+        case (GameStatus.IllegallyMoved, English) => br.finalAction.get.toWesternNotationString.split("\n").toList.drop(1)
+        case _ => Nil
+      }
+      val ys = prefix :: xs ++ suffix
+      val s = ys.map(s => option(s)).mkString
+
+      recordSelector.innerHTML = s
+      recordSelectorLong.innerHTML = s
     }
-    val ys = prefix :: xs ++ suffix
-    val s = ys.map(s => option(s)).mkString
-    recordSelector.innerHTML = s
-    recordSelectorLong.innerHTML = s
   }
 
   override def initialize(): Unit = {
