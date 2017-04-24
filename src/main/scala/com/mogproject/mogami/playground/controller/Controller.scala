@@ -59,9 +59,11 @@ object Controller {
     renderer.drawBoard()
 
     // update mode
-    modeController = Some(game.moves.nonEmpty.fold(
-      ViewModeController(renderer, config, game, args.gamePosition.branch, args.gamePosition.position),
-      PlayModeController(renderer, config, game, 0, 0)
+    val isSnapshot = game.trunk.moves.isEmpty && game.trunk.finalAction.isEmpty && game.branches.isEmpty
+
+    modeController = Some(isSnapshot.fold(
+      PlayModeController(renderer, config, game, 0, 0),
+      ViewModeController(renderer, config, game, args.gamePosition.branch, args.gamePosition.position)
     ))
 
     // render all parts
