@@ -1,12 +1,15 @@
 package com.mogproject.mogami.playground.controller
 
 import com.mogproject.mogami.util.Implicits._
+import com.mogproject.mogami.core.state.StateCache.Implicits._
 import com.mogproject.mogami.playground.view.Renderer
 import com.mogproject.mogami._
 import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller.mode._
 import com.mogproject.mogami.playground.io.RecordFormat
 import org.scalajs.dom.Element
+
+import scala.util.{Failure, Success, Try}
 
 /**
   * logic controller
@@ -26,7 +29,28 @@ object Controller {
     */
   def initialize(elem: Element, args: Arguments): Unit = {
     val config = args.config
-    val game = args.game
+
+    // create game
+    def loadGame(game: => Game): Game = Try(game) match {
+      case Success(g) => g
+      case Failure(e) =>
+        println(s"Failed to create a game: ${e}")
+        Game()
+    }
+
+    val gg = ((args.usen, args.sfen) match {
+      case (Some(u), _) => loadGame(Game.parseUsenString(u)) // parse USEN string
+      case (_, Some(s)) => loadGame(Game.parseSfenString(s)) // parse SFEN string
+      case _ => Game()
+    }).copy(gameInfo = args.gameInfo)
+
+    // update game info and comments
+    val game = args.comments.foldLeft(gg) { case (g, (br, cmts)) =>
+      g.updateBranch(br)(b => Some(b.updateComments(cmts))).getOrElse {
+        println(s"Ignored comments on the invalid branch no: ${br}")
+        g
+      }
+    }
 
     // create renderer
     val renderer = Renderer(elem, args.config.layout)

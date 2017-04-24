@@ -76,18 +76,19 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
   }
 
   def updateRecordContent(game: Game, branchNo: BranchNo, lng: Language): Unit = {
-    val prefix = lng match {
-      case Japanese => "初期局面"
-      case English => "Start"
-    }
-
     game.withBranch(branchNo) { br =>
+      val prefix = lng match {
+        case Japanese => "初期局面"
+        case English => "Start"
+      }
+
       // moves
       val initTurn = br.initialState.turn
 
-      val xs = getMoves(game, branchNo, lng).zipWithIndex.map { case (m, i) =>
-        val commentMark = if (br.hasComment(i + br.offset)) "*" else " "
-        f"${commentMark}${i + 1}%3d: ${(i % 2 == 0).fold(initTurn, !initTurn).toSymbolString()}${m}"
+      val xs = (prefix +: getMoves(game, branchNo, lng)).zipWithIndex.map { case (m, i) =>
+        val commentMark = if (br.hasComment(i + 1 + br.offset)) "*" else " "
+        val indexNotation = if (i == 0) "" else f"${i}%3d: " + (i % 2 == 0).fold(!initTurn, initTurn).toSymbolString()
+        commentMark + indexNotation + m
       }
 
       val suffix = (game.status, lng) match {
@@ -103,8 +104,7 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
         case (GameStatus.IllegallyMoved, English) => br.finalAction.get.toWesternNotationString.split("\n").toList.drop(1)
         case _ => Nil
       }
-      val ys = prefix :: xs ++ suffix
-      val s = ys.map(s => option(s)).mkString
+      val s = (xs ++ suffix).map(s => option(s)).mkString
 
       recordSelector.innerHTML = s
       recordSelectorLong.innerHTML = s

@@ -11,20 +11,27 @@ import scala.util.{Failure, Success, Try}
 /**
   * stores parameters
   */
-case class Arguments(game: Game = Game(),
+case class Arguments(sfen: Option[String] = None, // deprecated
+                     usen: Option[String] = None,
+                     gameInfo: GameInfo = GameInfo(),
                      gamePosition: GamePosition = GamePosition(0, 0),
+                     comments: Map[BranchNo, Map[Int, String]] = Map.empty,
                      action: Action = PlayAction,
                      config: Configuration = Configuration()) {
   def parseQueryString(query: String): Arguments = {
     @tailrec
     def f(sofar: Arguments, ls: List[List[String]]): Arguments = ls match {
-      case ("sfen" :: s :: Nil) :: xs => Try(Game.parseSfenString(s)) match {
-        case Success(g) => f(sofar.copy(game = g.copy(gameInfo = sofar.game.gameInfo)), xs)
-        case Failure(e) =>
-          println(s"Failed to create a game: ${e}")
-          println(s"Invalid parameter: sfen=${s}")
-          f(sofar, xs)
-      }
+      case ("sfen" :: s :: Nil) :: xs => f(sofar.copy(sfen = Some(s)), xs)
+      case ("u" :: s :: Nil) :: xs => f(sofar.copy(usen = Some(s)), xs)
+      case (x :: s :: Nil) :: xs if x.startsWith("c") => // comments
+        parseGamePosition(x.drop(1)) match {
+          case Some(pos) =>
+            val c = comments.updated(pos.branch, comments.getOrElse(pos.branch, Map.empty).updated(pos.position, s))
+            f(sofar.copy(comments = c), xs)
+          case _ =>
+            println(s"Invalid parameter: ${x}=${s}")
+            f(sofar, xs)
+        }
       case ("mlang" :: s :: Nil) :: xs => s match {
         case "ja" => f(sofar.copy(config = sofar.config.copy(messageLang = Japanese)), xs)
         case "en" => f(sofar.copy(config = sofar.config.copy(messageLang = English)), xs)
@@ -71,10 +78,8 @@ case class Arguments(game: Game = Game(),
           println(s"Invalid parameter: size=${s}")
           f(sofar, xs)
       }
-      case ("bn" :: s :: Nil) :: xs =>
-        f(sofar.copy(game = sofar.game.copy(gameInfo = sofar.game.gameInfo.updated('blackName, s))), xs)
-      case ("wn" :: s :: Nil) :: xs =>
-        f(sofar.copy(game = sofar.game.copy(gameInfo = sofar.game.gameInfo.updated('whiteName, s))), xs)
+      case ("bn" :: s :: Nil) :: xs => f(sofar.copy(gameInfo = sofar.gameInfo.updated('blackName, s)), xs)
+      case ("wn" :: s :: Nil) :: xs => f(sofar.copy(gameInfo = sofar.gameInfo.updated('whiteName, s)), xs)
       case _ :: xs => f(sofar, xs)
       case Nil => sofar
     }
@@ -86,40 +91,49 @@ case class Arguments(game: Game = Game(),
     val pattern = raw"(?:([\d])+[.])?([\d]+)".r
 
     s match {
-      case pattern(null, y) => for {yy <- Try(y.toInt).toOption} yield GamePosition(0, yy)
-      case pattern(x, y) => for {xx <- Try(x.toInt).toOption; yy <- Try(y.toInt).toOption} yield GamePosition(xx, yy)
+      case pattern(null, y) => for {yy <- Try(y.toInt).toOption}  yield GamePosition(0, yy)
+      case pattern(x, y) => for {xx <- Try(x.toInt).toOption; yy <- Try(y.toInt).toOption}  yield GamePosition(xx, yy)
       case _ => None
     }
   }
 
-  private[this] lazy val exg = game.toSfenExtendedGame
+}
+
+case class ArgumentsBuilder(game: Game,
+                            gamePosition: GamePosition = GamePosition(0, 0),
+                            config: Configuration = Configuration()) {
+
+  private[this] def toGamePosition(branchNo: BranchNo, pos: Int) = (branchNo == 0).fold("", branchNo + ".") + pos
 
   private[this] lazy val instantGame = Game(Branch(game.getState(gamePosition).get))
 
+  lazy val fullRecordUrl: String = createUrl(gameParams ++ commentParams ++ gameInfoParams ++ positionParams)
+
+  /**
+    * true if comments are too long and omitted
+    */
+  lazy val commentOmitted: Boolean = fullRecordUrl.length > 2000
+
   def toRecordUrl: String = {
-    createUrl(branchParams ++ finalActionParams ++ commentParams ++ gameInfoParams ++ positionParams)
+    if (commentOmitted) createUrl(gameParams ++ gameInfoParams ++ positionParams) else fullRecordUrl
   }
 
   def toSnapshotUrl: String = {
-    createUrl(("sfen", instantGame.toSfenString) +: gameInfoParams)
+    createUrl(("u", instantGame.toUsenString) +: gameInfoParams)
   }
 
   def toImageLinkUrl: String = {
-    createUrl(imageActionParams ++ branchParams ++ finalActionParams ++ gameInfoParams ++ positionParams)
+    createUrl(imageActionParams ++ gameParams ++ gameInfoParams ++ positionParams)
   }
 
-  private[this] def branchParams: Seq[(String, String)] = {
-    Seq(("sfen", exg.trunk.moves)) ++ exg.branches.zipWithIndex.map { case (br, n) => (s"br${n}", br.moves) }
-  }
-
-  private[this] def finalActionParams: Seq[(String, String)] = {
-    exg.trunk.finalAction.map(("fin", _)).toSeq ++
-      exg.branches.zipWithIndex.flatMap { case (br, n) => br.finalAction.map((s"fin${n}", _)) }
-  }
+  private[this] def gameParams: Seq[(String, String)] = Seq(("u", game.toUsenString))
 
   private[this] def commentParams: Seq[(String, String)] = {
-    exg.trunk.comments.map { case (i, s) => (s"c${i}", s) }.toSeq ++
-      exg.branches.zipWithIndex.flatMap { case (br, n) => br.comments.map { case (i, s) => (s"c${n}.${i}", s) } }
+    ((game.trunk, -1) +: game.branches.zipWithIndex).flatMap { case (br, n) =>
+      br.comments.map { case (i, s) =>
+        ("c" + toGamePosition(n + 1, i), s)
+      }
+    }
   }
 
   private[this] def gameInfoParams: Seq[(String, String)] = {
@@ -137,4 +151,10 @@ case class Arguments(game: Game = Game(),
   private[this] def createUrl(params: Seq[(String, String)]) = {
     config.baseUrl + "?" + (params.map { case (k, v) => k + "=" + encodeURIComponent(v) } ++ config.toQueryParameters).mkString("&")
   }
+
+  /** comments may include Japanese characters */
+  //  private[this] def encodeComment(s: String): String = s.getBytes("utf-8").toBase64
+  //
+  //  private[this] def decodeComment(s: String): String = new String(s.toByteArray, "utf-8")
+
 }

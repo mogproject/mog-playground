@@ -10,7 +10,6 @@ import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.{Game, Move, State}
 import com.mogproject.mogami.core.state.StateCache.Implicits._
 
-import scala.scalajs.js.URIUtils.encodeURIComponent
 import scala.util.{Failure, Success, Try}
 
 /**
@@ -34,6 +33,8 @@ trait GameController extends ModeController {
   def gamePosition: GamePosition = GamePosition(displayBranchNo, statusPosition + displayBranch.offset)
 
   override def gameInfo: GameInfo = game.gameInfo
+
+  lazy val argumentsBuilder = ArgumentsBuilder(game, gamePosition, config)
 
   /**
     * Abstract copy method
@@ -180,11 +181,9 @@ trait GameController extends ModeController {
   }
 
   protected def renderUrls(): Unit = {
-    val args = Arguments(game, gamePosition, config = config)
-
-    renderer.updateSnapshotUrl(args.toSnapshotUrl)
-    renderer.updateRecordUrl(args.toRecordUrl)
-    renderer.updateImageLinkUrl(args.toImageLinkUrl)
+    renderer.updateSnapshotUrl(argumentsBuilder.toSnapshotUrl)
+    renderer.updateRecordUrl(argumentsBuilder.toRecordUrl)
+    renderer.updateImageLinkUrl(argumentsBuilder.toImageLinkUrl)
     renderer.updateRecordShortUrl("", completed = false)
     renderer.updateSnapshotShortUrl("", completed = false)
     renderer.updateSfenString(selectedState.toSfenString)

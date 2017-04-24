@@ -19,6 +19,7 @@ lazy val root = (project in file("."))
       "org.scala-js" %%% "scalajs-dom" % "0.9.1",
       "be.doeraene" %%% "scalajs-jquery" % "0.9.1",
       "com.lihaoyi" %%% "scalatags" % "0.6.2",
+//      "com.github.marklister" %%% "base64" % "0.2.3",
       "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
       "org.scalacheck" %%% "scalacheck" % "1.13.4" % Test
     ),
