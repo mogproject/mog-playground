@@ -86,7 +86,7 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
       val initTurn = br.initialState.turn
 
       val xs = (prefix +: getMoves(game, branchNo, lng)).zipWithIndex.map { case (m, i) =>
-        val commentMark = if (br.hasComment(i + 1 + br.offset)) "*" else " "
+        val commentMark = if (br.hasComment(i + br.offset)) "*" else ""
         val indexNotation = if (i == 0) "" else f"${i}%3d: " + (i % 2 == 0).fold(!initTurn, initTurn).toSymbolString()
         commentMark + indexNotation + m
       }
