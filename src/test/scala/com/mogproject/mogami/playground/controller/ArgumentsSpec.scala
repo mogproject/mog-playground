@@ -10,7 +10,7 @@ class ArgumentsSpec extends FlatSpec with MustMatchers with GeneratorDrivenPrope
     Arguments().parseQueryString("") mustBe Arguments()
     Arguments().parseQueryString("?mode=view&mlang=en") mustBe Arguments(config = Configuration(messageLang = English))
     Arguments().parseQueryString("?sfen=lnsgkgsnl%2F1r5b1%2Fppppppppp%2F9%2F9%2F9%2FPPPPPPPPP%2F1B5R1%2FLNSGKGSNL%20b%20-%200%207g7f&mode=view&mlang=en") mustBe Arguments(
-      game = Game(Branch(State.HIRATE).makeMove(MoveBuilderSfen(Left(Square(7, 7)), Square(7, 6), promote = false)).get),
+      sfen = Some("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 0 7g7f"),
       config = Configuration(messageLang = English)
     )
 
