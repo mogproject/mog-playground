@@ -5,6 +5,7 @@ import com.mogproject.mogami._
 import com.mogproject.mogami.core.game.Game.BranchNo
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
 import com.mogproject.mogami.playground.view.EventManageable
+import com.mogproject.mogami.playground.view.parts.control.CommentButton
 import org.scalajs.dom.html.Div
 import org.scalajs.dom.raw.HTMLSelectElement
 import com.mogproject.mogami.util.Implicits._
@@ -133,7 +134,9 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
         div(cls := "btn-group", role := "group", controlInput2),
         div(cls := "btn-group", role := "group", controlInput3)
       )
-    )
+    ),
+    br(),
+    CommentButton.output
   ).render
 
   val outputLongSelector: HTMLSelectElement = recordSelectorLong

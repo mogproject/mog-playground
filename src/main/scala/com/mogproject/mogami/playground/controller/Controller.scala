@@ -172,6 +172,9 @@ object Controller {
 
   def loadRecordText(format: RecordFormat, content: String): Unit = doAction(_.loadRecordText(format, content), _.renderAll())
 
+  // Control Section
+  def setComment(text: String): Unit = doAction(_.setComment(text), _.renderAfterUpdatingComment())
+
   // Action Section
   def setResign(): Unit = doAction({
     case pc: PlayModeController => pc.setResign()

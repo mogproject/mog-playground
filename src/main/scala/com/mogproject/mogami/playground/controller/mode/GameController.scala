@@ -148,6 +148,13 @@ trait GameController extends ModeController {
     */
   override def setGameInfo(gameInfo: GameInfo): Option[ModeController] = Some(this.copy(game = game.copy(gameInfo = gameInfo)))
 
+  /**
+    * Set comments
+    */
+  override def setComment(text: String): Option[ModeController] = {
+    game.updateBranch(displayBranchNo)(br => Some(br.updateComment(gamePosition.position, text))).map(g => this.copy(game = g))
+  }
+
   //
   // renderer
   //
@@ -156,6 +163,13 @@ trait GameController extends ModeController {
     renderState()
     renderControl()
     renderUrls()
+    renderComment()
+  }
+
+  override def renderAfterUpdatingComment(): Unit = {
+    renderControl()
+    renderer.updateRecordUrl(argumentsBuilder.toRecordUrl)
+    renderer.updateRecordShortUrl("", completed = false)
   }
 
   protected def renderState(): Unit = {
@@ -182,11 +196,17 @@ trait GameController extends ModeController {
 
   protected def renderUrls(): Unit = {
     renderer.updateSnapshotUrl(argumentsBuilder.toSnapshotUrl)
-    renderer.updateRecordUrl(argumentsBuilder.toRecordUrl)
-    renderer.updateImageLinkUrl(argumentsBuilder.toImageLinkUrl)
-    renderer.updateRecordShortUrl("", completed = false)
     renderer.updateSnapshotShortUrl("", completed = false)
+
+    renderer.updateRecordUrl(argumentsBuilder.toRecordUrl)
+    renderer.updateRecordShortUrl("", completed = false)
+
+    renderer.updateImageLinkUrl(argumentsBuilder.toImageLinkUrl)
     renderer.updateSfenString(selectedState.toSfenString)
+  }
+
+  protected def renderComment(): Unit = {
+    renderer.updateComment(game.getComment(gamePosition).getOrElse(""))
   }
 
   def shortenSnapshotUrl(shortener: URLShortener): Unit = {

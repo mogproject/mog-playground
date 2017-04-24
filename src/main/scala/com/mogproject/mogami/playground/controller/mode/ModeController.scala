@@ -78,6 +78,8 @@ trait ModeController {
     renderer.updateFlip(config)
   }
 
+  def renderAfterUpdatingComment(): Unit = {}
+
   // cursor check
   def canActivate(cursor: Cursor): Boolean = false
 
@@ -105,6 +107,8 @@ trait ModeController {
   def setControl(controlType: Int): Option[ModeController] = None
 
   def setGameInfo(gameInfo: GameInfo): Option[ModeController] = None
+
+  def setComment(text: String): Option[ModeController] = None
 
   def toggleFlip(): Option[ModeController] = None
 

@@ -26,7 +26,7 @@ case class Arguments(sfen: Option[String] = None, // deprecated
       case (x :: s :: Nil) :: xs if x.startsWith("c") => // comments
         parseGamePosition(x.drop(1)) match {
           case Some(pos) =>
-            val c = comments.updated(pos.branch, comments.getOrElse(pos.branch, Map.empty).updated(pos.position, s))
+            val c = sofar.comments.updated(pos.branch, sofar.comments.getOrElse(pos.branch, Map.empty).updated(pos.position, s))
             f(sofar.copy(comments = c), xs)
           case _ =>
             println(s"Invalid parameter: ${x}=${s}")

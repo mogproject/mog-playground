@@ -9,6 +9,7 @@ import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.playground.view.parts._
+import com.mogproject.mogami.playground.view.parts.control.CommentButton
 import com.mogproject.mogami.playground.view.parts.manage.SaveLoadButton
 import com.mogproject.mogami.playground.view.section._
 import com.mogproject.mogami.util.Implicits._
@@ -413,11 +414,13 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def getSelectedIndex: Int = controlSection.getSelectedIndex
 
-  // control bar
+  // control section
   def updateControlBar(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean): Unit =
     controlSection.updateLabels(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean)
 
   def updateEditResetLabel(lang: Language): Unit = EditReset.updateLabel(lang)
+
+  def updateComment(text: String): Unit = CommentButton.updateComment(text)
 
   // languages
   def updateMessageLang(lang: Language): Unit = MessageLanguageSelector.updateValue(lang)
