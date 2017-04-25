@@ -26,7 +26,7 @@ case class ControlBar(canvasWidth: Int) extends EventManageable {
 
   private[this] val recordSelector: HTMLSelectElement = select(
     cls := "form-control rect-select",
-    width := canvasWidth - CONTROL_WIDTH * 4,
+    width := canvasWidth - CONTROL_WIDTH * 4 + 4,
     onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
   ).render
 
