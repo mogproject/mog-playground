@@ -135,3 +135,7 @@ canvas {
 .input-small {
   font-size: 12px;
 }
+
+.alert {
+  margin-bottom: 10px !important;
+}

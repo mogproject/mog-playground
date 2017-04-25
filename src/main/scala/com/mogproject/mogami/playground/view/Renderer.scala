@@ -387,6 +387,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def showGameInfoModal(config: Configuration, gameInfo: GameInfo): Unit = GameInfoDialog(config, gameInfo).show()
 
+  // share section
   def updateSnapshotUrl(url: String): Unit = SnapshotCopyButton.updateValue(url)
 
   def getSnapshotUrl: String = SnapshotCopyButton.getValue
@@ -403,6 +404,9 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def updateSfenString(sfen: String): Unit = SfenStringCopyButton.updateValue(sfen)
 
+  def updateCommentOmissionWarning(displayWarning: Boolean): Unit = GameMenuSection.updateCommentOmissionWarning(displayWarning)
+
+  // navigator section
   def updateMode(mode: Mode): Unit = navigatorSection.updateMode(mode)
 
   def updateFlip(config: Configuration): Unit = FlipButton.updateValue(config.flip)

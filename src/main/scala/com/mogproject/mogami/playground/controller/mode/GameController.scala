@@ -199,6 +199,8 @@ trait GameController extends ModeController {
 
     renderer.updateSnapshotUrl(argumentsBuilder.toSnapshotUrl)
     renderer.updateSnapshotShortUrl("", completed = false)
+
+    renderer.updateCommentOmissionWarning(argumentsBuilder.commentOmitted)
   }
 
   protected def renderUrls(): Unit = {

@@ -38,4 +38,10 @@ object GameMenuSection extends Section {
       )
     )
   )
+
+  def updateCommentOmissionWarning(displayWarning: Boolean): Unit =
+    if (displayWarning)
+      RecordCopyButton.showWarning()
+    else
+      RecordCopyButton.hideWarning()
 }
