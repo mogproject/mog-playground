@@ -1,6 +1,5 @@
-package com.mogproject.mogami.playground.view.parts.control
+package com.mogproject.mogami.playground.view.parts.common
 
-import com.mogproject.mogami.playground.view.parts.common.CopyButtonLike
 import org.scalajs.dom.html.Div
 
 import scalatags.JsDom.all._
