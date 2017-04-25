@@ -15,7 +15,7 @@ import scalatags.JsDom.all._
 /**
   *
   */
-case class ControlSection(canvasWidth: Int, isMobile: Boolean = false) extends Section with EventManageable {
+case class ControlSection(canvasWidth: Int, isMobile: Boolean) extends Section with EventManageable {
 
   private[this] lazy val commentButton = CommentButton(isMobile)
 

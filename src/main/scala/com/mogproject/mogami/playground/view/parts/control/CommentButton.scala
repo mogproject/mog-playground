@@ -20,6 +20,9 @@ case class CommentButton(isMobile: Boolean) {
     data("toggle") := "tooltip",
     data("trigger") := "manual",
     data("placement") := "top",
+    if (isMobile) {
+      readonly := isMobile
+    } else "",
     onfocus := { () =>
       textClearButton.disabled = false
       textUpdateButton.disabled = false
@@ -61,7 +64,7 @@ case class CommentButton(isMobile: Boolean) {
   lazy val output: Div = div(
     paddingTop := "10px",
     textCommentInput,
-    div(
+    if (isMobile) "" else div(
       cls := "row",
       marginTop := 3,
       div(cls := "col-xs-4 col-lg-3", textClearButton),
@@ -81,7 +84,9 @@ case class CommentButton(isMobile: Boolean) {
   // Operations
   //
   def updateComment(text: String): Unit = {
-    textCommentInput.value = text
-    textClearButton.disabled = text.isEmpty
+    if (!isMobile) {
+      textCommentInput.value = text
+      textClearButton.disabled = text.isEmpty
+    }
   }
 }

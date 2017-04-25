@@ -49,7 +49,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   private[this] val navigatorSection = NavigatorSection(layout)
 
-  private[this] lazy val controlSection = ControlSection(layout.canvasWidth)
+  private[this] lazy val controlSection = ControlSection(layout.canvasWidth, layout.isMobile)
 
   private[this] lazy val mainPane = div(
     div(cls := "navbar",
