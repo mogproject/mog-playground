@@ -119,7 +119,7 @@ case class ArgumentsBuilder(game: Game,
   }
 
   def toSnapshotUrl: String = {
-    createUrl(("u", instantGame.toUsenString) +: gameInfoParams)
+    createUrl(Seq("u" -> instantGame.toUsenString) ++ game.getComment(gamePosition).map("c0" -> _) ++ gameInfoParams)
   }
 
   def toImageLinkUrl: String = {

@@ -168,8 +168,7 @@ trait GameController extends ModeController {
 
   override def renderAfterUpdatingComment(): Unit = {
     renderControl()
-    renderer.updateRecordUrl(argumentsBuilder.toRecordUrl)
-    renderer.updateRecordShortUrl("", completed = false)
+    renderRecordUrls()
   }
 
   protected def renderState(): Unit = {
@@ -194,13 +193,16 @@ trait GameController extends ModeController {
     renderer.updateControlBar(canMoveBackward, canMoveForward)
   }
 
-  protected def renderUrls(): Unit = {
-    renderer.updateSnapshotUrl(argumentsBuilder.toSnapshotUrl)
-    renderer.updateSnapshotShortUrl("", completed = false)
-
+  private[this] def renderRecordUrls(): Unit = {
     renderer.updateRecordUrl(argumentsBuilder.toRecordUrl)
     renderer.updateRecordShortUrl("", completed = false)
 
+    renderer.updateSnapshotUrl(argumentsBuilder.toSnapshotUrl)
+    renderer.updateSnapshotShortUrl("", completed = false)
+  }
+
+  protected def renderUrls(): Unit = {
+    renderRecordUrls()
     renderer.updateImageLinkUrl(argumentsBuilder.toImageLinkUrl)
     renderer.updateSfenString(selectedState.toSfenString)
   }
