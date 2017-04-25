@@ -422,6 +422,10 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def updateComment(text: String): Unit = CommentButton.updateComment(text)
 
+  def setCommentReadOnly(): Unit = CommentButton.setReadOnly()
+
+  def resetCommentReadOnly(): Unit = CommentButton.resetReadOnly()
+
   // languages
   def updateMessageLang(lang: Language): Unit = MessageLanguageSelector.updateValue(lang)
 

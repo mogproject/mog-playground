@@ -19,7 +19,13 @@ object CommentButton {
     placeholder := "Comment",
     data("toggle") := "tooltip",
     data("trigger") := "manual",
-    data("placement") := "top"
+    data("placement") := "top",
+    onfocus := { () =>
+      if (textCommentInput.disabled.isEmpty || !textCommentInput.disabled.get) {
+        textClearButton.disabled = false
+        textUpdateButton.disabled = false
+      }
+    }
   ).render
 
   private[this] lazy val textClearButton: Button = button(
@@ -30,6 +36,9 @@ object CommentButton {
     data("original-title") := s"Clear this comment",
     onclick := { () =>
       textCommentInput.value = ""
+      Controller.setComment("")
+      textClearButton.disabled = true
+      textUpdateButton.disabled = true
       displayCommentInputTooltip("Cleared!")
     },
     "Clear"
@@ -42,7 +51,9 @@ object CommentButton {
     data("placement") := "bottom",
     data("original-title") := s"Update this comment",
     onclick := { () =>
-      Controller.setComment(textCommentInput.value)
+      val text = textCommentInput.value
+      Controller.setComment(text)
+      textUpdateButton.disabled = true
       displayCommentInputTooltip("Updated!")
     },
     "Update"
@@ -68,7 +79,25 @@ object CommentButton {
   }
 
   //
+  // Controls
+  //
+  def setReadOnly(): Unit = {
+    textCommentInput.disabled = true
+    textClearButton.disabled = true
+    textUpdateButton.disabled = true
+  }
+
+  def resetReadOnly(): Unit = {
+    textCommentInput.disabled = false
+    textClearButton.disabled = false
+    textUpdateButton.disabled = false
+  }
+
+  //
   // Operations
   //
-  def updateComment(text: String): Unit = textCommentInput.value = text
+  def updateComment(text: String): Unit = {
+    textCommentInput.value = text
+    textClearButton.disabled = text.isEmpty || (textCommentInput.disabled.isDefined && textCommentInput.disabled.get)
+  }
 }
