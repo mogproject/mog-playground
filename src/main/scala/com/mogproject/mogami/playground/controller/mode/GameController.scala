@@ -191,7 +191,7 @@ trait GameController extends ModeController {
     val index = renderer.getRecordIndex(displayPosition)
     val canMoveBackward = 0 < index
     val canMoveForward = 0 <= displayPosition && displayPosition < renderer.getMaxRecordIndex
-    renderer.updateControlBar(canMoveBackward, canMoveBackward, canMoveForward, canMoveForward)
+    renderer.updateControlBar(canMoveBackward, canMoveForward)
   }
 
   protected def renderUrls(): Unit = {

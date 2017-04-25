@@ -415,8 +415,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
   def getSelectedIndex: Int = controlSection.getSelectedIndex
 
   // control section
-  def updateControlBar(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean): Unit =
-    controlSection.updateLabels(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean)
+  def updateControlBar(backwardEnabled: Boolean, forwardEnabled: Boolean): Unit =
+    controlSection.updateLabels(backwardEnabled: Boolean, forwardEnabled: Boolean)
 
   def updateEditResetLabel(lang: Language): Unit = EditReset.updateLabel(lang)
 
