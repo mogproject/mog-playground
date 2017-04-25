@@ -9,22 +9,20 @@ import scalatags.JsDom.all._
 /**
   *
   */
-object CommentButton {
+case class CommentButton(isMobile: Boolean) {
   //
   // Elements
   //
   private[this] lazy val textCommentInput: TextArea = textarea(
-    cls := "form-control",
-    rows := 5,
+    cls := "form-control input-small",
+    rows := (if (isMobile) 2 else 5),
     placeholder := "Comment",
     data("toggle") := "tooltip",
     data("trigger") := "manual",
     data("placement") := "top",
     onfocus := { () =>
-      if (textCommentInput.disabled.isEmpty || !textCommentInput.disabled.get) {
-        textClearButton.disabled = false
-        textUpdateButton.disabled = false
-      }
+      textClearButton.disabled = false
+      textUpdateButton.disabled = false
     }
   ).render
 
@@ -61,6 +59,7 @@ object CommentButton {
 
   // Layout
   lazy val output: Div = div(
+    paddingTop := "10px",
     textCommentInput,
     div(
       cls := "row",
@@ -79,25 +78,10 @@ object CommentButton {
   }
 
   //
-  // Controls
-  //
-  def setReadOnly(): Unit = {
-    textCommentInput.disabled = true
-    textClearButton.disabled = true
-    textUpdateButton.disabled = true
-  }
-
-  def resetReadOnly(): Unit = {
-    textCommentInput.disabled = false
-    textClearButton.disabled = false
-    textUpdateButton.disabled = false
-  }
-
-  //
   // Operations
   //
   def updateComment(text: String): Unit = {
     textCommentInput.value = text
-    textClearButton.disabled = text.isEmpty || (textCommentInput.disabled.isDefined && textCommentInput.disabled.get)
+    textClearButton.disabled = text.isEmpty
   }
 }

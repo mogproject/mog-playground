@@ -420,11 +420,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def updateEditResetLabel(lang: Language): Unit = EditReset.updateLabel(lang)
 
-  def updateComment(text: String): Unit = CommentButton.updateComment(text)
-
-  def setCommentReadOnly(): Unit = CommentButton.setReadOnly()
-
-  def resetCommentReadOnly(): Unit = CommentButton.resetReadOnly()
+  def updateComment(text: String): Unit = controlSection.updateComment(text)
 
   // languages
   def updateMessageLang(lang: Language): Unit = MessageLanguageSelector.updateValue(lang)

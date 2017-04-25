@@ -15,7 +15,9 @@ import scalatags.JsDom.all._
 /**
   *
   */
-case class ControlSection(canvasWidth: Int) extends Section with EventManageable {
+case class ControlSection(canvasWidth: Int, isMobile: Boolean = false) extends Section with EventManageable {
+
+  private[this] lazy val commentButton = CommentButton(isMobile)
 
   private[this] val CONTROL_WIDTH = 48
   private[this] val LONG_LIST_SIZE = 36
@@ -88,7 +90,7 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
 
       val xs = (prefix +: getMoves(game, branchNo, lng)).zipWithIndex.map { case (m, i) =>
         val commentMark = if (br.hasComment(i + br.offset)) "*" else ""
-        val indexNotation = if (i == 0) "" else f"${i}%3d: " + (i % 2 == 0).fold(!initTurn, initTurn).toSymbolString()
+        val indexNotation = if (i == 0) "" else s"${i}: " + (i % 2 == 0).fold(!initTurn, initTurn).toSymbolString()
         commentMark + indexNotation + m
       }
 
@@ -135,8 +137,7 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
         div(cls := "btn-group", role := "group", controlInput3)
       )
     ),
-    br(),
-    CommentButton.output
+    commentButton.output
   ).render
 
   val outputLongSelector: HTMLSelectElement = recordSelectorLong
@@ -147,6 +148,8 @@ case class ControlSection(canvasWidth: Int) extends Section with EventManageable
     controlInput2.disabled = !forwardEnabled
     controlInput3.disabled = !stepForwardEnabled
   }
+
+  def updateComment(text: String): Unit = commentButton.updateComment(text)
 
   override def show(): Unit = {
     output.style.display = display.block.v

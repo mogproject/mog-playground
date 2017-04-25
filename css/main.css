@@ -131,3 +131,7 @@ canvas {
   -o-transition: height 0.01s;
   transition: height 0.01s;
 }
+
+.input-small {
+  font-size: 12px;
+}

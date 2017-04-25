@@ -21,12 +21,10 @@ case class ViewModeController(renderer: Renderer,
     */
   override def initialize(): Unit = {
     super.initialize()
-    renderer.setCommentReadOnly()
   }
 
   override def terminate(): Unit = {
     super.terminate()
-    renderer.resetCommentReadOnly()
   }
 
   override def copy(config: Configuration,
