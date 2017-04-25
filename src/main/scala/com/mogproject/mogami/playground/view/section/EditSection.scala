@@ -1,7 +1,7 @@
 package com.mogproject.mogami.playground.view.section
 
-import com.mogproject.mogami.playground.view.parts.EditReset
 import com.mogproject.mogami.playground.view.parts.common.AccordionMenu
+import com.mogproject.mogami.playground.view.parts.edit.EditReset
 
 import scalatags.JsDom.all._
 

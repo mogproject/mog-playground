@@ -8,9 +8,13 @@ import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.modal._
-import com.mogproject.mogami.playground.view.parts._
-import com.mogproject.mogami.playground.view.parts.control.CommentButton
+
+// todo: don't use parts directly but use only sections
+import com.mogproject.mogami.playground.view.parts.edit.EditReset
+import com.mogproject.mogami.playground.view.parts.language.{MessageLanguageSelector, PieceLanguageSelector, RecordLanguageSelector}
 import com.mogproject.mogami.playground.view.parts.manage.SaveLoadButton
+import com.mogproject.mogami.playground.view.parts.navigator.FlipButton
+import com.mogproject.mogami.playground.view.parts.share._
 import com.mogproject.mogami.playground.view.section._
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.util.MapUtil

@@ -1,6 +1,6 @@
-package com.mogproject.mogami.playground.view.parts
+package com.mogproject.mogami.playground.view.parts.share
 
-import com.mogproject.mogami.playground.view.parts.common.DropdownMenu
+import com.mogproject.mogami.playground.view.parts.common.{CopyButtonLike, DropdownMenu}
 import org.scalajs.dom.html.Div
 
 import scalatags.JsDom.all._

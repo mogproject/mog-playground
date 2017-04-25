@@ -1,8 +1,8 @@
 package com.mogproject.mogami.playground.view.section
 
-import com.mogproject.mogami.playground.view.parts._
 import com.mogproject.mogami.playground.view.parts.common.AccordionMenu
 import com.mogproject.mogami.playground.view.parts.manage.SaveLoadButton
+import com.mogproject.mogami.playground.view.parts.share._
 
 import scalatags.JsDom.all._
 

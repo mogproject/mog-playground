@@ -1,7 +1,7 @@
 package com.mogproject.mogami.playground.view.section
 
 import com.mogproject.mogami.playground.view.parts.common.AccordionMenu
-import com.mogproject.mogami.playground.view.parts.{MessageLanguageSelector, PieceLanguageSelector, RecordLanguageSelector}
+import com.mogproject.mogami.playground.view.parts.language.{MessageLanguageSelector, PieceLanguageSelector, RecordLanguageSelector}
 
 import scalatags.JsDom.all._
 
