@@ -1,4 +1,4 @@
-package com.mogproject.mogami.playground.view.parts
+package com.mogproject.mogami.playground.view.parts.common
 
 import org.scalajs.dom.html.Div
 

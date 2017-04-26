@@ -17,7 +17,7 @@ object RecordFormat {
     val ls = s.split("\n")
     if (ls.exists(x => x.startsWith("▲") || x.startsWith("△")))
       KI2
-    else if (ls.exists(x => x.startsWith("先手：")))
+    else if (ls.exists(x => x.startsWith("先手：") || x.startsWith("上手：")))
       KIF
     else
       CSA

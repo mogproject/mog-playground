@@ -1,7 +1,8 @@
-package com.mogproject.mogami.playground.view.parts
+package com.mogproject.mogami.playground.view.parts.navigator
 
-import com.mogproject.mogami.playground.controller.{Controller, English}
 import com.mogproject.mogami.playground.controller.mode.{Editing, Mode, Playing, Viewing}
+import com.mogproject.mogami.playground.controller.{Controller, English}
+import com.mogproject.mogami.playground.view.parts.common.ButtonLike
 import org.scalajs.dom.html.{Anchor, Div}
 
 import scalatags.JsDom.all._

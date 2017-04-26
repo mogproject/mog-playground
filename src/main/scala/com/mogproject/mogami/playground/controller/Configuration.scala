@@ -11,6 +11,7 @@ import scala.scalajs.js.UndefOr
   *
   */
 case class Configuration(screenWidth: Double = 375.0,
+                         defaultIsMobile: Option[Boolean] = None,
                          layoutSize: Int = 0,
                          messageLang: Language = Configuration.browserLanguage,
                          recordLang: Language = Configuration.browserLanguage,
@@ -19,7 +20,7 @@ case class Configuration(screenWidth: Double = 375.0,
                          baseUrl: String = ""
                         ) {
   val layout: Layout = {
-    val isMobile: Boolean = screenWidth < 768
+    val isMobile: Boolean = defaultIsMobile.getOrElse(screenWidth < 768)
 
     if (layoutSize > 0)
       Layout(layoutSize, isMobile)

@@ -138,7 +138,6 @@ object SaveLoadButton {
   //
   // layout
   //
-
   lazy val output: Div = div(
     label("Load from File"),
     div(

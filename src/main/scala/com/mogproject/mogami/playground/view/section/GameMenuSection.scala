@@ -1,8 +1,8 @@
 package com.mogproject.mogami.playground.view.section
 
-import com.mogproject.mogami.playground.view.parts._
 import com.mogproject.mogami.playground.view.parts.common.AccordionMenu
 import com.mogproject.mogami.playground.view.parts.manage.SaveLoadButton
+import com.mogproject.mogami.playground.view.parts.share._
 
 import scalatags.JsDom.all._
 
@@ -17,11 +17,11 @@ object GameMenuSection extends Section {
       isExpanded = true,
       isVisible = true,
       div(
-        SnapshotCopyButton.output,
-        SnapshotShortenButton.output,
-        br(),
         RecordCopyButton.output,
         RecordShortenButton.output,
+        br(),
+        SnapshotCopyButton.output,
+        SnapshotShortenButton.output,
         br(),
         ImageLinkButton.output,
         br(),
@@ -38,4 +38,10 @@ object GameMenuSection extends Section {
       )
     )
   )
+
+  def updateCommentOmissionWarning(displayWarning: Boolean): Unit =
+    if (displayWarning)
+      RecordCopyButton.showWarning()
+    else
+      RecordCopyButton.hideWarning()
 }

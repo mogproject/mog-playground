@@ -1,13 +1,11 @@
 package com.mogproject.mogami.playground.controller.mode
 
 import com.mogproject.mogami._
-import com.mogproject.mogami.core.Game.GameStatus
-import com.mogproject.mogami.core.GameInfo
-import com.mogproject.mogami.core.State.BoardType
 import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.view.Renderer
 import com.mogproject.mogami.util.MapUtil
 import com.mogproject.mogami.util.Implicits._
+import com.mogproject.mogami.core.state.StateCache.Implicits._
 
 import scala.util.{Failure, Success, Try}
 
@@ -31,7 +29,7 @@ case class EditModeController(renderer: Renderer,
     renderer.expandCanvas()
     renderer.drawBoard()
     renderer.showEditSection()
-    renderer.updateRecordContent(Game(), config.recordLang)
+    renderer.updateRecordContent(Game(), 0, config.recordLang)
     renderer.drawPieceBox()
     renderAll()
   }
@@ -124,8 +122,8 @@ case class EditModeController(renderer: Renderer,
     Try(State(turn, board, hand, None)) match {
       case Success(st) =>
         nextMode match {
-          case Playing => Some(PlayModeController(renderer, config, Game(st, gameInfo = gameInfo), 0))
-          case Viewing => Some(ViewModeController(renderer, config, Game(st, gameInfo = gameInfo), 0))
+          case Playing => Some(PlayModeController(renderer, config, Game(Branch(st), gameInfo = gameInfo), 0, 0))
+          case Viewing => Some(ViewModeController(renderer, config, Game(Branch(st), gameInfo = gameInfo), 0, 0))
           case Editing => None
         }
       case Failure(e) =>

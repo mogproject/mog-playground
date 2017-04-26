@@ -1,7 +1,6 @@
 package com.mogproject.mogami.playground.controller.mode
 
-import com.mogproject.mogami.core.GameInfo
-import com.mogproject.mogami.core.Player.{BLACK, WHITE}
+import com.mogproject.mogami._
 import com.mogproject.mogami.{Player, State}
 import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.io.RecordFormat
@@ -79,6 +78,8 @@ trait ModeController {
     renderer.updateFlip(config)
   }
 
+  def renderAfterUpdatingComment(updateTextArea: Boolean): Unit = {}
+
   // cursor check
   def canActivate(cursor: Cursor): Boolean = false
 
@@ -106,6 +107,8 @@ trait ModeController {
   def setControl(controlType: Int): Option[ModeController] = None
 
   def setGameInfo(gameInfo: GameInfo): Option[ModeController] = None
+
+  def setComment(text: String): Option[ModeController] = None
 
   def toggleFlip(): Option[ModeController] = None
 

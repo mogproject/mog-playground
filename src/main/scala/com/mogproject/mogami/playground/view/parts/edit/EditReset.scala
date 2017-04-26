@@ -1,7 +1,8 @@
-package com.mogproject.mogami.playground.view.parts
+package com.mogproject.mogami.playground.view.parts.edit
 
-import com.mogproject.mogami.core.State
+import com.mogproject.mogami.State
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
+import com.mogproject.mogami.playground.view.parts.common.ButtonLike
 import org.scalajs.dom.html.{Button, Div}
 
 import scalatags.JsDom.all._

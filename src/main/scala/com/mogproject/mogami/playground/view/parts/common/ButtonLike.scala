@@ -1,4 +1,4 @@
-package com.mogproject.mogami.playground.view.parts
+package com.mogproject.mogami.playground.view.parts.common
 
 import com.mogproject.mogami.playground.controller.Language
 import com.mogproject.mogami.playground.view.EventManageable

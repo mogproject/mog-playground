@@ -1,4 +1,6 @@
-package com.mogproject.mogami.playground.view.parts
+package com.mogproject.mogami.playground.view.parts.share
+
+import com.mogproject.mogami.playground.view.parts.common.CopyButtonLike
 
 /**
   *

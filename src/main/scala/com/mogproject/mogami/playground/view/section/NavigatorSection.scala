@@ -2,7 +2,7 @@ package com.mogproject.mogami.playground.view.section
 
 import com.mogproject.mogami.playground.controller.mode.{Editing, Mode, Playing, Viewing}
 import com.mogproject.mogami.playground.view.Layout
-import com.mogproject.mogami.playground.view.parts.{FlipButton, MenuButton, ModeSelector}
+import com.mogproject.mogami.playground.view.parts.navigator.{FlipButton, MenuButton, ModeSelector}
 import org.scalajs.dom.html.Div
 
 import scalatags.JsDom.all._

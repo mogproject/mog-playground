@@ -1,17 +1,20 @@
 package com.mogproject.mogami.playground.view
 
 import com.mogproject.mogami._
-import com.mogproject.mogami.core.Game.GameStatus
-import com.mogproject.mogami.core.Game.GameStatus.GameStatus
-import com.mogproject.mogami.core.GameInfo
+import com.mogproject.mogami.core.game.Game.BranchNo
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.modal._
-import com.mogproject.mogami.playground.view.parts._
+
+// todo: don't use parts directly but use only sections
+import com.mogproject.mogami.playground.view.parts.edit.EditReset
+import com.mogproject.mogami.playground.view.parts.language.{MessageLanguageSelector, PieceLanguageSelector, RecordLanguageSelector}
 import com.mogproject.mogami.playground.view.parts.manage.SaveLoadButton
+import com.mogproject.mogami.playground.view.parts.navigator.FlipButton
+import com.mogproject.mogami.playground.view.parts.share._
 import com.mogproject.mogami.playground.view.section._
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.util.MapUtil
@@ -50,7 +53,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   private[this] val navigatorSection = NavigatorSection(layout)
 
-  private[this] lazy val controlSection = ControlSection(layout.canvasWidth)
+  private[this] lazy val controlSection = ControlSection(layout.canvasWidth, layout.isMobile)
 
   private[this] lazy val mainPane = div(
     div(cls := "navbar",
@@ -384,6 +387,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def showGameInfoModal(config: Configuration, gameInfo: GameInfo): Unit = GameInfoDialog(config, gameInfo).show()
 
+  // share section
   def updateSnapshotUrl(url: String): Unit = SnapshotCopyButton.updateValue(url)
 
   def getSnapshotUrl: String = SnapshotCopyButton.getValue
@@ -400,12 +404,15 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def updateSfenString(sfen: String): Unit = SfenStringCopyButton.updateValue(sfen)
 
+  def updateCommentOmissionWarning(displayWarning: Boolean): Unit = GameMenuSection.updateCommentOmissionWarning(displayWarning)
+
+  // navigator section
   def updateMode(mode: Mode): Unit = navigatorSection.updateMode(mode)
 
   def updateFlip(config: Configuration): Unit = FlipButton.updateValue(config.flip)
 
   // record
-  def updateRecordContent(game: Game, lng: Language): Unit = controlSection.updateRecordContent(game, lng)
+  def updateRecordContent(game: Game, branchNo: BranchNo, lng: Language): Unit = controlSection.updateRecordContent(game, branchNo, lng)
 
   def updateRecordIndex(index: Int): Unit = controlSection.updateRecordIndex(index)
 
@@ -415,11 +422,15 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def getSelectedIndex: Int = controlSection.getSelectedIndex
 
-  // control bar
-  def updateControlBar(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean): Unit =
-    controlSection.updateLabels(stepBackwardEnabled: Boolean, backwardEnabled: Boolean, forwardEnabled: Boolean, stepForwardEnabled: Boolean)
+  // control section
+  def updateControlBar(backwardEnabled: Boolean, forwardEnabled: Boolean): Unit =
+    controlSection.updateLabels(backwardEnabled: Boolean, forwardEnabled: Boolean)
 
   def updateEditResetLabel(lang: Language): Unit = EditReset.updateLabel(lang)
+
+  def updateComment(text: String): Unit = controlSection.updateComment(text)
+
+  def showCommentModal(config: Configuration): Unit = CommentDialog(config, controlSection.getComment).show()
 
   // languages
   def updateMessageLang(lang: Language): Unit = MessageLanguageSelector.updateValue(lang)

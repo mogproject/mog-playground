@@ -1,8 +1,6 @@
 package com.mogproject.mogami.playground.view.modal
 
-import com.mogproject.mogami.Player
-import com.mogproject.mogami.core.GameInfo
-import com.mogproject.mogami.core.Player.{BLACK, WHITE}
+import com.mogproject.mogami._
 import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import org.scalajs.dom.html.{Div, Input}
