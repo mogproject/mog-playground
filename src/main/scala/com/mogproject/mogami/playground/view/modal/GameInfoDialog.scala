@@ -2,22 +2,20 @@ package com.mogproject.mogami.playground.view.modal
 
 import com.mogproject.mogami._
 import com.mogproject.mogami.playground.controller._
-import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
-import org.scalajs.dom.html.{Div, Input}
-import org.scalajs.jquery.jQuery
+import com.mogproject.mogami.playground.view.modal.common.ModalLike
+import org.scalajs.dom.html.Input
+import org.scalajs.jquery.JQuery
 
 import scalatags.JsDom.all._
 
 /**
   * Game information dialog
   */
-case class GameInfoDialog(config: Configuration, gameInfo: GameInfo) {
+case class GameInfoDialog(config: Configuration, gameInfo: GameInfo) extends ModalLike {
 
-  private[this] val title = config.messageLang match {
-    case Japanese => "対局情報"
-    case English => "Game Information"
-  }
-
+  //
+  // game info specific
+  //
   private[this] val nameLabel = config.messageLang match {
     case Japanese => "対局者名"
     case English => "Player Names"
@@ -43,61 +41,44 @@ case class GameInfoDialog(config: Configuration, gameInfo: GameInfo) {
   private[this] def getGameInfo: GameInfo =
     gameInfo.copy(tags = tagNames.map { case (p, t) => t -> inputNames(p).value })
 
-  private[this] val elem: Div =
-    div(cls := "modal face", tabindex := "-1", role := "dialog",
-      div(cls := "modal-dialog", role := "document",
-        div(cls := "modal-content",
-          // header
-          div(cls := "modal-header",
-            h4(cls := "modal-title", float := "left", title),
-            button(tpe := "button", cls := "close", data("dismiss") := "modal", aria.label := "Close",
-              span(aria.hidden := true, raw("&times;"))
-            )
-          ),
+  //
+  // modal traits
+  //
+  override val title: String = config.messageLang match {
+    case Japanese => "対局情報"
+    case English => "Game Information"
+  }
 
-          form(
-            // body
-            div(cls := "modal-body",
-              label(nameLabel),
+  override val modalBody: ElemType = div(bodyDefinition,
+    label(nameLabel),
+    div(cls := "row",
+      marginBottom := 3,
+      div(cls := "col-xs-4 small-padding", textAlign := "right", marginTop := 6, label("☗")),
+      div(cls := "col-xs-8", inputNames(BLACK))
+    ),
+    div(cls := "row",
+      div(cls := "col-xs-4 small-padding", textAlign := "right", marginTop := 6, label("☖")),
+      div(cls := "col-xs-8", inputNames(WHITE))
+    )
+  )
 
-              div(cls := "row",
-                marginBottom := 3,
-                div(cls := "col-xs-4 small-padding", textAlign := "right", marginTop := 6, label("☗")),
-                div(cls := "col-xs-8", inputNames(BLACK))
-              ),
-              div(cls := "row",
-                div(cls := "col-xs-4 small-padding", textAlign := "right", marginTop := 6, label("☖")),
-                div(cls := "col-xs-8", inputNames(WHITE))
-              )
-            ),
-
-            // footer
-            div(cls := "modal-footer",
-              div(cls := "row",
-                div(cls := "col-xs-4 col-xs-offset-8 col-md-3 col-md-offset-9",
-                  button(
-                    tpe := "submit", cls := "btn btn-default btn-block", data("dismiss") := "modal",
-                    onclick := { () => Controller.setGameInfo(getGameInfo) },
-                    "Update"
-                  )
-                )
-              )
-            )
-          )
+  override val modalFooter: ElemType = div(footerDefinition,
+    div(cls := "row",
+      div(cls := "col-xs-4 col-xs-offset-8 col-md-3 col-md-offset-9",
+        button(
+          tpe := "submit", cls := "btn btn-default btn-block", data("dismiss") := "modal",
+          onclick := { () => Controller.setGameInfo(getGameInfo) },
+          "Update"
         )
       )
-    ).render
+    )
+  )
 
-  def show(): Unit = {
-    val dialog = jQuery(elem)
+  override def initialize(dialog: JQuery): Unit = {
     dialog.on("show.bs.modal", () ⇒ {
       // todo: this doesn't work
       inputNames(BLACK).focus()
     })
-    dialog.on("hidden.bs.modal", () ⇒ {
-      // Remove from DOM
-      dialog.remove()
-    })
-    dialog.asInstanceOf[BootstrapJQuery].modal("show")
   }
+
 }
