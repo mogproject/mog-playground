@@ -75,7 +75,7 @@ case class CommentButton(isDisplayOnly: Boolean, isModal: Boolean, text: String 
 
   // Layout
   lazy val output: Div = div(
-    paddingTop := "10px",
+    paddingTop := isDisplayOnly.fold(3, 10),
     textCommentInput,
     if (isDisplayOnly) "" else div(
       cls := "row",

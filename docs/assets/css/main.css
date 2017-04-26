@@ -8,7 +8,7 @@
   display: block;
   height: 29px;
   min-height:29px !important;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .navbar-header {
@@ -130,4 +130,12 @@ canvas {
   -ms-transition: height 0.01s;
   -o-transition: height 0.01s;
   transition: height 0.01s;
+}
+
+.input-small {
+  font-size: 12px;
+}
+
+.alert {
+  margin-bottom: 10px !important;
 }
