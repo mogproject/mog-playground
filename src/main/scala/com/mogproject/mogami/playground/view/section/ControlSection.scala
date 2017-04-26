@@ -14,8 +14,7 @@ import scalatags.JsDom.all._
 case class ControlSection(canvasWidth: Int, isMobile: Boolean) extends Section {
 
   private[this] lazy val controlBar = ControlBar(canvasWidth)
-  private[this] lazy val commentButton = CommentButton(isMobile)
-
+  private[this] lazy val commentButton = CommentButton(isDisplayOnly = isMobile, isModal = false)
 
   override def initialize(): Unit = {
     controlBar.initialize()
@@ -45,6 +44,8 @@ case class ControlSection(canvasWidth: Int, isMobile: Boolean) extends Section {
   def updateRecordContent(game: Game, branchNo: BranchNo, lng: Language): Unit = controlBar.updateRecordContent(game, branchNo, lng)
 
   def updateComment(text: String): Unit = commentButton.updateComment(text)
+
+  def getComment: String = commentButton.getComment
 
   override def show(): Unit = {
     output.style.display = display.block.v

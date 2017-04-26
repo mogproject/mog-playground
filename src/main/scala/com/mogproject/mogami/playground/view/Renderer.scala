@@ -430,6 +430,8 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
 
   def updateComment(text: String): Unit = controlSection.updateComment(text)
 
+  def showCommentModal(config: Configuration): Unit = CommentDialog(config, controlSection.getComment).show()
+
   // languages
   def updateMessageLang(lang: Language): Unit = MessageLanguageSelector.updateValue(lang)
 

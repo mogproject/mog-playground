@@ -78,6 +78,13 @@ case class Arguments(sfen: Option[String] = None, // deprecated
           println(s"Invalid parameter: size=${s}")
           f(sofar, xs)
       }
+      case ("mobile" :: s :: Nil) :: xs => s.toLowerCase match {
+        case "true" => f(sofar.copy(config = sofar.config.copy(defaultIsMobile = Some(true))), xs)
+        case "false" => f(sofar.copy(config = sofar.config.copy(defaultIsMobile = Some(false))), xs)
+        case _ =>
+          println(s"Invalid parameter: mobile=${s}")
+          f(sofar, xs)
+      }
       case ("bn" :: s :: Nil) :: xs => f(sofar.copy(gameInfo = sofar.gameInfo.updated('blackName, s)), xs)
       case ("wn" :: s :: Nil) :: xs => f(sofar.copy(gameInfo = sofar.gameInfo.updated('whiteName, s)), xs)
       case _ :: xs => f(sofar, xs)

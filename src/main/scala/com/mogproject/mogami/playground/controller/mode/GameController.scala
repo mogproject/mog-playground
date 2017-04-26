@@ -166,7 +166,8 @@ trait GameController extends ModeController {
     renderComment()
   }
 
-  override def renderAfterUpdatingComment(): Unit = {
+  override def renderAfterUpdatingComment(updateTextArea: Boolean): Unit = {
+    if (updateTextArea) renderComment()
     renderControl()
     renderRecordUrls()
   }

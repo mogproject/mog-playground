@@ -173,7 +173,9 @@ object Controller {
   def loadRecordText(format: RecordFormat, content: String): Unit = doAction(_.loadRecordText(format, content), _.renderAll())
 
   // Control Section
-  def setComment(text: String): Unit = doAction(_.setComment(text), _.renderAfterUpdatingComment())
+  def setComment(text: String, updateTextArea: Boolean): Unit = doAction(_.setComment(text), _.renderAfterUpdatingComment(updateTextArea))
+
+  def showCommentModal(): Unit = modeController.get.renderer.showCommentModal(modeController.get.config)
 
   // Action Section
   def setResign(): Unit = doAction({

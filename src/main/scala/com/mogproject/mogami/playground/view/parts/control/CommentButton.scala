@@ -1,5 +1,6 @@
 package com.mogproject.mogami.playground.view.parts.control
 
+import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.controller.Controller
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import org.scalajs.dom.html.{Button, Div, TextArea}
@@ -9,53 +10,65 @@ import scalatags.JsDom.all._
 /**
   *
   */
-case class CommentButton(isMobile: Boolean) {
+case class CommentButton(isDisplayOnly: Boolean, isModal: Boolean, text: String = "") {
+
   //
   // Elements
   //
-  private[this] lazy val textCommentInput: TextArea = textarea(
+  lazy val textCommentInput: TextArea = textarea(
     cls := "form-control input-small",
-    rows := (if (isMobile) 2 else 5),
+    rows := isDisplayOnly.fold(2, isModal.fold(10, 5)),
     placeholder := "Comment",
     data("toggle") := "tooltip",
     data("trigger") := "manual",
     data("placement") := "top",
-    if (isMobile) {
-      readonly := isMobile
+    if (isDisplayOnly) {
+      readonly := true
     } else "",
-    onfocus := { () =>
-      textClearButton.disabled = false
-      textUpdateButton.disabled = false
-    }
+    if (isDisplayOnly) {
+      onclick := { () => Controller.showCommentModal() }
+    } else {
+      onfocus := { () =>
+        textClearButton.disabled = false
+        textUpdateButton.disabled = false
+      }
+    },
+    text
   ).render
 
-  private[this] lazy val textClearButton: Button = button(
+  lazy val textClearButton: Button = button(
     tpe := "button",
     cls := "btn btn-default btn-block",
     data("toggle") := "tooltip",
     data("placement") := "bottom",
     data("original-title") := s"Clear this comment",
+    data("dismiss") := "modal",
     onclick := { () =>
       textCommentInput.value = ""
-      Controller.setComment("")
-      textClearButton.disabled = true
-      textUpdateButton.disabled = true
-      displayCommentInputTooltip("Cleared!")
+      Controller.setComment("", isModal)
+      if (!isModal) {
+        textClearButton.disabled = true
+        textUpdateButton.disabled = true
+        displayCommentInputTooltip("Cleared!")
+      }
     },
     "Clear"
   ).render
 
-  private[this] lazy val textUpdateButton: Button = button(
+  lazy val textUpdateButton: Button = button(
     tpe := "button",
     cls := "btn btn-default btn-block",
     data("toggle") := "tooltip",
     data("placement") := "bottom",
     data("original-title") := s"Update this comment",
+    data("dismiss") := "modal",
     onclick := { () =>
       val text = textCommentInput.value
-      Controller.setComment(text)
-      textUpdateButton.disabled = true
-      displayCommentInputTooltip("Updated!")
+      Controller.setComment(text, isModal)
+      if (!isModal) {
+        textUpdateButton.disabled = true
+        displayCommentInputTooltip("Updated!")
+      }
     },
     "Update"
   ).render
@@ -64,7 +77,7 @@ case class CommentButton(isMobile: Boolean) {
   lazy val output: Div = div(
     paddingTop := "10px",
     textCommentInput,
-    if (isMobile) "" else div(
+    if (isDisplayOnly) "" else div(
       cls := "row",
       marginTop := 3,
       div(cls := "col-xs-4 col-lg-3", textClearButton),
@@ -84,9 +97,11 @@ case class CommentButton(isMobile: Boolean) {
   // Operations
   //
   def updateComment(text: String): Unit = {
-    if (!isMobile) {
-      textCommentInput.value = text
+    textCommentInput.value = text
+    if (!isDisplayOnly) {
       textClearButton.disabled = text.isEmpty
     }
   }
+
+  def getComment: String = textCommentInput.value
 }

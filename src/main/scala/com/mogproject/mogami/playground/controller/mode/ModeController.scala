@@ -78,7 +78,7 @@ trait ModeController {
     renderer.updateFlip(config)
   }
 
-  def renderAfterUpdatingComment(): Unit = {}
+  def renderAfterUpdatingComment(updateTextArea: Boolean): Unit = {}
 
   // cursor check
   def canActivate(cursor: Cursor): Boolean = false
