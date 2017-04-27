@@ -52,7 +52,7 @@ case class PlayModeController(renderer: Renderer,
     case _ => false
   }
 
-  private[this] def canResign: Boolean = (displayBranch.finalAction, game.status, displayPosition - game.moves.length) match {
+  private[this] def canResign: Boolean = (displayBranch.finalAction, displayBranch.status, displayPosition - currentMoves.length) match {
     case (Some(_), _, n) => n <= 0
     case (_, Mated | GameStatus.Playing, _) => true
     case (_, _, n) => n < 0

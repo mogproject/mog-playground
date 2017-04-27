@@ -30,6 +30,8 @@ trait GameController extends ModeController {
     throw new RuntimeException(s"failed to select branch: ${displayBranchNo}")
   )
 
+  lazy val currentMoves: Vector[Move] = game.getAllMoves(displayBranchNo)
+
   def gamePosition: GamePosition = GamePosition(displayBranchNo, statusPosition + displayBranch.offset)
 
   override def gameInfo: GameInfo = game.gameInfo
@@ -61,14 +63,14 @@ trait GameController extends ModeController {
     case _ => 1
   })
 
-  protected val statusPosition: Int = math.min(displayPosition, game.moves.length)
+  protected val statusPosition: Int = math.min(displayPosition, currentMoves.length)
 
   protected val lastStatusPosition: Int = displayBranch.moves.length
 
   protected def getLastMove: Option[Move] = (displayPosition, statusPosition, displayBranch.finalAction) match {
     case (x, _, Some(IllegalMove(mv))) if lastStatusPosition < x => Some(mv)
     case (_, 0, _) => None
-    case _ => Some(game.moves(statusPosition - 1))
+    case _ => Some(currentMoves(statusPosition - 1))
   }
 
   protected def isLastStatusPosition: Boolean =
@@ -88,7 +90,7 @@ trait GameController extends ModeController {
     case Editing =>
       val st = selectedState
       val mc = Some(EditModeController(renderer, config, st.turn, st.board, st.hand, st.unusedPtypeCount, game.gameInfo))
-      game.moves.isEmpty.fold(mc, {
+      currentMoves.isEmpty.fold(mc, {
         renderer.askConfirm(config.messageLang, () => Controller.update(mc))
         None
       })
@@ -131,8 +133,8 @@ trait GameController extends ModeController {
       case 0 => Some(this.copy(displayPosition = 0))
       case 1 => Some(this.copy(displayPosition = math.max(0, renderer.getSelectedIndex - 1)))
       case 2 =>
-        if (statusPosition < game.moves.length) {
-          val sq = game.moves(statusPosition).to
+        if (statusPosition < currentMoves.length) {
+          val sq = currentMoves(statusPosition).to
           renderer.flashCursor(Cursor(config.flip.fold(!sq, sq)))
         }
         Some(this.copy(displayPosition = renderer.getSelectedIndex + 1))
@@ -178,7 +180,7 @@ trait GameController extends ModeController {
       case _ => renderer.drawPieces(config, selectedState)
     }
 
-    renderer.drawIndicators(config, selectedState.turn, isLastStatusPosition.fold(game.status, GameStatus.Playing))
+    renderer.drawIndicators(config, selectedState.turn, isLastStatusPosition.fold(displayBranch.status, GameStatus.Playing))
     renderer.drawLastMove(config, getLastMove)
   }
 
@@ -248,7 +250,7 @@ trait GameController extends ModeController {
     result match {
       case Success(g) =>
         renderer.displayFileLoadMessage(s"Loaded: ${fileName}")
-        renderer.displayFileLoadTooltip(s"Loaded! (${g.moves.length} moves)")
+        renderer.displayFileLoadTooltip(getToolTipMessage(g))
         renderer.hideMenuModal(1000)
         Some(ViewModeController(this.renderer, this.config, g, 0, 0))
       case Failure(e) =>
@@ -269,7 +271,7 @@ trait GameController extends ModeController {
       case Success(g) =>
         renderer.displayFileLoadMessage("")
         renderer.displayTextLoadMessage("")
-        renderer.displayTextLoadTooltip(s"Loaded! (${g.moves.length} moves)")
+        renderer.displayTextLoadTooltip(getToolTipMessage(g))
         renderer.hideMenuModal(1000)
         Some(ViewModeController(this.renderer, this.config, g, 0, 0))
       case Failure(e) =>
@@ -277,5 +279,10 @@ trait GameController extends ModeController {
         renderer.displayTextLoadTooltip("Failed!")
         None
     }
+  }
+
+  private[this] def getToolTipMessage(g: Game): String = {
+    val ss = Seq(s"${g.trunk.moves.length} moves") ++ g.branches.nonEmpty.option(s"${g.branches.length} branches")
+    s"Loaded! (${ss.mkString(", ")})"
   }
 }

@@ -91,7 +91,7 @@ case class ControlBar(canvasWidth: Int) extends EventManageable {
         commentMark + indexNotation + m
       }
 
-      val suffix = (game.status, lng) match {
+      val suffix = (br.status, lng) match {
         case (GameStatus.Mated, Japanese) => List("詰み")
         case (GameStatus.Mated, English) => List("Mated")
         case (GameStatus.Drawn, Japanese) => List("千日手")
