@@ -3,9 +3,11 @@ package com.mogproject.mogami.playground.view.parts.branch
 import com.mogproject.mogami.{BranchNo, Game, Move}
 import com.mogproject.mogami.core.game.Game.GamePosition
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
+import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.parts.common.RadioButton
 import org.scalajs.dom.html.{Button, Div}
 import org.scalajs.dom.raw.HTMLSelectElement
+import com.mogproject.mogami.util.Implicits._
 
 import scalatags.JsDom.all._
 
@@ -17,11 +19,10 @@ object BranchButton {
   private[this] lazy val changeBranchButton: HTMLSelectElement = select(
     cls := "form-control",
     width := "100%",
-    data("dismiss") := "modal",
     onchange := (() => Controller.changeBranch(changeBranchButton.selectedIndex, None))
   ).render
 
-  private[this] lazy val forksButtons = div("No forks.").render
+  private[this] lazy val forksButtons = div("").render
 
   private[this] lazy val newBranchButton = RadioButton(Seq(false, true), Map(English -> Seq("Off", "On")))
 
@@ -36,14 +37,19 @@ object BranchButton {
     "Delete"
   ).render
 
+  private[this] def branchNoToString(branchNo: BranchNo): String = (branchNo == 0).fold("Trunk", s"Branch#${branchNo}")
+
   private[this] def updateBranchList(numBranches: Int, displayBranch: BranchNo): Unit = {
-    changeBranchButton.innerHTML = ("Trunk" +: (1 to numBranches).map(b => s"Branch#${b}")).map(s => option(s)).toString
+    changeBranchButton.innerHTML = (0 to numBranches).map(s => option(branchNoToString(s))).toString
     changeBranchButton.selectedIndex = displayBranch
   }
 
   private[this] def createForkButton(move: Move, branchNo: BranchNo, language: Language): Button = button(
     tpe := "button",
     cls := "btn btn-default btn-block",
+    data("toggle") := "tooltip",
+    data("placement") := "bottom",
+    data("original-title") := branchNoToString(branchNo),
     data("dismiss") := "modal",
     onclick := { () => Controller.changeBranch(branchNo, Some(1)) },
     move.player.toSymbolString() + (language match {
@@ -57,6 +63,7 @@ object BranchButton {
   //
   private[this] val playModeMenu: Div = div(
     display := display.none.v,
+    br(),
     label("New Branch Mode"),
     div(cls := "row",
       div(cls := "col-xs-8 col-lg-9", p(paddingTop := "6px", "Create a new branch when you make a different move.")),
@@ -74,10 +81,9 @@ object BranchButton {
       div(cls := "col-xs-6 col-lg-8", label(paddingTop := "6px", "Change Branch")),
       div(cls := "col-xs-6 col-lg-4", changeBranchButton)
     ),
-    br(),
     label("Forks"),
-    forksButtons,
     br(),
+    forksButtons,
     playModeMenu
   ).render
 
@@ -101,12 +107,21 @@ object BranchButton {
     updateBranchList(game.branches.length, gamePosition.branch)
 
     deleteBranchButton.disabled = gamePosition.isTrunk
+
     val forks = game.getForks(gamePosition)
-    forksButtons.innerHTML = ""
-    forksButtons.appendChild(div(
-      cls := "row",
-      forks.map { case (m, b) => div(cls := "col-lg-4 col-xs-6", createForkButton(m, b, language)) }
-    ).render)
+
+    if (forks.isEmpty) {
+      forksButtons.innerHTML = "No forks."
+    } else {
+      val nextMove = game.withBranch(gamePosition.branch)(br => br.getMove(gamePosition.position)).flatten.map(m => (m, gamePosition.branch))
+      val buttons = (nextMove.toSeq ++ forks).map { case (m, b) => createForkButton(m, b, language) }
+      Tooltip.enableHoverToolTip(buttons)
+      forksButtons.innerHTML = ""
+      forksButtons.appendChild(div(
+        cls := "row",
+        buttons.map(div(cls := "col-lg-4 col-xs-6", _))
+      ).render)
+    }
 
     val isLastPosition = game.withBranch(gamePosition.branch)(br => br.offset + br.moves.length >= gamePosition.position).getOrElse(false)
     if (isLastPosition) newBranchButton.disable() else newBranchButton.enable()

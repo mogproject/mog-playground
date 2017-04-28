@@ -4,7 +4,8 @@ import com.mogproject.mogami.playground.view.Layout
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.Element
-import org.scalajs.jquery.jQuery
+import org.scalajs.dom.raw.HTMLElement
+import org.scalajs.jquery.{JQuery, jQuery}
 
 import scala.scalajs.js
 
@@ -12,10 +13,14 @@ import scala.scalajs.js
   *
   */
 object Tooltip {
-  def enableHoverToolTip(layout: Layout): Unit = {
-    jQuery("""[data-toggle="tooltip"]""").asInstanceOf[BootstrapJQuery].tooltip {
+  def enableHoverToolTip(layout: Layout): Unit = enableHoverToolTip(jQuery("""[data-toggle="tooltip"]"""), layout.isMobile)
+
+  def enableHoverToolTip(elems: Seq[HTMLElement]): Unit = elems.foreach(e => enableHoverToolTip(jQuery(e)))
+
+  def enableHoverToolTip(jQuery: JQuery, isMobile: Boolean = false): Unit = {
+    jQuery.asInstanceOf[BootstrapJQuery].tooltip {
       val r = js.Dynamic.literal()
-      r.trigger = layout.isMobile.fold("focus", "hover")
+      r.trigger = isMobile.fold("focus", "hover")
       r.asInstanceOf[TooltipOptions]
     }
   }

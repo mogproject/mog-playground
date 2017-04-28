@@ -56,7 +56,7 @@ trait GameController extends ModeController {
   //
   // helper functions
   //
-  protected val lastDisplayPosition: Int = displayBranch.moves.length + (displayBranch.status match {
+  protected val lastDisplayPosition: Int = currentMoves.length + (displayBranch.status match {
     case GameStatus.IllegallyMoved => 2
     case GameStatus.Playing => 0
     case _ => 1
@@ -64,7 +64,7 @@ trait GameController extends ModeController {
 
   protected val statusPosition: Int = math.min(displayPosition, currentMoves.length)
 
-  protected val lastStatusPosition: Int = displayBranch.moves.length
+  protected val lastStatusPosition: Int = currentMoves.length
 
   protected def getLastMove: Option[Move] = (displayPosition, statusPosition, displayBranch.finalAction) match {
     case (x, _, Some(IllegalMove(mv))) if lastStatusPosition < x => Some(mv)
