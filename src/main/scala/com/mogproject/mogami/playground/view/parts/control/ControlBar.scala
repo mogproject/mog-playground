@@ -1,7 +1,6 @@
 package com.mogproject.mogami.playground.view.parts.control
 
-import com.mogproject.mogami.{Game, GameStatus, Move}
-import com.mogproject.mogami.core.game.Game.BranchNo
+import com.mogproject.mogami.{Game, GameStatus, Move, BranchNo, GamePosition}
 import com.mogproject.mogami.core.move.SpecialMove
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
@@ -67,7 +66,7 @@ case class ControlBar(canvasWidth: Int) extends EventManageable {
       case English => _.toWesternNotationString
     }
     game.withBranch(branchNo) { br =>
-      (br.moves.map(f) ++ (br.status match {
+      (game.getAllMoves(branchNo).map(f) ++ (br.status match {
         case GameStatus.Resigned | GameStatus.TimedUp => List(g(br.finalAction.get))
         case GameStatus.IllegallyMoved => g(br.finalAction.get).split("\n").toList.take(1)
         case _ => Nil
@@ -76,19 +75,20 @@ case class ControlBar(canvasWidth: Int) extends EventManageable {
   }
 
   def updateRecordContent(game: Game, branchNo: BranchNo, lng: Language): Unit = {
+
+    val prefix = lng match {
+      case Japanese => "初期局面"
+      case English => "Start"
+    }
+    val initTurn = game.trunk.initialState.turn
+
     game.withBranch(branchNo) { br =>
-      val prefix = lng match {
-        case Japanese => "初期局面"
-        case English => "Start"
-      }
-
       // moves
-      val initTurn = br.initialState.turn
-
       val xs = (prefix +: getMoves(game, branchNo, lng)).zipWithIndex.map { case (m, i) =>
-        val commentMark = if (br.hasComment(i + br.offset)) "*" else ""
+        val pos = i + game.trunk.offset
+        val symbolMark = game.hasFork(GamePosition(branchNo, pos)).fold("+", game.hasComment(GamePosition(branchNo,pos)).fold("*", ""))
         val indexNotation = if (i == 0) "" else s"${i}: " + (i % 2 == 0).fold(!initTurn, initTurn).toSymbolString()
-        commentMark + indexNotation + m
+        symbolMark + indexNotation + m
       }
 
       val suffix = (br.status, lng) match {

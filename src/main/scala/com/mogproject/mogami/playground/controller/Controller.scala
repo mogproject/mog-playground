@@ -177,6 +177,11 @@ object Controller {
 
   def showCommentModal(): Unit = modeController.get.renderer.showCommentModal(modeController.get.config)
 
+  // Branch Section
+  def changeBranch(branchNo: BranchNo, moveOffset: Option[Int]): Unit = doAction(_.changeBranch(branchNo, moveOffset), _.renderAll())
+
+  def deleteBranch(): Unit = ???
+
   // Action Section
   def setResign(): Unit = doAction({
     case pc: PlayModeController => pc.setResign()

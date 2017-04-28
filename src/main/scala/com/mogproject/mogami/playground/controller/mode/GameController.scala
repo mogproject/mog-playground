@@ -7,7 +7,6 @@ import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.io._
 import com.mogproject.mogami.util.Implicits._
-import com.mogproject.mogami.{Game, Move, State}
 import com.mogproject.mogami.core.state.StateCache.Implicits._
 
 import scala.util.{Failure, Success, Try}
@@ -32,7 +31,7 @@ trait GameController extends ModeController {
 
   lazy val currentMoves: Vector[Move] = game.getAllMoves(displayBranchNo)
 
-  def gamePosition: GamePosition = GamePosition(displayBranchNo, statusPosition + displayBranch.offset)
+  def gamePosition: GamePosition = GamePosition(displayBranchNo, statusPosition + game.trunk.offset)
 
   override def gameInfo: GameInfo = game.gameInfo
 
@@ -194,6 +193,9 @@ trait GameController extends ModeController {
     val canMoveBackward = 0 < index
     val canMoveForward = 0 <= displayPosition && displayPosition < renderer.getMaxRecordIndex
     renderer.updateControlBar(canMoveBackward, canMoveForward)
+
+    // branches
+    renderer.updateBranchButtons(game, gamePosition, config.recordLang)
   }
 
   private[this] def renderRecordUrls(): Unit = {
@@ -284,5 +286,9 @@ trait GameController extends ModeController {
   private[this] def getToolTipMessage(g: Game): String = {
     val ss = Seq(s"${g.trunk.moves.length} moves") ++ g.branches.nonEmpty.option(s"${g.branches.length} branches")
     s"Loaded! (${ss.mkString(", ")})"
+  }
+
+  override def changeBranch(branchNo: BranchNo, moveOffset: Option[Int]): Option[ModeController] = game.withBranch(branchNo) { br =>
+    copy(displayBranchNo = branchNo, displayPosition = displayPosition + moveOffset.getOrElse(0))
   }
 }

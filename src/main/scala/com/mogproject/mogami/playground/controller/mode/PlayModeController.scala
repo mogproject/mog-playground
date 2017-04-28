@@ -32,11 +32,13 @@ case class PlayModeController(renderer: Renderer,
   override def initialize(): Unit = {
     super.initialize()
     renderer.showActionSection()
+    renderer.showBranchEditMenu()
   }
 
   override def terminate(): Unit = {
     super.terminate()
     renderer.hideActionSection()
+    renderer.hideBranchEditMenu()
   }
 
   override def renderAll(): Unit = {

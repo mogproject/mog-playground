@@ -1,7 +1,6 @@
 package com.mogproject.mogami.playground.view
 
 import com.mogproject.mogami._
-import com.mogproject.mogami.core.game.Game.BranchNo
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller._
@@ -447,6 +446,13 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
   def displayTextLoadMessage(message: String): Unit = SaveLoadButton.displayTextLoadMessage(message)
 
   def displayTextLoadTooltip(message: String): Unit = SaveLoadButton.displayTextLoadTooltip(message)
+
+  // branch section
+  def updateBranchButtons(game: Game, gamePosition: GamePosition, language: Language): Unit = GameMenuSection.updateBranchButtons(game, gamePosition, language)
+
+  def showBranchEditMenu(): Unit = GameMenuSection.showBranchEditMenu()
+
+  def hideBranchEditMenu(): Unit = GameMenuSection.hideBranchEditMenu()
 
   // action section
   def showActionSection(): Unit = ActionSection.show()
