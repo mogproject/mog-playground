@@ -375,7 +375,7 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
   def askDeleteBranch(lang: Language, branchNo: BranchNo, callback: () => Unit): Unit = {
     val s = lang match {
       case Japanese => p(s"現在の変化 (Branch#${branchNo}) が削除されます。コメントも失われますが、よろしいですか?")
-      case English => p(s"Branch#${branchNo} will be deleted. Comments on this branch will also be removed.\n\nAre you sure?")
+      case English => p(s"Branch#${branchNo} will be deleted. Comments on this branch will also be removed. Are you sure?")
     }
     YesNoDialog(lang, s, callback).show()
   }
