@@ -18,7 +18,7 @@ object GameHelpSection extends Section {
         ul(
           li("Click on a player name to set the game information."),
           li("In Play Mode, you can move pieces by a flick."),
-          li("In View Mode, you can move to the next position by clicking anywhere on the board."),
+          li("In View Mode, click any square on the right-hand side of the board to move to the next position, and click the left-hand side to the previous position."),
           li("If you click and hold 'forward' or 'backward' button, the position changes continuously.")
         )
       )
