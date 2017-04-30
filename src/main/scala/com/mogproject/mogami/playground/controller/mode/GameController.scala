@@ -152,9 +152,8 @@ trait GameController extends ModeController {
   /**
     * Set comments
     */
-  override def setComment(text: String): Option[ModeController] = {
-    game.updateBranch(displayBranchNo)(br => Some(br.updateComment(gamePosition.position, text))).map(g => this.copy(game = g))
-  }
+  override def setComment(comment: String): Option[ModeController] =
+    game.updateComment(gamePosition, comment).map(g => this.copy(game = g))
 
   //
   // renderer

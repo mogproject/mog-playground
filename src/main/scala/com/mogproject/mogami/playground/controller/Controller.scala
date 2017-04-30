@@ -38,19 +38,20 @@ object Controller {
         Game()
     }
 
-    val gg = ((args.usen, args.sfen) match {
+    // load game
+    val gg: Game = ((args.usen, args.sfen) match {
       case (Some(u), _) => loadGame(Game.parseUsenString(u)) // parse USEN string
       case (_, Some(s)) => loadGame(Game.parseSfenString(s)) // parse SFEN string
       case _ => Game()
     }).copy(gameInfo = args.gameInfo)
 
-    // update game info and comments
-    val game = args.comments.foldLeft(gg) { case (g, (br, cmts)) =>
-      g.updateBranch(br)(b => Some(b.updateComments(cmts))).getOrElse {
-        println(s"Ignored comments on the invalid branch no: ${br}")
-        g
-      }
-    }
+    // update comments
+    val comments = for {
+      (b, m) <- args.comments
+      (pos, c) <- m
+      h <- gg.getHistoryHash(GamePosition(b, pos))
+    } yield h -> c
+    val game = gg.copy(comments = comments)
 
     // create renderer
     val renderer = Renderer(elem, args.config.layout)
