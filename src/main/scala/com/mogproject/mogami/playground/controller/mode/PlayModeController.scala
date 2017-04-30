@@ -74,10 +74,22 @@ case class PlayModeController(renderer: Renderer,
       val from = config.flip.when[Cursor](!_)(selected).moveFrom
 
       def f(to: Square, promote: Boolean): Option[GameController] = {
-        game
-          .truncated(gamePosition)
-          .updateBranch(displayBranchNo)(_.makeMove(MoveBuilderSfen(from, to, promote)))
-          .map(g => this.copy(game = g, displayPosition = displayPosition + 1))
+        val mv = MoveBuilderSfen(from, to, promote).toMove(selectedState, getLastMove.map(_.to))
+
+        val newBranchController = for {
+          m <- mv
+          if renderer.getIsNewBranchMode
+          g <- game.createBranch(gamePosition, m)
+        } yield this.copy(game = g, displayBranchNo = game.branches.length + 1, displayPosition = displayPosition + 1)
+
+
+        if (newBranchController.isDefined)
+          newBranchController
+        else
+          for {
+            m <- mv
+            g <- game.truncated(gamePosition).updateBranch(displayBranchNo)(_.makeMove(m))
+          } yield this.copy(game = g, displayPosition = displayPosition + 1)
       }
 
       config.flip.when[Cursor](!_)(invoked) match {

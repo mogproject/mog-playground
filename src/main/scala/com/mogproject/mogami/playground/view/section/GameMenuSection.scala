@@ -65,6 +65,8 @@ object GameMenuSection extends Section {
 
   def hideBranchEditMenu(): Unit = BranchButton.hideEditMenu()
 
+  def getIsNewBranchMode: Boolean = BranchButton.getIsNewBranchMode
+
   override def initialize(): Unit = {
     super.initialize()
     BranchButton.initialize()
