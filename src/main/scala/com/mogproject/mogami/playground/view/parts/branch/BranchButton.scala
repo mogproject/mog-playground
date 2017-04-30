@@ -8,6 +8,7 @@ import com.mogproject.mogami.playground.view.parts.common.RadioButton
 import org.scalajs.dom.html.{Button, Div}
 import org.scalajs.dom.raw.HTMLSelectElement
 import com.mogproject.mogami.util.Implicits._
+import org.scalajs.dom
 
 import scalatags.JsDom.all._
 
@@ -51,7 +52,7 @@ object BranchButton {
     data("placement") := "bottom",
     data("original-title") := branchNoToString(branchNo),
     data("dismiss") := "modal",
-    onclick := { () => Controller.changeBranch(branchNo, Some(1)) },
+    onclick := { () => dom.window.setTimeout(() => Controller.changeBranch(branchNo, Some(1)), 0) },
     move.player.toSymbolString() + (language match {
       case English => move.toWesternNotationString
       case Japanese => move.toJapaneseNotationString
