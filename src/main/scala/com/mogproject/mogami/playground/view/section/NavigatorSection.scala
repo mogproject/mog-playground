@@ -12,9 +12,9 @@ import scalatags.JsDom.all._
   */
 case class NavigatorSection(layout: Layout) extends Section {
   override val output: Div = div(
-    div(cls := "container", padding := 0,
-      div(cls := "navbar-header",
-        ul(cls := "nav navbar-nav",
+    div(cls := "container navbar-fixed-height", padding := 0,
+      div(cls := "navbar-header navbar-fixed-height",
+        ul(cls := "nav navbar-nav navbar-fixed-height",
           li(cls := "navbar-brand hidden-xs", "Shogi Playground"),
           li(ModeSelector.output),
           li(FlipButton.output),
