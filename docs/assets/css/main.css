@@ -6,7 +6,7 @@
 
 .navbar {
   display: block;
-  height: 29px;
+  height: 29px !important;
   min-height:29px !important;
   margin-bottom: 5px;
 }
@@ -45,6 +45,10 @@
   margin-left: 3px !important;
   margin-right: 3px !important;
   white-space: nowrap;
+}
+
+.navbar-fixed-height {
+  height: 29px;
 }
 
 .navbar>div {
