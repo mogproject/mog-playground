@@ -287,7 +287,14 @@ trait GameController extends ModeController {
     s"Loaded! (${ss.mkString(", ")})"
   }
 
+  //
+  // Branch operations
+  //
   override def changeBranch(branchNo: BranchNo, moveOffset: Option[Int]): Option[ModeController] = game.withBranch(branchNo) { br =>
     copy(displayBranchNo = branchNo, displayPosition = displayPosition + moveOffset.getOrElse(0))
   }
+
+  override def deleteBranch(branchNo: BranchNo): Option[ModeController] = game.deleteBranch(branchNo).map(g =>
+    this.copy(game = g, displayBranchNo = 0, displayPosition = 0)
+  )
 }

@@ -33,7 +33,7 @@ object BranchButton {
     data("placement") := "bottom",
     data("original-title") := "Delete this branch",
     data("dismiss") := "modal",
-    onclick := { () => Controller.deleteBranch() },
+    onclick := { () => Controller.askDeleteBranch() },
     "Delete"
   ).render
 
@@ -66,7 +66,7 @@ object BranchButton {
     br(),
     label("New Branch Mode"),
     div(cls := "row",
-      div(cls := "col-xs-8 col-lg-9", p(paddingTop := "6px", "Create a new branch when you make a different move.")),
+      div(cls := "col-xs-8 col-lg-9", p(paddingTop := "6px", "Create a new branch whenever you make a different move.")),
       div(cls := "col-xs-4 col-lg-3", newBranchButton.output)
     ),
     br(),

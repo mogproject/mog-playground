@@ -181,7 +181,12 @@ object Controller {
   // Branch Section
   def changeBranch(branchNo: BranchNo, moveOffset: Option[Int]): Unit = doAction(_.changeBranch(branchNo, moveOffset), _.renderAll())
 
-  def deleteBranch(): Unit = ???
+  def askDeleteBranch(): Unit = modeController match {
+    case Some(gc: GameController) => gc.renderer.askDeleteBranch(gc.config.messageLang, gc.displayBranchNo, () => deleteBranch(gc.displayBranchNo))
+    case _ =>
+  }
+
+  def deleteBranch(branchNo: BranchNo): Unit = doAction(_.deleteBranch(branchNo), _.renderAll())
 
   // Action Section
   def setResign(): Unit = doAction({
