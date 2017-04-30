@@ -1,7 +1,6 @@
 package com.mogproject.mogami.playground.view
 
 import com.mogproject.mogami._
-import com.mogproject.mogami.core.game.Game.BranchNo
 import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller._
@@ -373,6 +372,14 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
     YesNoDialog(lang, s, callback).show()
   }
 
+  def askDeleteBranch(lang: Language, branchNo: BranchNo, callback: () => Unit): Unit = {
+    val s = lang match {
+      case Japanese => p(s"現在の変化 (Branch#${branchNo}) が削除されます。コメントも失われますが、よろしいですか?")
+      case English => p(s"Branch#${branchNo} will be deleted. Comments on this branch will also be removed.\n\nAre you sure?")
+    }
+    YesNoDialog(lang, s, callback).show()
+  }
+
   def alertEditedState(msg: String, lang: Language): Unit = {
     val s = lang match {
       case Japanese => p("不正な局面です。", br, s"(${msg})")
@@ -447,6 +454,15 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
   def displayTextLoadMessage(message: String): Unit = SaveLoadButton.displayTextLoadMessage(message)
 
   def displayTextLoadTooltip(message: String): Unit = SaveLoadButton.displayTextLoadTooltip(message)
+
+  // branch section
+  def updateBranchButtons(game: Game, gamePosition: GamePosition, language: Language): Unit = GameMenuSection.updateBranchButtons(game, gamePosition, language)
+
+  def showBranchEditMenu(): Unit = GameMenuSection.showBranchEditMenu()
+
+  def hideBranchEditMenu(): Unit = GameMenuSection.hideBranchEditMenu()
+
+  def getIsNewBranchMode: Boolean = GameMenuSection.getIsNewBranchMode
 
   // action section
   def showActionSection(): Unit = ActionSection.show()

@@ -2,8 +2,8 @@ package com.mogproject.mogami.playground.view.modal
 
 import com.mogproject.mogami.playground.view.Layout
 import com.mogproject.mogami.playground.view.bootstrap.{BootstrapJQuery, Tooltip}
+import com.mogproject.mogami.playground.view.modal.common.ModalLike
 import com.mogproject.mogami.playground.view.section._
-import org.scalajs.dom.html.Div
 import org.scalajs.jquery.jQuery
 
 import scalatags.JsDom.all._
@@ -11,40 +11,19 @@ import scalatags.JsDom.all._
 /**
   * Menu dialog
   */
-object MenuDialog {
+object MenuDialog extends ModalLike {
 
-  private[this] val title = "Menu"
+  override val title = "Menu"
 
-  private[this] val ok = "OK"
+  override val modalBody: ElemType = div(bodyDefinition, MenuPane.output)
 
-  private[this] lazy val elem: Div =
-    div(cls := "modal face", tabindex := "-1", role := "dialog",
-      div(cls := "modal-dialog", role := "document",
-        div(cls := "modal-content",
-          // header
-          div(cls := "modal-header",
-            h4(cls := "modal-title", float := "left", title),
-            button(tpe := "button", cls := "close", data("dismiss") := "modal", aria.label := "Close",
-              span(aria.hidden := true, raw("&times;"))
-            )
-          ),
-
-          // body
-          div(cls := "modal-body",
-            MenuPane.output
-          ),
-
-          // footer
-          div(cls := "modal-footer",
-            div(cls := "row",
-              div(cls := "col-xs-4 col-xs-offset-8 col-md-3 col-md-offset-9",
-                button(tpe := "button", cls := "btn btn-default btn-block", data("dismiss") := "modal", ok)
-              )
-            )
-          )
-        )
+  override val modalFooter: ElemType = div(footerDefinition,
+    div(cls := "row",
+      div(cls := "col-xs-4 col-xs-offset-8 col-md-3 col-md-offset-9",
+        button(tpe := "button", cls := "btn btn-default btn-block", data("dismiss") := "modal", "OK")
       )
-    ).render
+    )
+  )
 
   private[this] var dialogElem: Option[BootstrapJQuery] = None
 

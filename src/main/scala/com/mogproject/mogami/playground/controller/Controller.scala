@@ -38,19 +38,20 @@ object Controller {
         Game()
     }
 
-    val gg = ((args.usen, args.sfen) match {
+    // load game
+    val gg: Game = ((args.usen, args.sfen) match {
       case (Some(u), _) => loadGame(Game.parseUsenString(u)) // parse USEN string
       case (_, Some(s)) => loadGame(Game.parseSfenString(s)) // parse SFEN string
       case _ => Game()
     }).copy(gameInfo = args.gameInfo)
 
-    // update game info and comments
-    val game = args.comments.foldLeft(gg) { case (g, (br, cmts)) =>
-      g.updateBranch(br)(b => Some(b.updateComments(cmts))).getOrElse {
-        println(s"Ignored comments on the invalid branch no: ${br}")
-        g
-      }
-    }
+    // update comments
+    val comments = for {
+      (b, m) <- args.comments
+      (pos, c) <- m
+      h <- gg.getHistoryHash(GamePosition(b, pos))
+    } yield h -> c
+    val game = gg.copy(comments = comments)
 
     // create renderer
     val renderer = Renderer(elem, args.config.layout)
@@ -176,6 +177,16 @@ object Controller {
   def setComment(text: String, updateTextArea: Boolean): Unit = doAction(_.setComment(text), _.renderAfterUpdatingComment(updateTextArea))
 
   def showCommentModal(): Unit = modeController.get.renderer.showCommentModal(modeController.get.config)
+
+  // Branch Section
+  def changeBranch(branchNo: BranchNo, moveOffset: Option[Int]): Unit = doAction(_.changeBranch(branchNo, moveOffset), _.renderAll())
+
+  def askDeleteBranch(): Unit = modeController match {
+    case Some(gc: GameController) => gc.renderer.askDeleteBranch(gc.config.messageLang, gc.displayBranchNo, () => deleteBranch(gc.displayBranchNo))
+    case _ =>
+  }
+
+  def deleteBranch(branchNo: BranchNo): Unit = doAction(_.deleteBranch(branchNo), _.renderAll())
 
   // Action Section
   def setResign(): Unit = doAction({

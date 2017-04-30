@@ -3,11 +3,11 @@ package com.mogproject.mogami.playground.view.modal
 import com.mogproject.mogami.Piece
 import com.mogproject.mogami.playground.controller.{Configuration, English, Japanese}
 import com.mogproject.mogami.playground.view.EventManageable
-import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
+import com.mogproject.mogami.playground.view.modal.common.ModalLike
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom.CanvasRenderingContext2D
-import org.scalajs.dom.html.{Canvas, Div}
-import org.scalajs.jquery.jQuery
+import org.scalajs.dom.html.Canvas
+import org.scalajs.jquery.JQuery
 
 import scalatags.JsDom.all._
 
@@ -19,14 +19,11 @@ case class PromotionDialog(config: Configuration,
                            piece: Piece,
                            callbackUnpromote: () => Unit,
                            callbackPromote: () => Unit
-                          ) extends EventManageable {
-
+                          ) extends EventManageable with ModalLike {
+  //
+  // promotion specific
+  //
   private[this] val textScale: Double = 1.5
-
-  private[this] val title = config.messageLang match {
-    case Japanese => "成りますか?"
-    case English => "Do you want to promote?"
-  }
 
   private[this] def createCanvas: Canvas = canvas(
     widthA := config.pieceRenderer.layout.PIECE_WIDTH * textScale,
@@ -60,41 +57,34 @@ case class PromotionDialog(config: Configuration,
     canvasPromote
   ).render
 
-  private[this] val elem: Div =
-    div(cls := "modal face", tabindex := "-1", role := "dialog", data("backdrop") := "static",
-      div(cls := "modal-dialog", role := "document",
-        div(cls := "modal-content",
-          // header
-          div(cls := "modal-header",
-            h4(cls := "modal-title", title)
-          ),
+  //
+  // modal traits
+  //
+  override def displayCloseButton: Boolean = false
 
-          // footer
-          div(cls := "modal-footer",
-            div(cls := "row",
-              div(cls := "col-xs-5 col-xs-offset-1 col-md-3 col-md-offset-3", buttonUnpromote),
-              div(cls := "col-xs-5 col-md-3", buttonPromote)
-            )
-          )
-        )
-      )
-    ).render
+  override def isStatic: Boolean = true
 
-  def show(): Unit = {
-    val dialog = jQuery(elem)
-    dialog.on("hidden.bs.modal", () ⇒ {
-      // Remove from DOM
-      dialog.remove()
-    })
+  override val title: String = config.messageLang match {
+    case Japanese => "成りますか?"
+    case English => "Do you want to promote?"
+  }
 
+  override val modalBody: ElemType = div()
+
+  override val modalFooter: ElemType = div(footerDefinition,
+    div(cls := "row",
+      div(cls := "col-xs-5 col-xs-offset-1 col-md-3 col-md-offset-3", buttonUnpromote),
+      div(cls := "col-xs-5 col-md-3", buttonPromote)
+    )
+  )
+
+  override def initialize(dialog: JQuery): Unit = {
     setModalClickEvent(buttonUnpromote, dialog, callbackUnpromote)
     setModalClickEvent(buttonPromote, dialog, callbackPromote)
 
     // draw large pieces
     config.pieceRenderer.drawPiece(contextUnpromote, config.flip.when[Piece](!_)(piece), 0, 0, textScale)
     config.pieceRenderer.drawPiece(contextPromote, config.flip.when[Piece](!_)(piece.promoted), 0, 0, textScale)
-
-    // show the modal
-    dialog.asInstanceOf[BootstrapJQuery].modal("show")
   }
+
 }

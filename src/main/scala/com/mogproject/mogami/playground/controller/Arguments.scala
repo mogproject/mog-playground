@@ -1,10 +1,12 @@
 package com.mogproject.mogami.playground.controller
 
 import com.mogproject.mogami._
+import com.mogproject.mogami.core.game.Game.{HistoryHash, Position}
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.core.state.StateCache.Implicits._
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 import scala.scalajs.js.URIUtils.{decodeURIComponent, encodeURIComponent}
 import scala.util.{Failure, Success, Try}
 
@@ -15,7 +17,7 @@ case class Arguments(sfen: Option[String] = None, // deprecated
                      usen: Option[String] = None,
                      gameInfo: GameInfo = GameInfo(),
                      gamePosition: GamePosition = GamePosition(0, 0),
-                     comments: Map[BranchNo, Map[Int, String]] = Map.empty,
+                     comments: Map[BranchNo, Map[Position, String]] = Map.empty,
                      action: Action = PlayAction,
                      config: Configuration = Configuration()) {
   def parseQueryString(query: String): Arguments = {
@@ -110,7 +112,7 @@ case class ArgumentsBuilder(game: Game,
                             gamePosition: GamePosition = GamePosition(0, 0),
                             config: Configuration = Configuration()) {
 
-  private[this] def toGamePosition(branchNo: BranchNo, pos: Int) = (branchNo == 0).fold("", branchNo + ".") + pos
+  private[this] def toGamePosition(branchNo: BranchNo, pos: Position) = (branchNo == 0).fold("", branchNo + ".") + pos
 
   private[this] lazy val instantGame = Game(Branch(game.getState(gamePosition).get))
 
@@ -136,10 +138,16 @@ case class ArgumentsBuilder(game: Game,
   private[this] def gameParams: Seq[(String, String)] = Seq(("u", game.toUsenString))
 
   private[this] def commentParams: Seq[(String, String)] = {
-    ((game.trunk, -1) +: game.branches.zipWithIndex).flatMap { case (br, n) =>
-      br.comments.map { case (i, s) =>
-        ("c" + toGamePosition(n + 1, i), s)
-      }
+    val comments = mutable.HashMap[HistoryHash, String]()
+    comments ++= game.comments
+
+    for {
+      (br, n) <- (game.trunk, -1) +: game.branches.zipWithIndex
+      (h, i) <- br.historyHash.zipWithIndex
+      c <- comments.get(h)
+    } yield {
+      comments -= h
+      ("c" + toGamePosition(n + 1, i + br.offset), c)
     }
   }
 

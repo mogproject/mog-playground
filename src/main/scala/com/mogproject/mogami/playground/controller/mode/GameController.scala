@@ -7,7 +7,6 @@ import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.io._
 import com.mogproject.mogami.util.Implicits._
-import com.mogproject.mogami.{Game, Move, State}
 import com.mogproject.mogami.core.state.StateCache.Implicits._
 
 import scala.util.{Failure, Success, Try}
@@ -30,7 +29,9 @@ trait GameController extends ModeController {
     throw new RuntimeException(s"failed to select branch: ${displayBranchNo}")
   )
 
-  def gamePosition: GamePosition = GamePosition(displayBranchNo, statusPosition + displayBranch.offset)
+  lazy val currentMoves: Vector[Move] = game.getAllMoves(displayBranchNo)
+
+  def gamePosition: GamePosition = GamePosition(displayBranchNo, statusPosition + game.trunk.offset)
 
   override def gameInfo: GameInfo = game.gameInfo
 
@@ -55,20 +56,20 @@ trait GameController extends ModeController {
   //
   // helper functions
   //
-  protected val lastDisplayPosition: Int = displayBranch.moves.length + (displayBranch.status match {
+  protected val lastDisplayPosition: Int = currentMoves.length + (displayBranch.status match {
     case GameStatus.IllegallyMoved => 2
     case GameStatus.Playing => 0
     case _ => 1
   })
 
-  protected val statusPosition: Int = math.min(displayPosition, game.moves.length)
+  protected val statusPosition: Int = math.min(displayPosition, currentMoves.length)
 
-  protected val lastStatusPosition: Int = displayBranch.moves.length
+  protected val lastStatusPosition: Int = currentMoves.length
 
   protected def getLastMove: Option[Move] = (displayPosition, statusPosition, displayBranch.finalAction) match {
     case (x, _, Some(IllegalMove(mv))) if lastStatusPosition < x => Some(mv)
     case (_, 0, _) => None
-    case _ => Some(game.moves(statusPosition - 1))
+    case _ => Some(currentMoves(statusPosition - 1))
   }
 
   protected def isLastStatusPosition: Boolean =
@@ -88,7 +89,7 @@ trait GameController extends ModeController {
     case Editing =>
       val st = selectedState
       val mc = Some(EditModeController(renderer, config, st.turn, st.board, st.hand, st.unusedPtypeCount, game.gameInfo))
-      game.moves.isEmpty.fold(mc, {
+      currentMoves.isEmpty.fold(mc, {
         renderer.askConfirm(config.messageLang, () => Controller.update(mc))
         None
       })
@@ -131,8 +132,8 @@ trait GameController extends ModeController {
       case 0 => Some(this.copy(displayPosition = 0))
       case 1 => Some(this.copy(displayPosition = math.max(0, renderer.getSelectedIndex - 1)))
       case 2 =>
-        if (statusPosition < game.moves.length) {
-          val sq = game.moves(statusPosition).to
+        if (statusPosition < currentMoves.length) {
+          val sq = currentMoves(statusPosition).to
           renderer.flashCursor(Cursor(config.flip.fold(!sq, sq)))
         }
         Some(this.copy(displayPosition = renderer.getSelectedIndex + 1))
@@ -151,9 +152,8 @@ trait GameController extends ModeController {
   /**
     * Set comments
     */
-  override def setComment(text: String): Option[ModeController] = {
-    game.updateBranch(displayBranchNo)(br => Some(br.updateComment(gamePosition.position, text))).map(g => this.copy(game = g))
-  }
+  override def setComment(comment: String): Option[ModeController] =
+    game.updateComment(gamePosition, comment).map(g => this.copy(game = g))
 
   //
   // renderer
@@ -178,7 +178,7 @@ trait GameController extends ModeController {
       case _ => renderer.drawPieces(config, selectedState)
     }
 
-    renderer.drawIndicators(config, selectedState.turn, isLastStatusPosition.fold(game.status, GameStatus.Playing))
+    renderer.drawIndicators(config, selectedState.turn, isLastStatusPosition.fold(displayBranch.status, GameStatus.Playing))
     renderer.drawLastMove(config, getLastMove)
   }
 
@@ -192,6 +192,9 @@ trait GameController extends ModeController {
     val canMoveBackward = 0 < index
     val canMoveForward = 0 <= displayPosition && displayPosition < renderer.getMaxRecordIndex
     renderer.updateControlBar(canMoveBackward, canMoveForward)
+
+    // branches
+    renderer.updateBranchButtons(game, gamePosition, config.recordLang)
   }
 
   private[this] def renderRecordUrls(): Unit = {
@@ -248,7 +251,7 @@ trait GameController extends ModeController {
     result match {
       case Success(g) =>
         renderer.displayFileLoadMessage(s"Loaded: ${fileName}")
-        renderer.displayFileLoadTooltip(s"Loaded! (${g.moves.length} moves)")
+        renderer.displayFileLoadTooltip(getToolTipMessage(g))
         renderer.hideMenuModal(1000)
         Some(ViewModeController(this.renderer, this.config, g, 0, 0))
       case Failure(e) =>
@@ -269,7 +272,7 @@ trait GameController extends ModeController {
       case Success(g) =>
         renderer.displayFileLoadMessage("")
         renderer.displayTextLoadMessage("")
-        renderer.displayTextLoadTooltip(s"Loaded! (${g.moves.length} moves)")
+        renderer.displayTextLoadTooltip(getToolTipMessage(g))
         renderer.hideMenuModal(1000)
         Some(ViewModeController(this.renderer, this.config, g, 0, 0))
       case Failure(e) =>
@@ -278,4 +281,20 @@ trait GameController extends ModeController {
         None
     }
   }
+
+  private[this] def getToolTipMessage(g: Game): String = {
+    val ss = Seq(s"${g.trunk.moves.length} moves") ++ g.branches.nonEmpty.option(s"${g.branches.length} branches")
+    s"Loaded! (${ss.mkString(", ")})"
+  }
+
+  //
+  // Branch operations
+  //
+  override def changeBranch(branchNo: BranchNo, moveOffset: Option[Int]): Option[ModeController] = game.withBranch(branchNo) { br =>
+    copy(displayBranchNo = branchNo, displayPosition = displayPosition + moveOffset.getOrElse(0))
+  }
+
+  override def deleteBranch(branchNo: BranchNo): Option[ModeController] = game.deleteBranch(branchNo).map(g =>
+    this.copy(game = g, displayBranchNo = 0, displayPosition = 0)
+  )
 }

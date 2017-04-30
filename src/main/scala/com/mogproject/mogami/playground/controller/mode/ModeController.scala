@@ -116,6 +116,11 @@ trait ModeController {
 
   def loadRecordText(format: RecordFormat, content: String): Option[ModeController] = None
 
+  // actions for branch section
+  def changeBranch(branchNo: BranchNo, moveOffset: Option[Int]): Option[ModeController] = None
+
+  def deleteBranch(branchNo: BranchNo): Option[ModeController] = None
+
   // actions for edit mode
   def setEditTurn(turn: Player): Option[ModeController] = None
 

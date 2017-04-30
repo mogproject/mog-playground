@@ -32,11 +32,13 @@ case class PlayModeController(renderer: Renderer,
   override def initialize(): Unit = {
     super.initialize()
     renderer.showActionSection()
+    renderer.showBranchEditMenu()
   }
 
   override def terminate(): Unit = {
     super.terminate()
     renderer.hideActionSection()
+    renderer.hideBranchEditMenu()
   }
 
   override def renderAll(): Unit = {
@@ -52,7 +54,7 @@ case class PlayModeController(renderer: Renderer,
     case _ => false
   }
 
-  private[this] def canResign: Boolean = (displayBranch.finalAction, game.status, displayPosition - game.moves.length) match {
+  private[this] def canResign: Boolean = (displayBranch.finalAction, displayBranch.status, displayPosition - currentMoves.length) match {
     case (Some(_), _, n) => n <= 0
     case (_, Mated | GameStatus.Playing, _) => true
     case (_, _, n) => n < 0
@@ -72,10 +74,22 @@ case class PlayModeController(renderer: Renderer,
       val from = config.flip.when[Cursor](!_)(selected).moveFrom
 
       def f(to: Square, promote: Boolean): Option[GameController] = {
-        game
-          .truncated(gamePosition)
-          .updateBranch(displayBranchNo)(_.makeMove(MoveBuilderSfen(from, to, promote)))
-          .map(g => this.copy(game = g, displayPosition = displayPosition + 1))
+        val mv = MoveBuilderSfen(from, to, promote).toMove(selectedState, getLastMove.map(_.to))
+
+        val newBranchController = for {
+          m <- mv
+          if renderer.getIsNewBranchMode
+          g <- game.createBranch(gamePosition, m)
+        } yield this.copy(game = g, displayBranchNo = game.branches.length + 1, displayPosition = displayPosition + 1)
+
+
+        if (newBranchController.isDefined)
+          newBranchController
+        else
+          for {
+            m <- mv
+            g <- game.truncated(gamePosition).updateBranch(displayBranchNo)(_.makeMove(m))
+          } yield this.copy(game = g, displayPosition = displayPosition + 1)
       }
 
       config.flip.when[Cursor](!_)(invoked) match {
