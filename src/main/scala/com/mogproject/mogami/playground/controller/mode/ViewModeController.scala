@@ -1,7 +1,7 @@
 package com.mogproject.mogami.playground.controller.mode
 
 import com.mogproject.mogami._
-import com.mogproject.mogami.core.game.Game.BranchNo
+import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.controller.{Configuration, Cursor}
 import com.mogproject.mogami.playground.view.Renderer
 
@@ -37,15 +37,15 @@ case class ViewModeController(renderer: Renderer,
 
   override def canInvokeWithoutSelection(cursor: Cursor): Boolean = true
 
-  override def invokeCursor(selected: Cursor, invoked: Cursor): Option[ModeController] = {
-    if (invoked.isBoard) {
-      setControl(2) // move next
-    } else if (invoked.isPlayer) {
+  override def invokeCursor(selected: Cursor, invoked: Cursor): Option[ModeController] = invoked match {
+    case Cursor(Some(board), None, None, None) =>
+      // move next or backward
+      setControl((board.file <= 5).fold(2, 1))
+    case Cursor(_, _, _, Some(_)) =>
+      // player
       renderer.showGameInfoModal(config, game.gameInfo)
       None
-    } else {
-      None
-    }
+    case _ => None
   }
 
   override def invokeHoldEvent(invoked: Cursor): Option[ModeController] = {
