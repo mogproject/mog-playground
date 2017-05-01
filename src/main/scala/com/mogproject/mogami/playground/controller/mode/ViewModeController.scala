@@ -38,36 +38,33 @@ case class ViewModeController(renderer: Renderer,
   override def canInvokeWithoutSelection(cursor: Cursor): Boolean = true
 
   override def invokeCursor(selected: Cursor, invoked: Cursor): Option[ModeController] = invoked match {
-    case Cursor(Some(board), None, None, None) =>
-      if (board.file <= 5) {
-        // move next
-        if (displayPosition < renderer.getMaxRecordIndex) {
-          renderer.startMoveForwardEffect()
-          setControl(2)
-        } else {
-          None
-        }
-      } else {
-        // move backword
-        if (0 < renderer.getRecordIndex(displayPosition)) {
-          renderer.startMoveBackwardEffect()
-          setControl(1)
-        } else {
-          None
-        }
-      }
-    case Cursor(_, _, _, Some(_)) =>
-      // player
-      renderer.showGameInfoModal(config, game.gameInfo)
-      None
+    case Cursor(Some(board), None, None, None) => invokeCursorHelper(board)
+    case Cursor(_, _, _, Some(_)) => renderer.showGameInfoModal(config, game.gameInfo); None
     case _ => None
   }
 
-  override def invokeHoldEvent(invoked: Cursor): Option[ModeController] = {
-    if (invoked.isBoard) {
-      setControl(2) // move next
+  override def invokeHoldEvent(invoked: Cursor): Option[ModeController] = invoked match {
+    case Cursor(Some(board), None, None, None) => invokeCursorHelper(board)
+    case _ => None
+  }
+
+  private[this] def invokeCursorHelper(board: Square): Option[ModeController] = {
+    if (board.file <= 5) {
+      // move next
+      if (displayPosition < renderer.getMaxRecordIndex) {
+        renderer.startMoveForwardEffect()
+        setControl(2)
+      } else {
+        None
+      }
     } else {
-      None
+      // move backward
+      if (0 < renderer.getRecordIndex(displayPosition)) {
+        renderer.startMoveBackwardEffect()
+        setControl(1)
+      } else {
+        None
+      }
     }
   }
 }
