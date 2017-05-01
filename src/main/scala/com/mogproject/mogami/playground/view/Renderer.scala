@@ -6,6 +6,7 @@ import com.mogproject.mogami.playground.api.Clipboard.Event
 import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
+import com.mogproject.mogami.playground.view.effect.MoveNextEffect
 import com.mogproject.mogami.playground.view.modal._
 
 // todo: don't use parts directly but use only sections
@@ -27,7 +28,7 @@ import scalatags.JsDom.all._
 /**
   * controls canvas rendering
   */
-case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
+case class Renderer(elem: Element, layout: Layout) extends CursorManageable with MoveNextEffect {
 
   // main canvas
   protected val canvas0: Canvas = createCanvas(0)
@@ -35,13 +36,15 @@ case class Renderer(elem: Element, layout: Layout) extends CursorManageable {
   protected val canvas2: Canvas = createCanvas(2)
   protected val canvas3: Canvas = createCanvas(3)
   protected val canvas4: Canvas = createCanvas(4)
-  protected val canvases: List[Canvas] = List(canvas0, canvas1, canvas2, canvas3, canvas4)
+  protected val canvas5: Canvas = createCanvas(5)
+  protected val canvases: List[Canvas] = List(canvas0, canvas1, canvas2, canvas3, canvas4, canvas5)
 
   protected val layer0: CanvasRenderingContext2D = canvas0.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
   protected val layer1: CanvasRenderingContext2D = canvas1.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
   protected val layer2: CanvasRenderingContext2D = canvas2.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
   protected val layer3: CanvasRenderingContext2D = canvas3.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
   protected val layer4: CanvasRenderingContext2D = canvas4.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+  protected val layer5: CanvasRenderingContext2D = canvas5.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
 
   // elements
   private[this] val canvasContainer: Div = div(

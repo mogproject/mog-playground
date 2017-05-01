@@ -39,8 +39,23 @@ case class ViewModeController(renderer: Renderer,
 
   override def invokeCursor(selected: Cursor, invoked: Cursor): Option[ModeController] = invoked match {
     case Cursor(Some(board), None, None, None) =>
-      // move next or backward
-      setControl((board.file <= 5).fold(2, 1))
+      if (board.file <= 5) {
+        // move next
+        if (displayPosition < renderer.getMaxRecordIndex) {
+          renderer.startMoveForwardEffect()
+          setControl(2)
+        } else {
+          None
+        }
+      } else {
+        // move backword
+        if (0 < renderer.getRecordIndex(displayPosition)) {
+          renderer.startMoveBackwardEffect()
+          setControl(1)
+        } else {
+          None
+        }
+      }
     case Cursor(_, _, _, Some(_)) =>
       // player
       renderer.showGameInfoModal(config, game.gameInfo)
