@@ -114,7 +114,7 @@ object BranchButton {
     if (forks.isEmpty) {
       forksButtons.innerHTML = "No forks."
     } else {
-      val nextMove = game.withBranch(gamePosition.branch)(br => br.getMove(gamePosition.position)).flatten.map(m => (m, gamePosition.branch))
+      val nextMove = game.getMove(gamePosition).map(_ -> gamePosition.branch)
       val buttons = (nextMove.toSeq ++ forks).map { case (m, b) => createForkButton(m, b, language) }
       Tooltip.enableHoverToolTip(buttons)
       forksButtons.innerHTML = ""
