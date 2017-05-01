@@ -56,6 +56,12 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
   val rankIndex = Rectangle(board.right - 1, board.top, MARGIN_RIGHT, BOARD_HEIGHT)
   val pieceBox = Rectangle(MARGIN_LEFT + PIECE_WIDTH, handBlack.bottom + MARGIN_BLOCK + 2, BOARD_WIDTH - PIECE_WIDTH, PIECE_HEIGHT)
 
+  lazy val moveForwardWidth: Int = PIECE_WIDTH * 3
+  lazy val moveForwardHeight: Int = PIECE_HEIGHT * 4
+
+  lazy val moveForward = RoundRect(board.left + PIECE_WIDTH * 11 / 2, board.top + PIECE_HEIGHT * 5 / 2, moveForwardWidth, moveForwardHeight, PIECE_WIDTH / 2)
+  lazy val moveBackward = RoundRect(board.left + PIECE_WIDTH / 2, board.top + PIECE_HEIGHT * 5 / 2, moveForwardWidth, moveForwardHeight, PIECE_WIDTH / 2)
+
   // fonts
   object font {
     private[this] val japanese = """"游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "HG明朝E", "ＭＳ Ｐ明朝", "ＭＳ 明朝", serif"""
@@ -74,6 +80,7 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
     lazy val playerIcon = s"${scaleByCanvas(40)}pt ${japanese}"
     lazy val playerName = s"${scaleByCanvas(28)}pt ${japanese}"
     lazy val pieceBoxLabel = s"${scaleByCanvas(28)}pt ${menu}"
+    lazy val moveForward = s"${scaleByCanvas(140)}pt ${japanese}"
   }
 
   // colors
@@ -116,4 +123,6 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
   }
 
   lazy val strokeSize: Int = scaleByCanvas(10)
+  lazy val moveForwardStrokeSize: Int = scaleByCanvas(20)
+  val moveForwardAlpha: Double = 0.3
 }
