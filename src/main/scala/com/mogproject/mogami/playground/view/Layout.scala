@@ -124,5 +124,5 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
 
   lazy val strokeSize: Int = scaleByCanvas(10)
   lazy val moveForwardStrokeSize: Int = scaleByCanvas(20)
-  val moveForwardAlpha: Double = 0.3
+  val moveForwardAlpha: Double = 0.2
 }

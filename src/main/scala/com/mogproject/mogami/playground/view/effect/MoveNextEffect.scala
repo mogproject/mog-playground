@@ -33,6 +33,6 @@ trait MoveNextEffect {
     }
 
     drawing(index) += 1
-    dom.window.setTimeout(f, 150)
+    dom.window.setTimeout(f, 300)
   }
 }
