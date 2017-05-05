@@ -3,7 +3,7 @@ package com.mogproject.mogami.playground.controller.mode
 import com.mogproject.mogami._
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.controller.{Configuration, Cursor}
-import com.mogproject.mogami.playground.view.Renderer
+import com.mogproject.mogami.playground.view.renderer.Renderer
 
 /**
   * View mode

@@ -1,13 +1,14 @@
-package com.mogproject.mogami.playground.view.piece
+package com.mogproject.mogami.playground.view.renderer.piece
 
 import com.mogproject.mogami.core.Player.BLACK
-import com.mogproject.mogami.playground.view.{Layout, TextRenderer}
+import com.mogproject.mogami.playground.view.layout.BoardLayout
+import com.mogproject.mogami.playground.view.renderer.TextRenderer
 import com.mogproject.mogami.{Hand, Piece, Ptype, Square}
 import org.scalajs.dom.CanvasRenderingContext2D
 
 trait PieceRenderer {
 
-  def layout: Layout
+  def layout: BoardLayout
 
   def drawPiece(ctx: CanvasRenderingContext2D, piece: Piece, left: Int, top: Int, scale: Double = 1.0): Unit
 

@@ -1,8 +1,8 @@
 package com.mogproject.mogami.playground.view.modal
 
 import com.mogproject.mogami.playground.controller.{English, Japanese, Language}
-import com.mogproject.mogami.playground.view.EventManageable
 import com.mogproject.mogami.playground.view.modal.common.ModalLike
+import com.mogproject.mogami.playground.view.parts.common.EventManageable
 import org.scalajs.dom.html.Element
 
 import scalatags.JsDom.all._

@@ -1,15 +1,15 @@
 package com.mogproject.mogami.playground.controller.mode
 
-import com.mogproject.mogami._
+import com.mogproject.mogami.{BranchNo, _}
 import com.mogproject.mogami.GameStatus._
-import com.mogproject.mogami.core.game.Game.{BranchNo, GamePosition}
 import com.mogproject.mogami.core.move.Resign
 import com.mogproject.mogami.core.state.State.PromotionFlag
 import com.mogproject.mogami.{Game, Square}
 import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor}
-import com.mogproject.mogami.playground.view.Renderer
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.core.state.StateCache.Implicits._
+import com.mogproject.mogami.playground.view.renderer.BoardRenderer.FlipEnabled
+import com.mogproject.mogami.playground.view.renderer.Renderer
 
 
 /**
@@ -48,7 +48,7 @@ case class PlayModeController(renderer: Renderer,
 
   override def canActivate(cursor: Cursor): Boolean = !cursor.isBox
 
-  override def canSelect(cursor: Cursor): Boolean = config.flip.when[Cursor](!_)(cursor) match {
+  override def canSelect(cursor: Cursor): Boolean = (config.flip == FlipEnabled).when[Cursor](!_)(cursor) match {
     case Cursor(Some(sq), None, None, None) => selectedState.board.get(sq).exists(selectedState.turn == _.owner)
     case Cursor(None, Some(h), None, None) => h.owner == selectedState.turn && selectedState.hand.get(h).exists(_ > 0)
     case _ => false
@@ -71,7 +71,7 @@ case class PlayModeController(renderer: Renderer,
       renderer.showGameInfoModal(config, game.gameInfo)
       None
     } else {
-      val from = config.flip.when[Cursor](!_)(selected).moveFrom
+      val from = (config.flip == FlipEnabled).when[Cursor](!_)(selected).moveFrom
 
       def f(to: Square, promote: Boolean): Option[GameController] = {
         val mv = MoveBuilderSfen(from, to, promote).toMove(selectedState, getLastMove.map(_.to))
@@ -92,7 +92,7 @@ case class PlayModeController(renderer: Renderer,
           } yield this.copy(game = g, displayPosition = displayPosition + 1)
       }
 
-      config.flip.when[Cursor](!_)(invoked) match {
+      (config.flip == FlipEnabled).when[Cursor](!_)(invoked) match {
         case Cursor(Some(to), None, None, None) if selectedState.canAttack(from, to) =>
           selectedState.getPromotionFlag(from, to) match {
             case Some(PromotionFlag.CannotPromote) => f(to, promote = false)
@@ -119,11 +119,11 @@ case class PlayModeController(renderer: Renderer,
     (selected.isBoard, selected.isHand, released.isBoard) match {
       case (true, false, true) =>
         for {
-          from <- selected.toSquare(config.flip)
-          to <- released.toSquare(config.flip)
+          from <- selected.toSquare(config.flip == FlipEnabled)
+          to <- released.toSquare(config.flip == FlipEnabled)
           p <- selectedState.board.get(from)
           sq <- adjustMovement(p, from, to)
-        } yield Cursor(sq, config.flip)
+        } yield Cursor(sq, config.flip == FlipEnabled)
       case (false, true, true) => Some(released) // no adjustment for hand pieces
       case _ => None
     }

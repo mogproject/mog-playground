@@ -1,10 +1,10 @@
 package com.mogproject.mogami.playground.view.parts.control
 
-import com.mogproject.mogami.{Game, GameStatus, Move, BranchNo, GamePosition}
+import com.mogproject.mogami.{BranchNo, Game, GamePosition, GameStatus, Move}
 import com.mogproject.mogami.core.move.SpecialMove
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
-import com.mogproject.mogami.playground.view.EventManageable
+import com.mogproject.mogami.playground.view.parts.common.EventManageable
 import org.scalajs.dom.html.Div
 import org.scalajs.dom.raw.HTMLSelectElement
 

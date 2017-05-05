@@ -2,8 +2,10 @@ package com.mogproject.mogami.playground.view.modal
 
 import com.mogproject.mogami.Piece
 import com.mogproject.mogami.playground.controller.{Configuration, English, Japanese}
-import com.mogproject.mogami.playground.view.EventManageable
 import com.mogproject.mogami.playground.view.modal.common.ModalLike
+import com.mogproject.mogami.playground.view.parts.common.EventManageable
+import com.mogproject.mogami.playground.view.renderer.BoardRenderer.FlipEnabled
+import com.mogproject.mogami.playground.view.renderer.piece.PieceRenderer
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom.CanvasRenderingContext2D
 import org.scalajs.dom.html.Canvas
@@ -16,6 +18,7 @@ import scalatags.JsDom.all._
   */
 // todo: draw on canvas
 case class PromotionDialog(config: Configuration,
+                           pieceRenderer: PieceRenderer,
                            piece: Piece,
                            callbackUnpromote: () => Unit,
                            callbackPromote: () => Unit
@@ -26,8 +29,8 @@ case class PromotionDialog(config: Configuration,
   private[this] val textScale: Double = 1.5
 
   private[this] def createCanvas: Canvas = canvas(
-    widthA := config.pieceRenderer.layout.PIECE_WIDTH * textScale,
-    heightA := config.pieceRenderer.layout.PIECE_HEIGHT * textScale,
+    widthA := pieceRenderer.layout.PIECE_WIDTH * textScale,
+    heightA := pieceRenderer.layout.PIECE_HEIGHT * textScale,
     marginLeft := "auto",
     marginRight := "auto",
     left := 0,
@@ -46,13 +49,13 @@ case class PromotionDialog(config: Configuration,
     canvasPromote.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
 
   private[this] val buttonUnpromote = button(tpe := "button", cls := "btn btn-default btn-block",
-    style := s"height: ${config.pieceRenderer.layout.PIECE_HEIGHT * textScale}px !important",
+    style := s"height: ${pieceRenderer.layout.PIECE_HEIGHT * textScale}px !important",
     data("dismiss") := "modal",
     canvasUnpromote
   ).render
 
   private[this] val buttonPromote = button(tpe := "button", cls := "btn btn-default btn-block",
-    style := s"height: ${config.pieceRenderer.layout.PIECE_HEIGHT * textScale}px !important",
+    style := s"height: ${pieceRenderer.layout.PIECE_HEIGHT * textScale}px !important",
     data("dismiss") := "modal",
     canvasPromote
   ).render
@@ -82,9 +85,11 @@ case class PromotionDialog(config: Configuration,
     setModalClickEvent(buttonUnpromote, dialog, callbackUnpromote)
     setModalClickEvent(buttonPromote, dialog, callbackPromote)
 
+    // todo: detect board ID
+
     // draw large pieces
-    config.pieceRenderer.drawPiece(contextUnpromote, config.flip.when[Piece](!_)(piece), 0, 0, textScale)
-    config.pieceRenderer.drawPiece(contextPromote, config.flip.when[Piece](!_)(piece.promoted), 0, 0, textScale)
+    pieceRenderer.drawPiece(contextUnpromote, (config.flip == FlipEnabled).when[Piece](!_)(piece), 0, 0, textScale)
+    pieceRenderer.drawPiece(contextPromote, (config.flip == FlipEnabled).when[Piece](!_)(piece.promoted), 0, 0, textScale)
   }
 
 }

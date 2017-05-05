@@ -3,9 +3,11 @@ package com.mogproject.mogami.playground.view.parts.board
 import com.mogproject.mogami.{BoardType, _}
 import com.mogproject.mogami.util.MapUtil
 import com.mogproject.mogami.util.Implicits._
-import com.mogproject.mogami.playground.controller.{Configuration, English, Japanese}
-import com.mogproject.mogami.playground.view._
+import com.mogproject.mogami.playground.controller.{English, Japanese, Language}
 import com.mogproject.mogami.playground.view.effect.MoveNextEffect
+import com.mogproject.mogami.playground.view.layout.BoardLayout
+import com.mogproject.mogami.playground.view.renderer.piece.{EnglishPieceRenderer, PieceRenderer, SimpleJapanesePieceRenderer}
+import com.mogproject.mogami.playground.view.renderer.{Circle, Line, Rectangle, TextRenderer}
 import org.scalajs.dom.{CanvasRenderingContext2D, UIEvent}
 import org.scalajs.dom.html.{Canvas, Div}
 
@@ -14,7 +16,18 @@ import scalatags.JsDom.all._
 /**
   *
   */
-case class MainBoard(layout: Layout) extends CursorManageable with MoveNextEffect {
+case class MainBoard(canvasWidth: Int,
+                     flip: Boolean,
+                     pieceLang: Language,
+                     recordLang: Language
+                    ) extends CursorManageable with MoveNextEffect {
+
+  protected val layout = BoardLayout(canvasWidth)
+
+  lazy val pieceRenderer: PieceRenderer = pieceLang match {
+    case Japanese => SimpleJapanesePieceRenderer(layout)
+    case English => EnglishPieceRenderer(layout)
+  }
 
   // main canvas
   protected val canvas0: Canvas = createCanvas(0)
@@ -33,7 +46,7 @@ case class MainBoard(layout: Layout) extends CursorManageable with MoveNextEffec
   protected val layer5: CanvasRenderingContext2D = canvas5.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
 
   // elements
-  private[this] lazy val canvasContainer: Div = div(
+  lazy val canvasContainer: Div = div(
     padding := 0,
     height := layout.canvasHeightCompact,
     canvases
@@ -68,13 +81,16 @@ case class MainBoard(layout: Layout) extends CursorManageable with MoveNextEffec
       setEventListener("mouseout", { _: UIEvent => clearHoldEvent() })
     }
 
+    // draw board
+    drawBoard()
   }
-
-  def output: Div = canvasContainer
 
   def expandCanvas(): Unit = {
     canvasContainer.style.height = layout.canvasHeight + "px"
     canvases.foreach(_.height = layout.canvasHeight)
+
+    // redraw board
+    drawBoard()
   }
 
   def contractCanvas(): Unit = {
@@ -103,8 +119,8 @@ case class MainBoard(layout: Layout) extends CursorManageable with MoveNextEffec
     }
   }
 
-  def drawPlayerIcon(config: Configuration): Unit = {
-    val (b, w) = config.flip.fold((layout.color.white, layout.color.fg), (layout.color.fg, layout.color.white))
+  def drawPlayerIcon(): Unit = {
+    val (b, w) = flip.fold((layout.color.white, layout.color.fg), (layout.color.fg, layout.color.white))
     val ctx = layer2
 
     // clear
@@ -123,8 +139,8 @@ case class MainBoard(layout: Layout) extends CursorManageable with MoveNextEffec
     layout.playerIconBlack.clear(ctx)
   }
 
-  def drawPlayerNames(config: Configuration, blackName: String, whiteName: String): Unit = {
-    drawPlayerIcon(config)
+  def drawPlayerNames(blackName: String, whiteName: String): Unit = {
+    drawPlayerIcon()
 
     val ctx = layer0
 
@@ -133,8 +149,8 @@ case class MainBoard(layout: Layout) extends CursorManageable with MoveNextEffec
 
     // draw
     List(
-      (config.flip.fold(whiteName, blackName), layout.playerNameBlack, false),
-      (config.flip.fold(blackName, whiteName), layout.playerNameWhite, true)).foreach { case (t, r, rot) =>
+      (flip.fold(whiteName, blackName), layout.playerNameBlack, false),
+      (flip.fold(blackName, whiteName), layout.playerNameWhite, true)).foreach { case (t, r, rot) =>
       TextRenderer(ctx, t, layout.font.playerName, layout.color.fg, r.left, r.top, r.width, r.height)
         .withTrim.alignLeft.alignMiddle.withRotate(rot).render()
     }
@@ -146,10 +162,10 @@ case class MainBoard(layout: Layout) extends CursorManageable with MoveNextEffec
     layout.playerNameBlack.clear(ctx, -1)
   }
 
-  def drawIndexes(config: Configuration): Unit = {
+  def drawIndexes(): Unit = {
     val ctx = layer3
     val fileIndex = "１２３４５６７８９"
-    val rankIndex = config.recordLang match {
+    val rankIndex = recordLang match {
       case Japanese => "一二三四五六七八九"
       case English => "abcdefghi"
     }
@@ -160,7 +176,7 @@ case class MainBoard(layout: Layout) extends CursorManageable with MoveNextEffec
 
     // file
     for (i <- 0 until 9) {
-      val text = fileIndex.charAt(config.flip.fold(8 - i, i)).toString
+      val text = fileIndex.charAt(flip.fold(8 - i, i)).toString
       val left = layout.fileIndex.left + layout.PIECE_WIDTH * (8 - i)
       val top = layout.fileIndex.top
 
@@ -170,7 +186,7 @@ case class MainBoard(layout: Layout) extends CursorManageable with MoveNextEffec
 
     //rank
     for (i <- 0 until 9) {
-      val text = rankIndex.charAt(config.flip.fold(8 - i, i)).toString
+      val text = rankIndex.charAt(flip.fold(8 - i, i)).toString
       val left = layout.rankIndex.left
       val top = layout.rankIndex.top + layout.PIECE_HEIGHT * i
       TextRenderer(ctx, text, layout.font.numberIndex, layout.color.fg, left, top, layout.rankIndex.width, layout.PIECE_HEIGHT)
@@ -178,27 +194,25 @@ case class MainBoard(layout: Layout) extends CursorManageable with MoveNextEffec
     }
   }
 
-  private[this] def drawPieces(config: Configuration, board: BoardType, hand: HandType): Unit = {
-    val pr = config.pieceRenderer
-
+  private[this] def drawPieces(board: BoardType, hand: HandType): Unit = {
     clearPieces()
-    board.foreach { case (sq, pc) => pr.drawOnBoard(layer2, config.flip.when[Piece](!_)(pc), config.flip.when[Square](!_)(sq)) }
-    hand.withFilter(_._2 > 0).foreach { case (pc, n) => pr.drawInHand(layer2, config.flip.when[Hand](!_)(pc), n) }
+    board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, flip.when[Piece](!_)(pc), flip.when[Square](!_)(sq)) }
+    hand.withFilter(_._2 > 0).foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, flip.when[Hand](!_)(pc), n) }
   }
 
-  def drawPieces(config: Configuration, state: State): Unit = drawPieces(config, state.board, state.hand)
+  def drawPieces(state: State): Unit = drawPieces(state.board, state.hand)
 
   /**
     * Draw illegal state
     */
-  def drawIllegalStatePieces(config: Configuration, state: State, move: Move): Unit = {
+  def drawIllegalStatePieces(state: State, move: Move): Unit = {
     val releaseBoard: BoardType => BoardType = move.from.when(sq => b => b - sq)
     val releaseHand: HandType => HandType = move.isDrop.when(MapUtil.decrementMap(_, Hand(move.newPiece)))
     val obtainHand: HandType => HandType = move.capturedPiece.when(p => h => MapUtil.incrementMap(h, Hand(!p.demoted)))
 
     val board = releaseBoard(state.board) + (move.to -> move.newPiece)
     val hand = (releaseHand andThen obtainHand) (state.hand)
-    drawPieces(config, board, hand)
+    drawPieces(board, hand)
   }
 
   def clearPieces(): Unit = {
@@ -207,22 +221,20 @@ case class MainBoard(layout: Layout) extends CursorManageable with MoveNextEffec
     layout.handBlack.clear(layer2, -4)
   }
 
-  def drawEditingPieces(config: Configuration, board: BoardType, hand: HandType, box: Map[Ptype, Int]): Unit = {
-    val pr = config.pieceRenderer
-
+  def drawEditingPieces(board: BoardType, hand: HandType, box: Map[Ptype, Int]): Unit = {
     clearPieces()
     clearPiecesInBox()
-    board.foreach { case (sq, pc) => pr.drawOnBoard(layer2, config.flip.when[Piece](!_)(pc), config.flip.when[Square](!_)(sq)) }
-    hand.withFilter(_._2 > 0).foreach { case (pc, n) => pr.drawInHand(layer2, config.flip.when[Hand](!_)(pc), n) }
-    box.withFilter(_._2 > 0).foreach { case (pt, n) => pr.drawInBox(layer2, pt, n) }
+    board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, flip.when[Piece](!_)(pc), flip.when[Square](!_)(sq)) }
+    hand.withFilter(_._2 > 0).foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, flip.when[Hand](!_)(pc), n) }
+    box.withFilter(_._2 > 0).foreach { case (pt, n) => pieceRenderer.drawInBox(layer2, pt, n) }
   }
 
   def clearPiecesInBox(): Unit = {
     layout.pieceBox.clear(layer2, -4)
   }
 
-  def drawIndicators(config: Configuration, turn: Player, status: GameStatus): Unit = {
-    val t = config.flip.fold(!turn, turn) // flip turn
+  def drawIndicators(turn: Player, status: GameStatus): Unit = {
+    val t = flip.fold(!turn, turn) // flip turn
 
     def f(r: Rectangle, text: String, rotated: Boolean): Unit = {
       TextRenderer(layer0, text, layout.font.indicator, layout.color.white, r.left, r.top, r.width, r.height)

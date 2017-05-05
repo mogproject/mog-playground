@@ -1,7 +1,6 @@
 package com.mogproject.mogami.playground.view.parts.common
 
 import com.mogproject.mogami.playground.controller.Language
-import com.mogproject.mogami.playground.view.EventManageable
 import org.scalajs.dom.Element
 import org.scalajs.dom.raw.HTMLElement
 

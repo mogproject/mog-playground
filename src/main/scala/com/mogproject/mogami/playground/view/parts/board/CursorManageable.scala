@@ -1,10 +1,13 @@
-package com.mogproject.mogami.playground.view
+package com.mogproject.mogami.playground.view.parts.board
 
 import com.mogproject.mogami._
-import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor}
-import org.scalajs.dom.html.Canvas
+import com.mogproject.mogami.playground.controller.{Controller, Cursor}
+import com.mogproject.mogami.playground.view.layout.BoardLayout
+import com.mogproject.mogami.playground.view.parts.common.EventManageable
+import com.mogproject.mogami.playground.view.renderer.Rectangle
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
+import org.scalajs.dom.html.Canvas
 import org.scalajs.dom.{CanvasRenderingContext2D, MouseEvent, TouchEvent}
 
 /**
@@ -18,13 +21,14 @@ trait CursorManageable extends EventManageable {
   // constants
   private[this] val boxPtypes: Seq[Ptype] = Ptype.KING +: Ptype.inHand
 
-  protected val layout: Layout
+  protected val layout: BoardLayout
 
   protected val canvas2: Canvas
   protected val layer0: CanvasRenderingContext2D
   protected val layer3: CanvasRenderingContext2D
   protected val layer4: CanvasRenderingContext2D
 
+  def flip: Boolean
 
   /**
     * Convert MouseEvent to Cursor
@@ -33,7 +37,7 @@ trait CursorManageable extends EventManageable {
     */
   def getCursor(clientX: Double, clientY: Double): Option[Cursor] = {
     // todo: refactor
-    // flip the cursor here when config.flip=true
+    // flip the cursor here when flip=true
 
     val rect = canvas2.getBoundingClientRect()
     val (x, y) = (clientX - rect.left, clientY - rect.top)
@@ -149,7 +153,7 @@ trait CursorManageable extends EventManageable {
   /**
     * Draw the last move area.
     */
-  def drawLastMove(config: Configuration, move: Option[Move]): Unit = {
+  def drawLastMove(move: Option[Move]): Unit = {
     val newArea: Set[Cursor] = move match {
       case None => Set.empty
       case Some(mv) =>
@@ -161,7 +165,7 @@ trait CursorManageable extends EventManageable {
     }
 
     clearLastMove()
-    newArea.foreach(a => cursorToRect(a, config.flip).drawFill(layer0, layout.color.light, 1))
+    newArea.foreach(a => cursorToRect(a, flip).drawFill(layer0, layout.color.light, 1))
   }
 
   def clearLastMove(): Unit = {

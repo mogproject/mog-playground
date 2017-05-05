@@ -2,11 +2,12 @@ package com.mogproject.mogami.playground.controller
 
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.core.state.StateCache.Implicits._
-import com.mogproject.mogami.playground.view.Renderer
-import com.mogproject.mogami._
+import com.mogproject.mogami.{BranchNo, _}
 import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller.mode._
 import com.mogproject.mogami.playground.io.RecordFormat
+import com.mogproject.mogami.playground.view.layout.Layout
+import com.mogproject.mogami.playground.view.renderer.Renderer
 import org.scalajs.dom.Element
 
 import scala.util.{Failure, Success, Try}
@@ -30,34 +31,12 @@ object Controller {
   def initialize(elem: Element, args: Arguments): Unit = {
     val config = args.config
 
-    // create game
-    def loadGame(game: => Game): Game = Try(game) match {
-      case Success(g) => g
-      case Failure(e) =>
-        println(s"Failed to create a game: ${e}")
-        Game()
-    }
-
     // load game
-    val gg: Game = ((args.usen, args.sfen) match {
-      case (Some(u), _) => loadGame(Game.parseUsenString(u)) // parse USEN string
-      case (_, Some(s)) => loadGame(Game.parseSfenString(s)) // parse SFEN string
-      case _ => Game()
-    }).copy(gameInfo = args.gameInfo)
-
-    // update comments
-    val comments = for {
-      (b, m) <- args.comments
-      (pos, c) <- m
-      h <- gg.getHistoryHash(GamePosition(b, pos))
-    } yield h -> c
-    val game = gg.copy(comments = comments)
+    val game = createGameFromArgs(args)
 
     // create renderer
-    val renderer = Renderer(elem, args.config.layout)
-
-    // draw board (do only one in the life time)
-    renderer.drawBoard()
+    val renderer = new Renderer
+    renderer.initialize(elem, config)
 
     // update mode
     val isSnapshot = game.trunk.moves.isEmpty && game.trunk.finalAction.isEmpty && game.branches.isEmpty
@@ -72,6 +51,29 @@ object Controller {
 
     // create image if the action is ImageAction
     if (args.action == ImageAction) renderer.drawAsImage()
+  }
+
+  private[this] def createGameFromArgs(args: Arguments): Game = {
+    def loadGame(game: => Game): Game = Try(game) match {
+      case Success(g) => g
+      case Failure(e) =>
+        println(s"Failed to create a game: ${e}")
+        Game()
+    }
+
+    val gg: Game = ((args.usen, args.sfen) match {
+      case (Some(u), _) => loadGame(Game.parseUsenString(u)) // parse USEN string
+      case (_, Some(s)) => loadGame(Game.parseSfenString(s)) // parse SFEN string
+      case _ => Game()
+    }).copy(gameInfo = args.gameInfo)
+
+    // update comments
+    val comments = for {
+      (b, m) <- args.comments
+      (pos, c) <- m
+      h <- gg.getHistoryHash(GamePosition(b, pos))
+    } yield h -> c
+    gg.copy(comments = comments)
   }
 
   /**
@@ -193,4 +195,17 @@ object Controller {
     case pc: PlayModeController => pc.setResign()
     case _ => None
   }, _.renderAll())
+
+  // Orientation
+  def changeOrientation(isLandscape: Boolean): Unit = {
+    val newConfig = modeController.get.config.updateOrientation(isLandscape)
+    modeController.get.renderer.initializeBoardRenderer(newConfig)
+
+    modeController = modeController.get match {
+      case gc: GameController => Some(gc.copy(config = newConfig))
+      case ec: EditModeController => Some(ec.copy(config = newConfig))
+    }
+
+    modeController.get.renderAll()
+  }
 }

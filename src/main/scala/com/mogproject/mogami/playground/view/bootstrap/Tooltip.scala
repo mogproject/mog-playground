@@ -1,6 +1,5 @@
 package com.mogproject.mogami.playground.view.bootstrap
 
-import com.mogproject.mogami.playground.view.Layout
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.Element
@@ -13,7 +12,7 @@ import scala.scalajs.js
   *
   */
 object Tooltip {
-  def enableHoverToolTip(layout: Layout): Unit = enableHoverToolTip(jQuery("""[data-toggle="tooltip"]"""), layout.isMobile)
+  def enableHoverToolTip(isMobile: Boolean): Unit = enableHoverToolTip(jQuery("""[data-toggle="tooltip"]"""), isMobile)
 
   def enableHoverToolTip(elems: Seq[HTMLElement]): Unit = elems.foreach(e => enableHoverToolTip(jQuery(e)))
 

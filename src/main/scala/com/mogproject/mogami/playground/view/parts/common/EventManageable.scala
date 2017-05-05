@@ -1,9 +1,9 @@
-package com.mogproject.mogami.playground.view
+package com.mogproject.mogami.playground.view.parts.common
 
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import org.scalajs.dom
-import org.scalajs.dom.{MouseEvent, TouchEvent}
 import org.scalajs.dom.raw.{HTMLElement, UIEvent}
+import org.scalajs.dom.{MouseEvent, TouchEvent}
 import org.scalajs.jquery.JQuery
 
 /**

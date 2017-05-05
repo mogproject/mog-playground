@@ -2,8 +2,9 @@ package com.mogproject.mogami.playground.view.renderer
 
 import com.mogproject.mogami.{BoardType, _}
 import com.mogproject.mogami.playground.controller.{Configuration, Cursor}
-import com.mogproject.mogami.playground.view.{Layout, TextRenderer}
 import com.mogproject.mogami.playground.view.parts.board.MainBoard
+import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipEnabled}
+import com.mogproject.mogami.playground.view.renderer.piece.PieceRenderer
 import org.scalajs.dom
 import org.scalajs.dom.html.Div
 
@@ -14,15 +15,28 @@ import scalatags.JsDom.all._
   */
 trait BoardRenderer {
 
-  def layout: Layout
+  private[this] var mainBoards: Seq[MainBoard] = Seq.empty
 
-  private[this] var mainBoard = MainBoard(layout)
+  lazy val boardRendererElement: Div = div().render
 
-  private[this] var mainBoards = Seq(mainBoard)
+  def getPieceRenderer: PieceRenderer = mainBoards.head.pieceRenderer
 
-  def boardRendererElement: Div = mainBoard.output
+  /**
+    * Initialize or reload main boards
+    *
+    * @param config configuration
+    */
+  def initializeBoardRenderer(config: Configuration): Unit = {
+    mainBoards = if (config.flip == DoubleBoard) {
+      Seq(false, true).map(f => MainBoard(config.canvasWidth, f, config.pieceLang, config.recordLang))
+    } else {
+      Seq(MainBoard(config.canvasWidth, config.flip == FlipEnabled, config.pieceLang, config.recordLang))
+    }
 
-  def initializeBoardRenderer(): Unit = mainBoard.initialize()
+    boardRendererElement.innerHTML = ""
+    boardRendererElement.appendChild(mainBoards.head.canvasContainer)
+    mainBoards.foreach(_.initialize())
+  }
 
   //
   // Actions
@@ -31,28 +45,28 @@ trait BoardRenderer {
     dom.window.document.body.style.backgroundColor = "black"
 
     val t = "Snapshot - Shogi Playground"
-    val base64 = mainBoard.getImageBase64
+    val base64 = mainBoards.head.getImageBase64
     val elem = a(attr("download") := "snapshot.png", title := t, href := base64, img(alt := t, src := base64))
     dom.window.document.body.innerHTML = elem.toString
   }
 
   def drawBoard(): Unit = mainBoards.foreach(_.drawBoard())
 
-  def drawIndexes(config: Configuration): Unit = mainBoards.foreach(_.drawIndexes(config))
+  def drawIndexes(): Unit = mainBoards.foreach(_.drawIndexes())
 
-  def drawIndicators(config: Configuration, turn: Player, status: GameStatus): Unit = mainBoards.foreach(_.drawIndicators(config, turn, status))
+  def drawIndicators(turn: Player, status: GameStatus): Unit = mainBoards.foreach(_.drawIndicators(turn, status))
 
-  def drawPlayerIcon(config: Configuration): Unit = mainBoards.foreach(_.drawPlayerIcon(config))
+  def drawPlayerIcon(): Unit = mainBoards.foreach(_.drawPlayerIcon())
 
   def clearPlayerIcon(): Unit = mainBoards.foreach(_.clearPlayerIcon())
 
-  def drawPlayerNames(config: Configuration, blackName: String, whiteName: String): Unit = mainBoards.foreach(_.drawPlayerNames(config, blackName, whiteName))
+  def drawPlayerNames(blackName: String, whiteName: String): Unit = mainBoards.foreach(_.drawPlayerNames(blackName, whiteName))
 
   def clearPlayerNames(): Unit = mainBoards.foreach(_.clearPlayerNames())
 
-  def drawPieces(config: Configuration, state: State): Unit = mainBoards.foreach(_.drawPieces(config, state))
+  def drawPieces(state: State): Unit = mainBoards.foreach(_.drawPieces(state))
 
-  def drawIllegalStatePieces(config: Configuration, state: State, move: Move): Unit = mainBoards.foreach(_.drawIllegalStatePieces(config, state, move))
+  def drawIllegalStatePieces(state: State, move: Move): Unit = mainBoards.foreach(_.drawIllegalStatePieces(state, move))
 
   def clearPieces(): Unit = mainBoards.foreach(_.clearPieces())
 
@@ -61,7 +75,7 @@ trait BoardRenderer {
 
   def contractCanvas(): Unit = mainBoards.foreach(_.contractCanvas())
 
-  def drawEditingPieces(config: Configuration, board: BoardType, hand: HandType, box: Map[Ptype, Int]): Unit = mainBoards.foreach(_.drawEditingPieces(config, board, hand, box))
+  def drawEditingPieces(board: BoardType, hand: HandType, box: Map[Ptype, Int]): Unit = mainBoards.foreach(_.drawEditingPieces(board, hand, box))
 
   def clearPiecesInBox(): Unit = mainBoards.foreach(_.clearPiecesInBox())
 
@@ -72,7 +86,7 @@ trait BoardRenderer {
   // cursor
   def flashCursor(cursor: Cursor): Unit = mainBoards.foreach(_.flashCursor(cursor))
 
-  def drawLastMove(config: Configuration, move: Option[Move]): Unit = mainBoards.foreach(_.drawLastMove(config, move))
+  def drawLastMove(move: Option[Move]): Unit = mainBoards.foreach(_.drawLastMove(move))
 
   def clearLastMove(): Unit = mainBoards.foreach(_.clearLastMove())
 
@@ -86,5 +100,22 @@ trait BoardRenderer {
   def startMoveForwardEffect(): Unit = mainBoards.foreach(_.startMoveForwardEffect())
 
   def startMoveBackwardEffect(): Unit = mainBoards.foreach(_.startMoveBackwardEffect())
+}
+
+object BoardRenderer {
+
+  sealed trait FlipType {
+    def unary_! : FlipType = this match {
+      case FlipEnabled => FlipDisabled
+      case FlipDisabled => FlipEnabled
+      case DoubleBoard => DoubleBoard
+    }
+  }
+
+  case object FlipDisabled extends FlipType
+
+  case object FlipEnabled extends FlipType
+
+  case object DoubleBoard extends FlipType
 
 }

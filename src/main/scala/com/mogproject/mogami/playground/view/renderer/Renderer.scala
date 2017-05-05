@@ -1,13 +1,13 @@
-package com.mogproject.mogami.playground.view
+package com.mogproject.mogami.playground.view.renderer
 
-import com.mogproject.mogami.{BranchNo, _}
-import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.api.Clipboard.Event
+import com.mogproject.mogami.playground.api.{Clipboard, MobileScreen}
 import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.modal._
-import com.mogproject.mogami.playground.view.renderer.BoardRenderer
+import com.mogproject.mogami.{BranchNo, _}
+import org.scalajs.dom.html.Div
 
 // todo: don't use parts directly but use only sections
 import com.mogproject.mogami.playground.view.parts.edit.EditReset
@@ -25,21 +25,23 @@ import scalatags.JsDom.all._
 /**
   * controls canvas rendering
   */
-case class Renderer(elem: Element, layout: Layout) extends BoardRenderer {
+class Renderer extends BoardRenderer {
+  //
+  // HTML elements
+  //
+  private[this] var controlSection: ControlSection = ControlSection(0, false)
 
-  private[this] val navigatorSection = NavigatorSection(layout)
+  private[this] var mainPane: Div = div().render
 
-  private[this] lazy val controlSection = ControlSection(layout.canvasWidth, layout.isMobile)
-
-  private[this] lazy val mainPane = div(
+  private[this] def createMainPane(canvasWidth: Int, isMobile: Boolean) = div(
     div(cls := "navbar",
-      tag("nav")(cls := "navbar navbar-default navbar-fixed-top", navigatorSection.output)
+      tag("nav")(cls := "navbar navbar-default navbar-fixed-top", NavigatorSection.output)
     ),
     div(cls := "container",
-      layout.isMobile.fold(Seq(position := position.fixed.v, width := "100%"), ""),
+      isMobile.fold(Seq(position := position.fixed.v, width := "100%"), ""),
       div(cls := "row",
         div(cls := "col-sm-7 col-md-6 col-lg-5", paddingLeft := 0, paddingRight := 0,
-          div(margin := "auto", padding := 0, width := layout.canvasWidth,
+          div(margin := "auto", padding := 0, width := canvasWidth,
             boardRendererElement,
             controlSection.output
           )
@@ -56,14 +58,16 @@ case class Renderer(elem: Element, layout: Layout) extends BoardRenderer {
     )
   ).render
 
-  initialize()
-
-  private[this] def initialize(): Unit = {
+  def initialize(elem: Element, config: Configuration): Unit = {
+    // create elements
+    controlSection = ControlSection(config.canvasWidth, config.isMobile)
+    mainPane = createMainPane(config.canvasWidth, config.isMobile)
     elem.appendChild(mainPane)
 
-    initializeBoardRenderer()
-    navigatorSection.initialize()
+    initializeBoardRenderer(config)
+    NavigatorSection.initialize()
     controlSection.initialize()
+
     MenuPane.initialize()
 
     // initialize clipboard.js
@@ -72,7 +76,10 @@ case class Renderer(elem: Element, layout: Layout) extends BoardRenderer {
     cp.on("error", (e: Event) => Tooltip.display(e.trigger, "Failed!"))
 
     // initialize tooltips
-    Tooltip.enableHoverToolTip(layout)
+    Tooltip.enableHoverToolTip(config.isMobile)
+
+    // add events
+    dom.window.addEventListener("orientationchange", (e: Event) => Controller.changeOrientation(MobileScreen.isLandscape))
   }
 
   /**
@@ -87,7 +94,7 @@ case class Renderer(elem: Element, layout: Layout) extends BoardRenderer {
   def hideControlSection(): Unit = List(controlSection, GameMenuSection, GameHelpSection).foreach(_.hide())
 
   def askPromote(config: Configuration, piece: Piece, callbackUnpromote: () => Unit, callbackPromote: () => Unit): Unit = {
-    PromotionDialog(config, piece, callbackUnpromote, callbackPromote).show()
+    PromotionDialog(config, getPieceRenderer, piece, callbackUnpromote, callbackPromote).show()
   }
 
   def askConfirm(lang: Language, callback: () => Unit): Unit = {
@@ -114,7 +121,7 @@ case class Renderer(elem: Element, layout: Layout) extends BoardRenderer {
     AlertDialog(lang, s).show()
   }
 
-  def showMenuModal(): Unit = MenuDialog.show(layout)
+  def showMenuModal(): Unit = MenuDialog.show()
 
   def hideMenuModal(timeout: Double): Unit = dom.window.setTimeout({ () => MenuDialog.hide() }, timeout)
 
@@ -140,7 +147,7 @@ case class Renderer(elem: Element, layout: Layout) extends BoardRenderer {
   def updateCommentOmissionWarning(displayWarning: Boolean): Unit = GameMenuSection.updateCommentOmissionWarning(displayWarning)
 
   // navigator section
-  def updateMode(mode: Mode): Unit = navigatorSection.updateMode(mode)
+  def updateMode(mode: Mode): Unit = NavigatorSection.updateMode(mode)
 
   def updateFlip(config: Configuration): Unit = FlipButton.updateValue(config.flip)
 

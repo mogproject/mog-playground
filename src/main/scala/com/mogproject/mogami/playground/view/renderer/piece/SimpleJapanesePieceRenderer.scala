@@ -1,14 +1,15 @@
-package com.mogproject.mogami.playground.view.piece
+package com.mogproject.mogami.playground.view.renderer.piece
 
 import com.mogproject.mogami.Piece
-import com.mogproject.mogami.playground.view.{Layout, TextRenderer}
+import com.mogproject.mogami.playground.view.layout.BoardLayout
+import com.mogproject.mogami.playground.view.renderer.TextRenderer
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom.CanvasRenderingContext2D
 
 /**
   * Japanese pieces (one character)
   */
-case class SimpleJapanesePieceRenderer(layout: Layout) extends PieceRenderer {
+case class SimpleJapanesePieceRenderer(layout: BoardLayout) extends PieceRenderer {
   override def drawPiece(ctx: CanvasRenderingContext2D, piece: Piece, left: Int, top: Int, scale: Double = 1.0): Unit = {
     val w = (layout.PIECE_WIDTH * scale).toInt
     val h = (layout.PIECE_HEIGHT * scale).toInt

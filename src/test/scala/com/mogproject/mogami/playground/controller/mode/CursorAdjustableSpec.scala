@@ -2,7 +2,7 @@ package com.mogproject.mogami.playground.controller.mode
 
 import com.mogproject.mogami._
 import com.mogproject.mogami.playground.controller.Configuration
-import com.mogproject.mogami.playground.view.Renderer
+import com.mogproject.mogami.playground.view.renderer.Renderer
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FlatSpec, MustMatchers}
 

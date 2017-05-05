@@ -4,7 +4,7 @@ import com.mogproject.mogami._
 import com.mogproject.mogami.{Player, State}
 import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.io.RecordFormat
-import com.mogproject.mogami.playground.view.Renderer
+import com.mogproject.mogami.playground.view.renderer.Renderer
 
 
 /**
@@ -58,13 +58,12 @@ trait ModeController {
 
     // player names
     renderer.drawPlayerNames(
-      config,
       gameInfo.tags.getOrElse('blackName, defaultNames(config.recordLang, BLACK)),
       gameInfo.tags.getOrElse('whiteName, defaultNames(config.recordLang, WHITE))
     )
 
     // draw indexes
-    renderer.drawIndexes(config)
+    renderer.drawIndexes()
 
     // update flip button
     renderer.updateFlip(config)

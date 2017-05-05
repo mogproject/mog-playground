@@ -1,14 +1,16 @@
-package com.mogproject.mogami.playground.view
+package com.mogproject.mogami.playground.view.layout
+
+import com.mogproject.mogami.playground.view.renderer.{Rectangle, RoundRect}
 
 /**
-  * layout constants
+  *
   */
-case class Layout(canvasWidth: Int, isMobile: Boolean) {
+case class BoardLayout(canvasWidth: Int) {
 
   lazy val canvasHeight: Int = pieceBox.bottom + MARGIN_BOTTOM
   lazy val canvasHeightCompact: Int = handBlack.bottom + MARGIN_BOTTOM
 
-  def scaleByCanvas(x: Int): Int = canvasWidth * x / 1000
+  private[this] def scaleByCanvas(x: Int): Int = canvasWidth * x / 1000
 
   def scaleByPiece(pieceWidth: Int, x: Int): Int = pieceWidth * x / 1000
 
@@ -112,17 +114,10 @@ case class Layout(canvasWidth: Int, isMobile: Boolean) {
     // numbers
     val number = "#f3f372"
     val stroke = "#333333"
-
-    // bootstrap
-    val bsPrimary = "#337ab7"
-    val bsDefault = "#f8f8f8"
-    val bsSuccess = "#dff0d8"
-    val bsInfo = "#d9edf7"
-    val bsWarning = "#fcf8e3"
-    val bsDanger = "#f2dede"
   }
 
   lazy val strokeSize: Int = scaleByCanvas(10)
   lazy val moveForwardStrokeSize: Int = scaleByCanvas(20)
   val moveForwardAlpha: Double = 0.2
+
 }
