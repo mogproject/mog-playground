@@ -17,7 +17,7 @@ trait BoardRenderer {
 
   private[this] var mainBoards: Seq[MainBoard] = Seq.empty
 
-  lazy val boardRendererElement: Div = div().render
+  lazy val boardRendererElement: Div = div(cls := "row").render
 
   def getPieceRenderer: PieceRenderer = mainBoards.head.pieceRenderer
 
@@ -34,7 +34,8 @@ trait BoardRenderer {
     }
 
     boardRendererElement.innerHTML = ""
-    boardRendererElement.appendChild(mainBoards.head.canvasContainer)
+    // todo: finalize layout
+    boardRendererElement.appendChild(mainBoards.map(e => div(cls := s"col-xs-${12 / mainBoards.length}", e.canvasContainer)).render)
     mainBoards.foreach(_.initialize())
   }
 

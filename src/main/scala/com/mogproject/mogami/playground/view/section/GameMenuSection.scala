@@ -35,7 +35,7 @@ object GameMenuSection extends Section {
     AccordionMenu(
       "Branch",
       "Branch",
-      isExpanded = true,
+      isExpanded = false,
       isVisible = true,
       div(
         BranchButton.output

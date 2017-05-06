@@ -1,8 +1,6 @@
 package com.mogproject.mogami.playground.controller
 
-import com.mogproject.mogami.playground.api.MobileScreen
 import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipDisabled, FlipEnabled, FlipType}
-import com.mogproject.mogami.playground.view.renderer.piece.{EnglishPieceRenderer, PieceRenderer, SimpleJapanesePieceRenderer}
 import org.scalajs.dom
 
 import scala.scalajs.js.UndefOr
@@ -11,10 +9,7 @@ import scala.scalajs.js.UndefOr
   *
   */
 case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
-                         screenWidth: Double = Configuration.defaultScreenWidth,
-                         screenHeight: Double = Configuration.defaultScreenHeight,
                          isMobile: Boolean = Configuration.defaultIsMobile,
-                         isLandscape: Boolean = Configuration.defaultIsLandscape,
                          canvasWidth: Int = Configuration.defaultCanvasWidth,
                          messageLang: Language = Configuration.browserLanguage,
                          recordLang: Language = Configuration.browserLanguage,
@@ -50,9 +45,8 @@ case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
     (parseMessageLang andThen parseRecordLang andThen parsePieceLang andThen parseFlip) (List.empty)
   }
 
-  def updateOrientation(newIsLandScape: Boolean): Configuration = {
-    val newCanvasWidth = if (newIsLandScape) 200 else Configuration.defaultCanvasWidth
-    this.copy(isLandscape = newIsLandScape, canvasWidth = newCanvasWidth)
+  def updateScreenSize(): Configuration = {
+    this.copy(canvasWidth = Configuration.getDefaultCanvasWidth(dom.window.screen.width, dom.window.screen.height))
   }
 
 }
@@ -73,18 +67,10 @@ object Configuration {
 
   lazy val defaultBaseUrl = s"${dom.window.location.protocol}//${dom.window.location.host}${dom.window.location.pathname}"
 
-  lazy val defaultScreenWidth: Double = dom.window.screen.width
+  lazy val defaultIsMobile: Boolean = dom.window.screen.width < 768
 
-  lazy val defaultScreenHeight: Double = dom.window.screen.height
+  lazy val defaultCanvasWidth: Int = getDefaultCanvasWidth(dom.window.screen.width, dom.window.screen.height)
 
-  lazy val defaultIsMobile: Boolean = defaultScreenWidth < 768
-
-  lazy val defaultIsLandscape: Boolean = MobileScreen.isLandscape
-
-  lazy val defaultCanvasWidth: Int = defaultScreenWidth match {
-    case x if x >= 1024.0 => 400
-    case x if x >= 400.0 => 375
-    case x if x >= 375.0 => 336
-    case _ => 300
-  }
+  def getDefaultCanvasWidth(screenWidth: Double, screenHeight: Double): Int =
+    math.max(100, math.min(math.min(screenWidth - 10, (screenHeight - 40) * 400 / 576).toInt, 400))
 }

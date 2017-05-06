@@ -16,7 +16,7 @@ import scalatags.JsDom.all._
 case class ControlBar(canvasWidth: Int) extends EventManageable {
 
   private[this] val CONTROL_WIDTH = 48
-  private[this] val LONG_LIST_SIZE = 36
+  private[this] val LONG_LIST_SIZE = 32
 
   private[this] val controlInput0 = createControlInput("step-backward")
   private[this] val controlInput1 = createControlInput("backward")

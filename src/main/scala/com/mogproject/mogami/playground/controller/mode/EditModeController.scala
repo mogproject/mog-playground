@@ -1,6 +1,6 @@
 package com.mogproject.mogami.playground.controller.mode
 
-import com.mogproject.mogami.{HandType, _}
+import com.mogproject.mogami.{HandType, BoardType, _}
 import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.util.MapUtil
 import com.mogproject.mogami.util.Implicits._

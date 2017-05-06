@@ -30,20 +30,24 @@ object FlipButton extends ButtonLike[FlipType, Button, Div] {
 
   override def updateLabel(lang: Language): Unit = ???
 
-  override def updateValue(newValue: FlipType): Unit = newValue match {
-    case FlipEnabled =>
-      inputs.head.disabled = false
-      inputs.head.classList.remove("btn-default")
-      inputs.head.classList.add("btn-primary")
-    case FlipDisabled =>
-      inputs.head.disabled = false
-      inputs.head.classList.remove("btn-primary")
-      inputs.head.classList.add("btn-default")
-    case DoubleBoard =>
-      inputs.head.classList.remove("btn-primary")
-      inputs.head.classList.add("btn-default")
-      inputs.head.disabled = true
+  override def updateValue(newValue: FlipType): Unit = {
+    val elem = inputs.head
+
+    newValue match {
+      case FlipEnabled =>
+        elem.disabled = false
+        elem.classList.remove("btn-default")
+        elem.classList.add("btn-primary")
+      case FlipDisabled =>
+        elem.disabled = false
+        elem.classList.remove("btn-primary")
+        elem.classList.add("btn-default")
+      case DoubleBoard =>
+        elem.classList.remove("btn-primary")
+        elem.classList.add("btn-default")
+        elem.disabled = true
+    }
   }
 
-  override protected def invoke(key: FlipType) = Controller.toggleFlip()
+  override protected def invoke(key: FlipType): Unit = Controller.toggleFlip()
 }

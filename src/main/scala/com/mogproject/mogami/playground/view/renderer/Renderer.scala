@@ -1,12 +1,13 @@
 package com.mogproject.mogami.playground.view.renderer
 
 import com.mogproject.mogami.playground.api.Clipboard.Event
-import com.mogproject.mogami.playground.api.{Clipboard, MobileScreen}
+import com.mogproject.mogami.playground.api.Clipboard
 import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.{BranchNo, _}
+import org.scalajs.dom.UIEvent
 import org.scalajs.dom.html.Div
 
 // todo: don't use parts directly but use only sections
@@ -79,7 +80,7 @@ class Renderer extends BoardRenderer {
     Tooltip.enableHoverToolTip(config.isMobile)
 
     // add events
-    dom.window.addEventListener("orientationchange", (e: Event) => Controller.changeOrientation(MobileScreen.isLandscape))
+    dom.window.addEventListener("orientationchange", (_: UIEvent) => Controller.changeScreenSize())
   }
 
   /**

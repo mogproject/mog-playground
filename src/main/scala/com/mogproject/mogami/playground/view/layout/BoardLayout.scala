@@ -116,7 +116,7 @@ case class BoardLayout(canvasWidth: Int) {
     val stroke = "#333333"
   }
 
-  lazy val strokeSize: Int = scaleByCanvas(10)
+  lazy val strokeSize: Int = math.max(3, scaleByCanvas(10))
   lazy val moveForwardStrokeSize: Int = scaleByCanvas(20)
   val moveForwardAlpha: Double = 0.2
 

@@ -128,15 +128,17 @@ canvas {
 }
 
 .collapsing {
-  /* fixes issue#105 */
+  /**
+  /* fixes issue#105 *
   height: 100% !important;
 
-  /* disable transition */
+  /* disable transition *
   -webkit-transition: height 0.01s;
   -moz-transition: height 0.01s;
   -ms-transition: height 0.01s;
   -o-transition: height 0.01s;
   transition: height 0.01s;
+  **/
 }
 
 .input-small {

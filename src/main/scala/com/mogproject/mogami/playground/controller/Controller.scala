@@ -6,7 +6,6 @@ import com.mogproject.mogami.{BranchNo, _}
 import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller.mode._
 import com.mogproject.mogami.playground.io.RecordFormat
-import com.mogproject.mogami.playground.view.layout.Layout
 import com.mogproject.mogami.playground.view.renderer.Renderer
 import org.scalajs.dom.Element
 
@@ -132,9 +131,9 @@ object Controller {
 
   def setMessageLanguage(lang: Language): Unit = doAction(_.setMessageLanguage(lang), _.renderAll())
 
-  def setRecordLanguage(lang: Language): Unit = doAction(_.setRecordLanguage(lang), _.renderAll())
+  def setRecordLanguage(lang: Language): Unit = doAction(_.setRecordLanguage(lang), _.refreshBoard())
 
-  def setPieceLanguage(lang: Language): Unit = doAction(_.setPieceLanguage(lang), _.renderAll())
+  def setPieceLanguage(lang: Language): Unit = doAction(_.setPieceLanguage(lang), _.refreshBoard())
 
   def setRecord(index: Int): Unit = doAction(_.setRecord(index), _.renderAll())
 
@@ -147,7 +146,7 @@ object Controller {
 
   def setGameInfo(gameInfo: GameInfo): Unit = doAction(_.setGameInfo(gameInfo), _.renderAll())
 
-  def toggleFlip(): Unit = doAction(_.toggleFlip(), _.renderAll())
+  def toggleFlip(): Unit = doAction(_.toggleFlip(), _.refreshBoard())
 
   def showMenu(): Unit = modeController.get.renderer.showMenuModal()
 
@@ -197,15 +196,11 @@ object Controller {
   }, _.renderAll())
 
   // Orientation
-  def changeOrientation(isLandscape: Boolean): Unit = {
-    val newConfig = modeController.get.config.updateOrientation(isLandscape)
-    modeController.get.renderer.initializeBoardRenderer(newConfig)
-
-    modeController = modeController.get match {
+  def changeScreenSize(): Unit = doAction({ mc =>
+    val newConfig = mc.config.updateScreenSize()
+    mc match {
       case gc: GameController => Some(gc.copy(config = newConfig))
       case ec: EditModeController => Some(ec.copy(config = newConfig))
     }
-
-    modeController.get.renderAll()
-  }
+  }, _.refreshBoard())
 }

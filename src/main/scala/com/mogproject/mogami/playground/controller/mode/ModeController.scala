@@ -77,6 +77,11 @@ trait ModeController {
     renderer.updateFlip(config)
   }
 
+  def refreshBoard(): Unit = {
+    renderer.initializeBoardRenderer(config)
+    renderAll()
+  }
+
   def renderAfterUpdatingComment(updateTextArea: Boolean): Unit = {}
 
   // cursor check

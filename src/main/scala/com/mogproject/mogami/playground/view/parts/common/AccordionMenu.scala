@@ -15,9 +15,6 @@ case class AccordionMenu(ident: String, title: String, isExpanded: Boolean, isVi
   private[this] val glyphCls = Map(false -> "glyphicon-menu-right", true -> "glyphicon-menu-down")
   private[this] val panelCls = Map(false -> "panel-default", true -> "panel-info")
 
-  // @note do not set a group
-  // data("parent") := "#accordion"
-
   private[this] val glyph = span(cls := "glyphicon").render
 
   private[this] val mainElem: Div = div(
@@ -40,6 +37,7 @@ case class AccordionMenu(ident: String, title: String, isExpanded: Boolean, isVi
       role := "button",
       data("toggle") := "collapse",
       data("target") := s"#collapse${ident}",
+      data("parent") := "#accordion",
       h4(cls := "panel-title",
         span(
           cls := "accordion-toggle",
