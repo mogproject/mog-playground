@@ -148,3 +148,7 @@ canvas {
 .alert {
   margin-bottom: 10px !important;
 }
+
+select {
+  padding: 0 !important;
+}

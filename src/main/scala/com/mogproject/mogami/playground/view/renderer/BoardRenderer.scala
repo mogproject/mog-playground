@@ -36,6 +36,7 @@ trait BoardRenderer {
     boardRendererElement.innerHTML = ""
     // todo: finalize layout
     boardRendererElement.appendChild(mainBoards.map(e => div(cls := s"col-xs-${12 / mainBoards.length}", e.canvasContainer)).render)
+    boardRendererElement.style.width = config.canvasWidth * mainBoards.length + "px"
     mainBoards.foreach(_.initialize())
   }
 

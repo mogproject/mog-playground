@@ -38,19 +38,24 @@ class Renderer extends BoardRenderer {
     div(cls := "navbar",
       tag("nav")(cls := "navbar navbar-default navbar-fixed-top", NavigatorSection.output)
     ),
-    div(cls := "container",
+    div(cls := "container-fluid",
       isMobile.fold(Seq(position := position.fixed.v, width := "100%"), ""),
       div(cls := "row",
-        div(cls := "col-sm-7 col-md-6 col-lg-5", paddingLeft := 0, paddingRight := 0,
-          div(margin := "auto", padding := 0, width := canvasWidth,
-            boardRendererElement,
-            controlSection.output
-          )
+        div(cls := "col-sm-5 col-sm-push-7 col-md-4 col-md-push-8 hidden-xs",
+          // side menu
+          paddingLeft := 0,
+          MenuPane.output
         ),
-        div(cls := "col-sm-5 col-md-6 col-lg-7 hidden-xs", paddingLeft := 0,
+        div(cls := "col-sm-7 col-sm-pull-5 col-md-8 col-md-pull-4",
           div(cls := "row",
-            div(cls := "col-md-4 col-lg-3 hidden-sm", paddingLeft := 0, controlSection.outputLongSelector),
-            div(cls := "col-md-8 col-lg-9", MenuPane.output)
+            // long selector
+            div(cls := "hidden-xs hidden-sm", width := 168, float := float.left.v, paddingLeft := 15, paddingRight := 0, controlSection.outputLongSelector),
+
+            // boards
+            div(cls := "", overflowX := overflow.auto.v, paddingLeft := 15, paddingRight := 15,
+              boardRendererElement,
+              controlSection.output
+            )
           )
         )
       ),
