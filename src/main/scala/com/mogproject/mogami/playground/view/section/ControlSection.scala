@@ -11,21 +11,32 @@ import scalatags.JsDom.all._
 /**
   *
   */
-case class ControlSection(canvasWidth: Int, isMobile: Boolean) extends Section {
+case class ControlSection(canvasWidth: Int, isMobile: Boolean, isSmall: Boolean) extends Section {
 
-  private[this] lazy val controlBar = ControlBar(canvasWidth)
+  private[this] val sectionWidth = math.max(300, canvasWidth)
+
+  private[this] lazy val controlBar = ControlBar(sectionWidth, isSmall = isSmall)
   private[this] lazy val commentButton = CommentButton(isDisplayOnly = isMobile, isModal = false)
 
   override def initialize(): Unit = {
     controlBar.initialize()
   }
 
-  override val output: Div = div(
-    width := canvasWidth,
+  override lazy val output: Div = div(
+    width := sectionWidth,
     paddingTop := "5px",
     controlBar.output,
     commentButton.output
   ).render
+
+  lazy val outputControlBar: Div = div(
+    cls := "center-block",
+    width := sectionWidth,
+    paddingTop := "5px",
+    controlBar.output
+  ).render
+
+  def outputComment: Div = commentButton.output
 
   def outputLongSelector: HTMLSelectElement = controlBar.outputLongSelector
 

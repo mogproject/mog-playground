@@ -10,6 +10,7 @@ import scala.scalajs.js.UndefOr
   */
 case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
                          isMobile: Boolean = Configuration.defaultIsMobile,
+                         isLandscape: Boolean = Configuration.defaultIsLandscape,
                          canvasWidth: Int = Configuration.defaultCanvasWidth,
                          messageLang: Language = Configuration.browserLanguage,
                          recordLang: Language = Configuration.browserLanguage,
@@ -46,7 +47,10 @@ case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
   }
 
   def updateScreenSize(): Configuration = {
-    this.copy(canvasWidth = Configuration.getDefaultCanvasWidth(dom.window.screen.width, dom.window.screen.height))
+    this.copy(
+      canvasWidth = Configuration.getDefaultCanvasWidth(dom.window.screen.width, dom.window.screen.height),
+      isLandscape = Configuration.defaultIsLandscape
+    )
   }
 
 }
@@ -68,6 +72,8 @@ object Configuration {
   lazy val defaultBaseUrl = s"${dom.window.location.protocol}//${dom.window.location.host}${dom.window.location.pathname}"
 
   lazy val defaultIsMobile: Boolean = dom.window.screen.width < 768
+
+  def defaultIsLandscape: Boolean = dom.window.screen.height < dom.window.screen.width
 
   lazy val defaultCanvasWidth: Int = getDefaultCanvasWidth(dom.window.screen.width, dom.window.screen.height)
 

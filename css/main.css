@@ -96,7 +96,11 @@
   background-color: #fff;
 }
 
+html {
+  height: 100%;
+}
 body {
+  height: 100%;
   /* disables selection */
   user-select: none; /* CSS3 */
   -moz-user-select: none; /* Firefox */
@@ -116,8 +120,16 @@ hr {
   margin-bottom: 10px !important;
 }
 
+row {
+  height: 100%;
+}
+
 canvas {
   position: absolute;
+}
+
+.container-fluid {
+  padding: 0 !important;
 }
 
 .modal-open {
@@ -146,10 +158,25 @@ canvas {
   font-size: 12px;
 }
 
+.control-small {
+  height: 28px !important
+}
+
 .alert {
   margin-bottom: 10px !important;
 }
 
 select {
   padding: 0 !important;
+}
+
+.side-bar-col {
+  background-color: #ccd1d9;
+  z-index: 1000;
+  margin-bottom: -9999px;
+  padding-bottom: 9999px;
+}
+
+.row{
+    overflow: hidden;
 }

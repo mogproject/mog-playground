@@ -17,7 +17,9 @@ trait BoardRenderer {
 
   private[this] var mainBoards: Seq[MainBoard] = Seq.empty
 
-  lazy val boardRendererElement: Div = div(cls := "row").render
+  lazy val boardRendererElement1: Div = div().render
+
+  lazy val boardRendererElement2: Div = div().render
 
   def getPieceRenderer: PieceRenderer = mainBoards.head.pieceRenderer
 
@@ -33,10 +35,15 @@ trait BoardRenderer {
       Seq(MainBoard(config.canvasWidth, config.flip == FlipEnabled, config.pieceLang, config.recordLang))
     }
 
-    boardRendererElement.innerHTML = ""
+    boardRendererElement1.innerHTML = ""
+    boardRendererElement2.innerHTML = ""
     // todo: finalize layout
-    boardRendererElement.appendChild(mainBoards.map(e => div(cls := s"col-xs-${12 / mainBoards.length}", e.canvasContainer)).render)
-    boardRendererElement.style.width = config.canvasWidth * mainBoards.length + 30 + "px"
+    boardRendererElement1.appendChild(mainBoards.head.canvasContainer)
+    if (mainBoards.length == 2) {
+      boardRendererElement2.appendChild(mainBoards(1).canvasContainer)
+    }
+
+//    boardRendererElement1.style.width = config.canvasWidth * mainBoards.length + 30 + "px"
     mainBoards.foreach(_.initialize())
   }
 

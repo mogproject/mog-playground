@@ -6,6 +6,7 @@ import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.modal._
+import com.mogproject.mogami.playground.view.renderer.BoardRenderer.DoubleBoard
 import com.mogproject.mogami.{BranchNo, _}
 import org.scalajs.dom.UIEvent
 import org.scalajs.dom.html.Div
@@ -30,36 +31,31 @@ class Renderer extends BoardRenderer {
   //
   // HTML elements
   //
-  private[this] var controlSection: ControlSection = ControlSection(0, false)
+  private[this] var controlSection: ControlSection = ControlSection(0, false, false)
 
   private[this] var mainPane: Div = div().render
 
-  private[this] def createMainPane(canvasWidth: Int, isMobile: Boolean) = div(
+  private[this] def createMainPane(canvasWidth: Int, numBoards: Int, isMobile: Boolean, isLandscape: Boolean) = div(
     div(cls := "navbar",
       tag("nav")(cls := "navbar navbar-default navbar-fixed-top", NavigatorSection.output)
     ),
     div(cls := "container-fluid",
-      isMobile.fold(Seq(position := position.fixed.v, width := "100%"), ""),
+      isMobile.fold(Seq(position := position.fixed.v, width := "100%", padding := 0), ""),
       div(cls := "row",
         // side menu
-        div(cls := "col-sm-5 col-sm-push-7 col-md-4 col-md-push-8 hidden-xs",
-          paddingLeft := 0,
-          MenuPane.output
+        div(cls := "col-sm-5 col-sm-push-7 col-md-4 col-md-push-8 hidden-xs side-bar-col",
+          div(
+            MenuPane.output
+          )
         ),
         // main content
         div(cls := "col-sm-7 col-sm-pull-5 col-md-8 col-md-pull-4",
-          div(cls := "container-fluid", width := 168 + canvasWidth + 30, padding := 0,
-            div(cls := "row",
-              // long selector
-              div(cls := "hidden-xs hidden-sm", width := 168, float := float.left.v, paddingLeft := 15, paddingRight := 0, controlSection.outputLongSelector),
-
-              // boards
-              div(overflowX := overflow.auto.v, paddingLeft := 15, paddingRight := 15,
-                boardRendererElement,
-                controlSection.output
-              )
-            )
-          )
+          (isMobile, isLandscape, numBoards == 2) match {
+            case (true, true, true) => createMobileLandscapeMainDouble(canvasWidth)
+            case (true, true, false) => createMobileLandscapeMain(canvasWidth)
+            case (true, false, _) => createMobilePortraitMain(canvasWidth)
+            case _ => createPCPortraitMain(canvasWidth, numBoards)
+          }
         )
       ),
       hr(),
@@ -67,10 +63,80 @@ class Renderer extends BoardRenderer {
     )
   ).render
 
+  // todo: create a class
+  private[this] def createPCPortraitMain(canvasWidth: Int, numBoards: Int) = div(
+    div(cls := "container-fluid", width := 168 + canvasWidth * numBoards + 30, padding := 0,
+      div(cls := "row",
+        // long selector
+        div(cls := "hidden-xs hidden-sm", width := 168, float := float.left.v, paddingLeft := 15, paddingRight := 0, controlSection.outputLongSelector),
+
+        // boards
+        div(overflowX := overflow.auto.v, paddingLeft := 15, paddingRight := 15,
+          if (numBoards == 2) {
+            div(cls := "row",
+              div(cls := "col-sm-6",
+                boardRendererElement1,
+                controlSection.output
+              ),
+              div(cls := "col-sm-6",
+                boardRendererElement2
+              )
+            )
+          } else {
+            div(
+              boardRendererElement1,
+              controlSection.output
+            )
+          }
+        )
+      )
+    )
+  )
+
+  private[this] def createMobilePortraitMain(canvasWidth: Int) = div(
+    cls := "container-fluid", width := canvasWidth, padding := 0,
+    boardRendererElement1,
+    controlSection.output
+  ).render
+
+  private[this] def createMobileLandscapeMain(canvasWidth: Int) = div(
+    cls := "container-fluid", width := canvasWidth * 2 + 30, padding := 0,
+    div(cls := "row",
+      div(cls := "col-xs-6",
+        boardRendererElement1
+      ),
+      div(cls := "col-xs-6",
+        controlSection.outputComment
+      )
+    ),
+    div(cls := "row",
+      div(cls := "col-xs-12",
+        controlSection.outputControlBar
+      )
+    )
+  ).render
+
+  private[this] def createMobileLandscapeMainDouble(canvasWidth: Int) = div(
+    cls := "container-fluid", width := canvasWidth * 2 + 30, padding := 0,
+    div(cls := "row",
+      div(cls := "col-xs-6",
+        boardRendererElement1
+      ),
+      div(cls := "col-xs-6",
+        boardRendererElement2
+      )
+    ),
+    div(cls := "row",
+      div(cls := "col-xs-12",
+        controlSection.outputControlBar
+      )
+    )
+  ).render
+
   def initialize(elem: Element, config: Configuration): Unit = {
     // create elements
-    controlSection = ControlSection(config.canvasWidth, config.isMobile)
-    mainPane = createMainPane(config.canvasWidth, config.isMobile)
+    controlSection = ControlSection(config.canvasWidth, config.isMobile, config.isMobile && config.isLandscape)
+    mainPane = createMainPane(config.canvasWidth, (config.flip == DoubleBoard).fold(2, 1), config.isMobile, config.isLandscape)
     elem.appendChild(mainPane)
 
     initializeBoardRenderer(config)
