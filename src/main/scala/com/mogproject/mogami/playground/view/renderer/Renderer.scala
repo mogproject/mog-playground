@@ -41,20 +41,23 @@ class Renderer extends BoardRenderer {
     div(cls := "container-fluid",
       isMobile.fold(Seq(position := position.fixed.v, width := "100%"), ""),
       div(cls := "row",
+        // side menu
         div(cls := "col-sm-5 col-sm-push-7 col-md-4 col-md-push-8 hidden-xs",
-          // side menu
           paddingLeft := 0,
           MenuPane.output
         ),
+        // main content
         div(cls := "col-sm-7 col-sm-pull-5 col-md-8 col-md-pull-4",
-          div(cls := "row",
-            // long selector
-            div(cls := "hidden-xs hidden-sm", width := 168, float := float.left.v, paddingLeft := 15, paddingRight := 0, controlSection.outputLongSelector),
+          div(cls := "container-fluid", width := 168 + canvasWidth + 30, padding := 0,
+            div(cls := "row",
+              // long selector
+              div(cls := "hidden-xs hidden-sm", width := 168, float := float.left.v, paddingLeft := 15, paddingRight := 0, controlSection.outputLongSelector),
 
-            // boards
-            div(cls := "", overflowX := overflow.auto.v, paddingLeft := 15, paddingRight := 15,
-              boardRendererElement,
-              controlSection.output
+              // boards
+              div(overflowX := overflow.auto.v, paddingLeft := 15, paddingRight := 15,
+                boardRendererElement,
+                controlSection.output
+              )
             )
           )
         )

@@ -21,6 +21,7 @@ case class ControlSection(canvasWidth: Int, isMobile: Boolean) extends Section {
   }
 
   override val output: Div = div(
+    width := canvasWidth,
     paddingTop := "5px",
     controlBar.output,
     commentButton.output

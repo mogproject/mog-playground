@@ -40,7 +40,7 @@ case class CommentButton(isDisplayOnly: Boolean, isModal: Boolean, text: String 
     tpe := "button",
     cls := "btn btn-default btn-block",
     data("toggle") := "tooltip",
-    data("placement") := "bottom",
+    data("placement") := "top",
     data("original-title") := s"Clear this comment",
     data("dismiss") := "modal",
     onclick := { () =>
@@ -59,7 +59,7 @@ case class CommentButton(isDisplayOnly: Boolean, isModal: Boolean, text: String 
     tpe := "button",
     cls := "btn btn-default btn-block",
     data("toggle") := "tooltip",
-    data("placement") := "bottom",
+    data("placement") := "top",
     data("original-title") := s"Update this comment",
     data("dismiss") := "modal",
     onclick := { () =>
