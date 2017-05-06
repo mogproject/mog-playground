@@ -8,7 +8,7 @@ import scalatags.JsDom.all._
 /**
   *
   */
-object LanguageSection extends Section {
+object SettingsSection extends Section {
   override def initialize(): Unit = {
     super.initialize()
     MessageLanguageSelector.initialize()
@@ -17,8 +17,8 @@ object LanguageSection extends Section {
   }
 
   override val accordions: Seq[AccordionMenu] = Seq(AccordionMenu(
-    "Language",
-    "Language Settings",
+    "Settings",
+    "Settings",
     false,
     true,
     div(
