@@ -179,7 +179,7 @@ object SaveLoadButton {
   // File I/O
   //
   private[this] def readSingleFile(callback: String => String => Unit): Unit = {
-    val maxFileSizeKB = 20
+    val maxFileSizeKB = 100
 
     val head = (fileLoadInput.files.length >= 0).option(fileLoadInput.files(0))
     (for {
