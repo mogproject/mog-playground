@@ -45,11 +45,13 @@ class Renderer extends BoardRenderer {
         // side menu
         div(cls := "col-sm-5 col-sm-push-7 col-md-4 col-md-push-8 hidden-xs side-bar-col",
           div(
+            p("Menu"),
             MenuPane.output
           )
         ),
         // main content
         div(cls := "col-sm-7 col-sm-pull-5 col-md-8 col-md-pull-4",
+          paddingTop := 5,
           (isMobile, isLandscape, numBoards == 2) match {
             case (true, true, true) => createMobileLandscapeMainDouble(canvasWidth)
             case (true, true, false) => createMobileLandscapeMain(canvasWidth)
@@ -59,7 +61,7 @@ class Renderer extends BoardRenderer {
         )
       ),
       hr(),
-      small(p(textAlign := "right", "Shogi Playground © 2017 ", a(href := "http://mogproject.com", target := "_blank", "mogproject")))
+      small(p(textAlign := "right", marginRight := 20, "Shogi Playground © 2017 ", a(href := "http://mogproject.com", target := "_blank", "mogproject")))
     )
   ).render
 
