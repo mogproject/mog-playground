@@ -10,9 +10,13 @@ import scalatags.JsDom.all._
 object SideBar {
   private[this] var isCollapsed = false
 
+  private[this] val EXPANDED_WIDTH = 460.px
+
+  private[this] val COLLAPSED_WIDTH = 60.px
+
   val titleExpanded: Heading = h4(
     a(href := "#", onclick := { () => collapseSideBar() }, span(cls := "glyphicon glyphicon-minus")),
-    " Menu"
+    span(paddingLeft := 14.px, "Menu")
   ).render
 
   val titleCollapsed: Heading = h4(
@@ -21,7 +25,9 @@ object SideBar {
   ).render
 
 
-  val output: Div = div(cls := "col-sm-5 col-sm-push-7 col-md-4 col-md-push-8 hidden-xs side-bar-col",
+  val output: Div = div(cls := "hidden-xs side-bar-col",
+    float := float.right.v,
+    width := EXPANDED_WIDTH,
     div(
       titleExpanded,
       titleCollapsed,
@@ -29,8 +35,8 @@ object SideBar {
     )
   ).render
 
-  def collapseSideBar(): Unit = {
-    output.style.width = 80.px
+  def collapseSideBar(): Unit = if (!isCollapsed) {
+    output.style.width = COLLAPSED_WIDTH
     titleExpanded.style.display = display.none.v
     titleCollapsed.style.display = display.block.v
     MenuPane.collapseMenu()
@@ -38,7 +44,7 @@ object SideBar {
   }
 
   def expandSideBar(): Unit = if (isCollapsed) {
-    output.style.width = 460.px
+    output.style.width = EXPANDED_WIDTH
     titleCollapsed.style.display = display.none.v
     titleExpanded.style.display = display.block.v
     MenuPane.expandMenu()

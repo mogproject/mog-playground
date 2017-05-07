@@ -175,6 +175,8 @@ select {
   z-index: 1000;
   border-left: 6px groove #F8F8F8;
   padding-top: 5px;
+  padding-right: 5px;
+  padding-left: 5px;
   margin-bottom: -9999px;
   padding-bottom: 9999px;
 }
@@ -182,4 +184,9 @@ select {
 .row{
   overflow: hidden;
   margin: 0;
+}
+
+[class*="col-"] {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }

@@ -45,7 +45,8 @@ class Renderer extends BoardRenderer {
         // sidebar
         SideBar.output,
         // main content
-        div(cls := "col-sm-7 col-sm-pull-5 col-md-8 col-md-pull-4",
+        div(
+          //cls := "col-sm-7 col-sm-pull-5 col-md-8 col-md-pull-4",
           paddingTop := 5,
           (isMobile, isLandscape, numBoards == 2) match {
             case (true, true, true) => createMobileLandscapeMainDouble(canvasWidth)
@@ -68,7 +69,7 @@ class Renderer extends BoardRenderer {
         div(cls := "hidden-xs hidden-sm", width := 168, float := float.left.v, paddingLeft := 15, paddingRight := 0, controlSection.outputLongSelector),
 
         // boards
-        div(overflowX := overflow.auto.v, paddingLeft := 15, paddingRight := 15,
+        div(overflowX := overflow.auto.v, paddingLeft := 15, paddingRight := 15, paddingBottom := 15.px,
           if (numBoards == 2) {
             div(cls := "row",
               div(cls := "col-sm-6",
