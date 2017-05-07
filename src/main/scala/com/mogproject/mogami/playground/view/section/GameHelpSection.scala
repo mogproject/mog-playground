@@ -12,6 +12,7 @@ object GameHelpSection extends Section {
     AccordionMenu(
       "Help",
       "Help",
+      "question-sign",
       isExpanded = false,
       isVisible = true,
       div(

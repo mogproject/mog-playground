@@ -19,6 +19,7 @@ object ActionSection extends Section {
     AccordionMenu(
       "Action",
       "Action",
+      "tower",
       isExpanded = false,
       isVisible = false,
       div(cls := "row",

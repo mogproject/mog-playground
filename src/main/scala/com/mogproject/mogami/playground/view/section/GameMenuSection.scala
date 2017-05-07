@@ -18,6 +18,7 @@ object GameMenuSection extends Section {
     AccordionMenu(
       "Share",
       "Share",
+      "share",
       isExpanded = false,
       isVisible = true,
       div(
@@ -35,6 +36,7 @@ object GameMenuSection extends Section {
     AccordionMenu(
       "Branch",
       "Branch",
+      "share-alt",
       isExpanded = false,
       isVisible = true,
       div(
@@ -44,6 +46,7 @@ object GameMenuSection extends Section {
     AccordionMenu(
       "Manage",
       "Manage",
+      "file",
       isExpanded = false,
       isVisible = true,
       div(

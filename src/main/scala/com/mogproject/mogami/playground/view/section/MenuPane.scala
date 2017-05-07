@@ -31,14 +31,6 @@ object MenuPane {
   }
 
   def collapseMenu(): Unit = {
-    // collapse accordion
-    //    jQuery(".panel-collapse").asInstanceOf[BootstrapJQuery].collapse("hide")
-//    jQuery(".panel-collapse").asInstanceOf[BootstrapJQuery].collapse {
-//      val r = js.Dynamic.literal()
-//      r.toggle = "true"
-//      r.parent = "#accordion"
-//      r
-//    }
     jQuery(".panel-collapse").asInstanceOf[BootstrapJQuery].collapse {
       val r = js.Dynamic.literal()
       r.toggle = false

@@ -19,6 +19,7 @@ object SettingsSection extends Section {
   override val accordions: Seq[AccordionMenu] = Seq(AccordionMenu(
     "Settings",
     "Settings",
+    "wrench",
     false,
     true,
     div(

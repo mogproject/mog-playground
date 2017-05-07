@@ -18,6 +18,7 @@ object EditSection extends Section {
     AccordionMenu(
       "Reset",
       "Reset",
+      "erase",
       false,
       false,
       div(EditReset.output)
@@ -25,6 +26,7 @@ object EditSection extends Section {
     AccordionMenu(
       "EditHelp",
       "Help",
+      "question-sign",
       false,
       false,
       div(
