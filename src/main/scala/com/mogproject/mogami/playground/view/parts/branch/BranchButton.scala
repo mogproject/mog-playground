@@ -67,7 +67,7 @@ object BranchButton {
     br(),
     label("New Branch Mode"),
     div(cls := "row",
-      div(cls := "col-xs-8 col-lg-9", p(paddingTop := "6px", "Create a new branch whenever you make a different move.")),
+      div(cls := "col-xs-8 col-lg-9", p(paddingTop := "6px", "Creates a new branch whenever you make a different move.")),
       div(cls := "col-xs-4 col-lg-3", newBranchButton.output)
     ),
     br(),
