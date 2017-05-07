@@ -170,10 +170,9 @@ select {
   padding: 0 !important;
 }
 
-.side-bar-col {
+.sidebar {
   background-color: #F7F7F7;
   z-index: 1000;
-  border-left: 6px groove #F8F8F8;
   padding-top: 5px;
   padding-right: 5px;
   padding-left: 5px;
@@ -181,12 +180,20 @@ select {
   padding-bottom: 9999px;
 }
 
-.row{
-  overflow: hidden;
-  margin: 0;
+.sidebar-right {
+  border-left: 6px groove #F8F8F8;
+  float: right;
 }
 
-[class*="col-"] {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+.sidebar-left {
+  border-right: 6px groove #F8F8F8;
+  float: left;
+}
+
+.row{
+  overflow: hidden;
+}
+
+.no-margin {
+  margin: 0;
 }

@@ -41,13 +41,21 @@ class Renderer extends BoardRenderer {
     ),
     div(cls := "container-fluid",
       isMobile.fold(Seq(position := position.fixed.v, width := "100%", padding := 0), ""),
-      div(cls := "row",
+      div(cls := "row no-margin",
         // sidebar
         SideBar.output,
+
+        // long selector
+        div(
+          cls := "hidden-xs hidden-sm sidebar sidebar-left",
+          width := 240.px,
+          h4(marginLeft := 14.px, "Record"),
+          div(width := 168.px, marginLeft := "auto", marginRight := "auto", controlSection.outputLongSelector)
+        ),
+
         // main content
         div(
-          //cls := "col-sm-7 col-sm-pull-5 col-md-8 col-md-pull-4",
-          paddingTop := 5,
+          paddingTop := 5, display := display.`inline-block`.v, width := "calc(100% - 240px - 460px)",
           (isMobile, isLandscape, numBoards == 2) match {
             case (true, true, true) => createMobileLandscapeMainDouble(canvasWidth)
             case (true, true, false) => createMobileLandscapeMain(canvasWidth)
@@ -63,30 +71,30 @@ class Renderer extends BoardRenderer {
 
   // todo: create a class
   private[this] def createPCPortraitMain(canvasWidth: Int, numBoards: Int) = div(
-    div(cls := "container-fluid", width := 168 + canvasWidth * numBoards + 30, padding := 0,
-      div(cls := "row",
-        // long selector
-        div(cls := "hidden-xs hidden-sm", width := 168, float := float.left.v, paddingLeft := 15, paddingRight := 0, controlSection.outputLongSelector),
-
-        // boards
-        div(overflowX := overflow.auto.v, paddingLeft := 15, paddingRight := 15, paddingBottom := 15.px,
-          if (numBoards == 2) {
-            div(cls := "row",
-              div(cls := "col-sm-6",
-                boardRendererElement1,
-                controlSection.output
-              ),
-              div(cls := "col-sm-6",
-                boardRendererElement2
-              )
-            )
-          } else {
-            div(
+    div(cls := "container-fluid center-block",
+      // boards
+      div(
+        width := canvasWidth * numBoards + 30,
+        overflowX := overflow.auto.v,
+        marginLeft := "auto",
+        marginRight := "auto",
+        paddingLeft := 15.px, paddingRight := 15.px, paddingBottom := 15.px,
+        if (numBoards == 2) {
+          div(cls := "row",
+            div(cls := "col-xs-6",
               boardRendererElement1,
               controlSection.output
+            ),
+            div(cls := "col-xs-6",
+              boardRendererElement2
             )
-          }
-        )
+          )
+        } else {
+          div(
+            boardRendererElement1,
+            controlSection.output
+          )
+        }
       )
     )
   )

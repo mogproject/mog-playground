@@ -25,8 +25,7 @@ object SideBar {
   ).render
 
 
-  val output: Div = div(cls := "hidden-xs side-bar-col",
-    float := float.right.v,
+  val output: Div = div(cls := "hidden-xs sidebar sidebar-right",
     width := EXPANDED_WIDTH,
     div(
       titleExpanded,
