@@ -82,10 +82,13 @@
 .small-padding {
   padding-top: 0px !important;
   padding-bottom: 0px !important;
-  padding-right: 3px !important;
-  padding-left: 3px !important;
+  padding-right: 10px !important;
+  padding-left: 10px !important;
 }
 
+.no-margin {
+  margin: 0 !important;
+}
 .rect-select {
   border-radius: 0 !important;
   -webkit-appearance:none;
@@ -167,7 +170,10 @@ canvas {
 }
 
 select {
-  padding: 0 !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  padding-right: 3px !important;
+  padding-left: 3px !important;
 }
 
 .sidebar {
@@ -178,6 +184,12 @@ select {
   padding-left: 5px;
   margin-bottom: -9999px;
   padding-bottom: 9999px;
+
+  -webkit-transition: width 0.3s;
+  -moz-transition: width 0.3s;
+  -ms-transition: width 0.3s;
+  -o-transition: width 0.3s;
+  transition: width 0.3s;
 }
 
 .sidebar-right {
@@ -192,8 +204,4 @@ select {
 
 .row{
   overflow: hidden;
-}
-
-.no-margin {
-  margin: 0;
 }
