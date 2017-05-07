@@ -13,7 +13,7 @@ import org.scalajs.dom.html.Div
 
 // todo: don't use parts directly but use only sections
 import com.mogproject.mogami.playground.view.parts.edit.EditReset
-import com.mogproject.mogami.playground.view.parts.language.{MessageLanguageSelector, PieceLanguageSelector, RecordLanguageSelector}
+import com.mogproject.mogami.playground.view.parts.settings.{MessageLanguageSelector, PieceLanguageSelector, RecordLanguageSelector}
 import com.mogproject.mogami.playground.view.parts.manage.SaveLoadButton
 import com.mogproject.mogami.playground.view.parts.navigator.FlipButton
 import com.mogproject.mogami.playground.view.parts.share._
@@ -49,7 +49,7 @@ class Renderer extends BoardRenderer {
         div(
           cls := "hidden-xs hidden-sm sidebar sidebar-left",
           width := 240.px,
-          h4(marginLeft := 14.px, "Record"),
+          h4(marginLeft := 14.px, "Moves"),
           div(width := 168.px, marginLeft := "auto", marginRight := "auto", controlSection.outputLongSelector)
         ),
 
@@ -161,6 +161,9 @@ class Renderer extends BoardRenderer {
 
     // add events
     dom.window.addEventListener("orientationchange", (_: UIEvent) => Controller.changeScreenSize())
+
+    // initialize settings
+    SettingsSection.updateDoubleBoardButton(config.flip == DoubleBoard)
   }
 
   /**

@@ -6,6 +6,7 @@ import com.mogproject.mogami.{BranchNo, _}
 import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller.mode._
 import com.mogproject.mogami.playground.io.RecordFormat
+import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipDisabled, FlipEnabled}
 import com.mogproject.mogami.playground.view.renderer.Renderer
 import org.scalajs.dom.Element
 
@@ -129,12 +130,6 @@ object Controller {
   // actions
   def setMode(mode: Mode): Unit = if (!modeController.exists(_.mode == mode)) doAction(_.setMode(mode), _ => {})
 
-  def setMessageLanguage(lang: Language): Unit = doAction(_.setMessageLanguage(lang), _.renderAll())
-
-  def setRecordLanguage(lang: Language): Unit = doAction(_.setRecordLanguage(lang), _.refreshBoard())
-
-  def setPieceLanguage(lang: Language): Unit = doAction(_.setPieceLanguage(lang), _.refreshBoard())
-
   def setRecord(index: Int): Unit = doAction(_.setRecord(index), _.renderAll())
 
   def setControl(controlType: Int): Unit = update(modeController.flatMap(_.setControl(controlType)))
@@ -194,6 +189,24 @@ object Controller {
     case pc: PlayModeController => pc.setResign()
     case _ => None
   }, _.renderAll())
+
+  //
+  // Settings section
+  //
+  def setMessageLanguage(lang: Language): Unit = doAction(_.setMessageLanguage(lang), _.renderAll())
+
+  def setRecordLanguage(lang: Language): Unit = doAction(_.setRecordLanguage(lang), _.refreshBoard())
+
+  def setPieceLanguage(lang: Language): Unit = doAction(_.setPieceLanguage(lang), _.refreshBoard())
+
+  def setDoubleBoard(isDoubleBoard: Boolean): Unit = doAction({ mc =>
+    (mc.config.flip, isDoubleBoard) match {
+      case (DoubleBoard, true) => None
+      case (_, true) => Some(mc.updateConfig(mc.config.copy(flip = DoubleBoard)))
+      case (DoubleBoard, false) => Some(mc.updateConfig(mc.config.copy(flip = FlipDisabled)))
+      case _ => None
+    }
+  }, _.refreshBoard())
 
   // Orientation
   def changeScreenSize(): Unit = doAction({ mc =>

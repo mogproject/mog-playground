@@ -1,4 +1,4 @@
-package com.mogproject.mogami.playground.view.parts.language
+package com.mogproject.mogami.playground.view.parts.settings
 
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
 import com.mogproject.mogami.playground.view.parts.common.ButtonLike

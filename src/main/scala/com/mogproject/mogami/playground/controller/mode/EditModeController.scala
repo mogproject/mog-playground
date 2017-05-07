@@ -43,6 +43,11 @@ case class EditModeController(renderer: Renderer,
     renderer.drawBoard()
   }
 
+  /**
+    * Set new config
+    */
+  override def updateConfig(config: Configuration): ModeController = this.copy(config = config)
+
   override def renderAll(): Unit = {
     super.renderAll()
 

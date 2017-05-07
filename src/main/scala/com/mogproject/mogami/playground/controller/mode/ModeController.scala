@@ -84,6 +84,8 @@ trait ModeController {
 
   def renderAfterUpdatingComment(updateTextArea: Boolean): Unit = {}
 
+  def updateConfig(config: Configuration): ModeController
+
   // cursor check
   def canActivate(cursor: Cursor): Boolean = false
 

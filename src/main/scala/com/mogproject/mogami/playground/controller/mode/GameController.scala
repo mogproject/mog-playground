@@ -156,6 +156,11 @@ trait GameController extends ModeController {
   override def setComment(comment: String): Option[ModeController] =
     game.updateComment(gamePosition, comment).map(g => this.copy(game = g))
 
+  /**
+    * Set new config
+    */
+  override def updateConfig(config: Configuration): ModeController = this.copy(config = config)
+
   //
   // renderer
   //
