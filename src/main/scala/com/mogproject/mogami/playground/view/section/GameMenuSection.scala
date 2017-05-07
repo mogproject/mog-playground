@@ -18,7 +18,7 @@ object GameMenuSection extends Section {
     AccordionMenu(
       "Share",
       "Share",
-      isExpanded = true,
+      isExpanded = false,
       isVisible = true,
       div(
         RecordCopyButton.output,

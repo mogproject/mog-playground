@@ -1,11 +1,16 @@
 package com.mogproject.mogami.playground.view.parts.common
 
+import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
+import com.mogproject.mogami.playground.view.section.{MenuPane, SideBar}
 import org.scalajs.dom.html.Div
 import com.mogproject.mogami.util.Implicits._
+import org.scalajs.dom
 
 import scalatags.JsDom.TypedTag
 import scalatags.JsDom.all._
 import org.scalajs.jquery.jQuery
+
+import scala.scalajs.js
 
 /**
   *
@@ -28,6 +33,16 @@ case class AccordionMenu(ident: String, title: String, isExpanded: Boolean, isVi
     )
   ).render
 
+  private[this] val titleElem = span(" " + title).render
+
+  private[this] val titleElemHeading = h4(cls := "panel-title",
+    span(
+      cls := "accordion-toggle",
+      glyph,
+      titleElem
+    )
+  ).render
+
   val output: Div = div(
     cls := "panel",
     if (isVisible) "" else display := display.none.v,
@@ -38,14 +53,7 @@ case class AccordionMenu(ident: String, title: String, isExpanded: Boolean, isVi
       data("toggle") := "collapse",
       data("target") := s"#collapse${ident}",
       data("parent") := "#accordion",
-      h4(cls := "panel-title",
-        span(
-          cls := "accordion-toggle",
-          glyph,
-          " ",
-          title
-        )
-      )
+      titleElemHeading
     ),
     mainElem
   ).render
@@ -63,7 +71,17 @@ case class AccordionMenu(ident: String, title: String, isExpanded: Boolean, isVi
 
     // set events
     jQuery(mainElem)
-      .on("show.bs.collapse", () => f(true))
+      .on("show.bs.collapse", { () => f(true); SideBar.expandSideBar() })
       .on("hide.bs.collapse", () => f(false))
   }
+
+  def collapseTitle(): Unit = {
+
+    titleElem.innerHTML = ""
+  }
+
+  def expandTitle(): Unit = {
+    titleElem.innerHTML = " " + title
+  }
+
 }

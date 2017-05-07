@@ -18,14 +18,14 @@ object EditSection extends Section {
     AccordionMenu(
       "Reset",
       "Reset",
-      true,
+      false,
       false,
       div(EditReset.output)
     ),
     AccordionMenu(
       "EditHelp",
       "Help",
-      true,
+      false,
       false,
       div(
         ul(

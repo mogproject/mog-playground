@@ -42,13 +42,8 @@ class Renderer extends BoardRenderer {
     div(cls := "container-fluid",
       isMobile.fold(Seq(position := position.fixed.v, width := "100%", padding := 0), ""),
       div(cls := "row",
-        // side menu
-        div(cls := "col-sm-5 col-sm-push-7 col-md-4 col-md-push-8 hidden-xs side-bar-col",
-          div(
-            p("Menu"),
-            MenuPane.output
-          )
-        ),
+        // sidebar
+        SideBar.output,
         // main content
         div(cls := "col-sm-7 col-sm-pull-5 col-md-8 col-md-pull-4",
           paddingTop := 5,
