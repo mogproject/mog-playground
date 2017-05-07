@@ -31,6 +31,7 @@ object SettingsSection extends Section {
     true,
     div(
       div(cls := "row",
+        marginBottom := 10.px,
         div(cls := "col-xs-8 col-lg-9 small-padding", label(marginTop := 6, "Double Board Mode")),
         div(cls := "col-xs-4 col-lg-3", doubleBoardButton.output)
       ),
