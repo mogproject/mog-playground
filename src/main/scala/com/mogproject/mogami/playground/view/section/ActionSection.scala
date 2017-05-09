@@ -23,7 +23,7 @@ object ActionSection extends Section {
       isExpanded = false,
       isVisible = false,
       div(cls := "row",
-        div(cls := "col-xs-6 col-lg-4",
+        div(cls := "col-xs-6 col-sm-4",
           ResignButton.output
         )
       )

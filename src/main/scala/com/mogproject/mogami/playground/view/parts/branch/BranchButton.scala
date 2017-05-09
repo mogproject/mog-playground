@@ -67,20 +67,20 @@ object BranchButton {
     br(),
     label("New Branch Mode"),
     div(cls := "row",
-      div(cls := "col-xs-7 col-lg-9", p(paddingTop := "6px", "Creates a new branch whenever you make a different move.")),
-      div(cls := "col-xs-5 col-lg-3", newBranchButton.output)
+      div(cls := "col-xs-7 col-sm-9", p(paddingTop := "6px", "Creates a new branch whenever you make a different move.")),
+      div(cls := "col-xs-5 col-sm-3", newBranchButton.output)
     ),
     br(),
     div(cls := "row",
-      div(cls := "col-xs-8 col-lg-9", label(paddingTop := "6px", "Delete This Branch")),
-      div(cls := "col-xs-4 col-lg-3", deleteBranchButton)
+      div(cls := "col-xs-8 col-sm-9", label(paddingTop := "6px", "Delete This Branch")),
+      div(cls := "col-xs-4 col-sm-3", deleteBranchButton)
     )
   ).render
 
   lazy val output: Div = div(
     div(cls := "row",
-      div(cls := "col-xs-6 col-lg-8", label(paddingTop := "6px", "Change Branch")),
-      div(cls := "col-xs-6 col-lg-4", changeBranchButton)
+      div(cls := "col-xs-6 col-sm-8", label(paddingTop := "6px", "Change Branch")),
+      div(cls := "col-xs-6 col-sm-4", changeBranchButton)
     ),
     label("Forks"),
     br(),
@@ -120,7 +120,7 @@ object BranchButton {
       forksButtons.innerHTML = ""
       forksButtons.appendChild(div(
         cls := "row",
-        buttons.map(div(cls := "col-lg-4 col-xs-6", _))
+        buttons.map(div(cls := "col-sm-4 col-xs-6", _))
       ).render)
     }
 

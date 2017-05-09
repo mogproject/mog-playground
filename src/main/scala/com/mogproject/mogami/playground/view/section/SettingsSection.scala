@@ -39,8 +39,8 @@ object SettingsSection extends Section {
       div(cls := "row",
         marginLeft := (-10).px,
         marginBottom := 10.px,
-        div(cls := "col-xs-7 col-lg-9 small-padding", label(marginTop := 6, "Double Board Mode")),
-        div(cls := "col-xs-5 col-lg-3", doubleBoardButton.output)
+        div(cls := "col-xs-7 col-sm-9 small-padding", label(marginTop := 6, "Double Board Mode")),
+        div(cls := "col-xs-5 col-sm-3", doubleBoardButton.output)
       ),
       MessageLanguageSelector.output,
       RecordLanguageSelector.output,
