@@ -73,7 +73,7 @@ trait BoardRenderer {
 
 
   private[this] def createPCPortraitMain(canvasWidth: Int, numBoards: Int): TypedTag[Div] = div(cls := "main-area",
-    width := canvasWidth * numBoards + 100,
+    width := (canvasWidth + 70) * numBoards - 40, // +30 for 1 board, +100 for 2 boards
     paddingLeft := 15.px, paddingRight := 15.px, paddingBottom := 15.px,
     if (numBoards == 2) {
       div(cls := "row",
