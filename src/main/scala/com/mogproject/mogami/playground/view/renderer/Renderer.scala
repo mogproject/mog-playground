@@ -75,7 +75,7 @@ class Renderer extends BoardRenderer {
       // boards
       div(
         width := canvasWidth * numBoards + 30,
-        overflowX := overflow.auto.v,
+        /* overflowX := overflow.auto.v, */
         marginLeft := "auto",
         marginRight := "auto",
         paddingLeft := 15.px, paddingRight := 15.px, paddingBottom := 15.px,

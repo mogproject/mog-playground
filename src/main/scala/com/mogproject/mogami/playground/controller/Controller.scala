@@ -6,6 +6,7 @@ import com.mogproject.mogami.{BranchNo, _}
 import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller.mode._
 import com.mogproject.mogami.playground.io.RecordFormat
+import com.mogproject.mogami.playground.view.parts.settings.BoardSizeButton.PresetBoardSize
 import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipDisabled, FlipEnabled}
 import com.mogproject.mogami.playground.view.renderer.Renderer
 import org.scalajs.dom.Element
@@ -208,12 +209,10 @@ object Controller {
     }
   }, _.refreshBoard())
 
+  def changeBoardSize(size: PresetBoardSize): Unit =
+    doAction({ mc => Some(mc.updateConfig(mc.config.copy(canvasWidth = size.width))) }, _.refreshBoard())
+
   // Orientation
-  def changeScreenSize(): Unit = doAction({ mc =>
-    val newConfig = mc.config.updateScreenSize()
-    mc match {
-      case gc: GameController => Some(gc.copy(config = newConfig))
-      case ec: EditModeController => Some(ec.copy(config = newConfig))
-    }
-  }, _.refreshBoard())
+  def changeScreenSize(): Unit =
+    doAction({ mc => Some(mc.updateConfig(mc.config.updateScreenSize())) }, _.refreshBoard())
 }

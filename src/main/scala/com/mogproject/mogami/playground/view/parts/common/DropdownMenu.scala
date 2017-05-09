@@ -8,7 +8,7 @@ import scalatags.JsDom.all._
   * Dropdown menu
   */
 
-case class DropdownMenu[A](items: Vector[A], default: Int, header: String, onChange: Int => Unit) {
+case class DropdownMenu[A](items: Vector[A], default: Int, header: String, onChange: Int => Unit, outputClass: String = "input-group-btn") {
   private[this] var value: Int = 0
 
   private[this] val labelButton = button(
@@ -22,7 +22,7 @@ case class DropdownMenu[A](items: Vector[A], default: Int, header: String, onCha
   initialize()
 
   lazy val output: Div = div(
-    cls := "input-group-btn",
+    cls := outputClass,
     labelButton,
     ul(
       cls := "dropdown-menu",
