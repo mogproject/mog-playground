@@ -1,5 +1,6 @@
 package com.mogproject.mogami.playground.controller
 
+import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.api.MobileScreen
 import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipDisabled, FlipEnabled, FlipType}
 import org.scalajs.dom
@@ -11,8 +12,8 @@ import scala.scalajs.js.UndefOr
   */
 case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
                          isMobile: Boolean = Configuration.defaultIsMobile,
-                         isLandscape: Boolean = Configuration.defaultIsLandscape,
-                         canvasWidth: Int = Configuration.defaultCanvasWidth,
+                         isLandscape: Boolean = Configuration.getIsLandscape,
+                         canvasWidth: Int = Configuration.getDefaultCanvasWidth,
                          messageLang: Language = Configuration.browserLanguage,
                          recordLang: Language = Configuration.browserLanguage,
                          pieceLang: Language = Japanese,
@@ -48,10 +49,7 @@ case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
   }
 
   def updateScreenSize(): Configuration = {
-    this.copy(
-      canvasWidth = Configuration.getDefaultCanvasWidth(dom.window.screen.width, dom.window.screen.height),
-      isLandscape = Configuration.defaultIsLandscape
-    )
+    this.copy(isLandscape = Configuration.getIsLandscape, canvasWidth = Configuration.getDefaultCanvasWidth)
   }
 
 }
@@ -74,10 +72,12 @@ object Configuration {
 
   lazy val defaultIsMobile: Boolean = dom.window.screen.width < 768
 
-  def defaultIsLandscape: Boolean = MobileScreen.isLandscape
+  def getIsLandscape: Boolean = MobileScreen.isLandscape
 
-  lazy val defaultCanvasWidth: Int = getDefaultCanvasWidth(dom.window.screen.width, dom.window.screen.height)
+  def getDefaultCanvasWidth: Int = getDefaultCanvasWidth(dom.window.screen.width, dom.window.screen.height, getIsLandscape)
 
-  def getDefaultCanvasWidth(screenWidth: Double, screenHeight: Double): Int =
-    math.max(100, math.min(math.min(screenWidth - 10, (screenHeight - 40) * 400 / 576).toInt, 400))
+  def getDefaultCanvasWidth(screenWidth: Double, screenHeight: Double, isLandscape: Boolean): Int = {
+    val (k, w, h) = isLandscape.fold((90, screenHeight, screenWidth), (160, screenWidth, screenHeight))
+    math.max(100, math.min(math.min(w - 10, (h - k) * 400 / 576).toInt, 400))
+  }
 }

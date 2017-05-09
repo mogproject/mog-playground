@@ -1,6 +1,6 @@
 package com.mogproject.mogami.playground.view.parts.settings
 
-import com.mogproject.mogami.playground.controller.Controller
+import com.mogproject.mogami.playground.controller.{Configuration, Controller}
 import com.mogproject.mogami.playground.view.parts.common.DropdownMenu
 import org.scalajs.dom.html.Div
 
@@ -18,19 +18,19 @@ object BoardSizeButton {
     override def toString: String = s"${width} - ${label}"
   }
 
-  case object LandscapeIPhone5 extends PresetBoardSize(194, "iPhone 5 (Landscape)")
+  case object LandscapeIPhone5 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(320, 568, isLandscape = true), "iPhone 5 (Landscape)")
 
-  case object LandscapeIPhone6 extends PresetBoardSize(232, "iPhone 6 (Landscape)")
+  case object LandscapeIPhone6 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(375, 667, isLandscape = true), "iPhone 6 (Landscape)")
+
+  case object LandscapeIPhone6Plus extends PresetBoardSize(Configuration.getDefaultCanvasWidth(414, 736, isLandscape = true), "iPhone 6 Plus (Landscape)")
 
   case object Small extends PresetBoardSize(240, "Small")
 
-  case object LandscapeIPhone6Plus extends PresetBoardSize(259, "iPhone 6 Plus (Landscape)")
-
-  case object PortraitIPhone5 extends PresetBoardSize(310, "iPhone 5 (Portrait)")
+  case object PortraitIPhone5 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(320, 568, isLandscape = false), "iPhone 5 (Portrait)")
 
   case object Medium extends PresetBoardSize(320, "Medium")
 
-  case object PortraitIPhone6 extends PresetBoardSize(365, "iPhone 6 (Portrait)")
+  case object PortraitIPhone6 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(375, 667, isLandscape = false), "iPhone 6 (Portrait)")
 
   case object Large extends PresetBoardSize(400, "Large")
 
