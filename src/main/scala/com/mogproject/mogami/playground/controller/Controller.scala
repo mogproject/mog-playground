@@ -212,6 +212,10 @@ object Controller {
   def changeBoardSize(size: PresetBoardSize): Unit =
     doAction({ mc => Some(mc.updateConfig(mc.config.copy(canvasWidth = size.width))) }, _.refreshBoard())
 
+  def collapseSideBar(): Unit = modeController.get.renderer.collapseSideBar()
+
+  def expandSideBar(): Unit = modeController.get.renderer.expandSideBar()
+
   // Orientation
   def changeScreenSize(): Unit =
     doAction({ mc => Some(mc.updateConfig(mc.config.updateScreenSize())) }, _.refreshBoard())

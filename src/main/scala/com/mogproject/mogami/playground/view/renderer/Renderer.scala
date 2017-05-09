@@ -7,7 +7,7 @@ import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.playground.view.renderer.BoardRenderer.DoubleBoard
-import com.mogproject.mogami.{BranchNo, _}
+import com.mogproject.mogami.{BranchNo, GamePosition, _}
 import org.scalajs.dom.UIEvent
 import org.scalajs.dom.html.Div
 
@@ -69,7 +69,7 @@ class Renderer extends BoardRenderer {
     elem.appendChild(mainPane)
 
     initializeBoardRenderer(config, isEditMode)
-    if (!config.isMobile) contractMainPane()
+    config.isMobile.fold(widenMainPane(), contractMainPane())
     NavigatorSection.initialize()
     MenuPane.initialize()
 
@@ -219,4 +219,19 @@ class Renderer extends BoardRenderer {
     // @note setTimeout is necessary for data-dismiss modal closing
     dom.window.setTimeout(() => ActionSection.update(lang, canResign), 0)
   }
+
+  // side bar
+  def collapseSideBar(): Unit = {
+    SideBar.collapseSideBar()
+    expandMainPane()
+  }
+
+  /**
+    * @note Never happens on mobile
+    */
+  def expandSideBar(): Unit = if (SideBar.isCollapsed) {
+    contractMainPane()
+    SideBar.expandSideBar()
+  }
+
 }

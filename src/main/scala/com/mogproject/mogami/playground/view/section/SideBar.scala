@@ -1,5 +1,6 @@
 package com.mogproject.mogami.playground.view.section
 
+import com.mogproject.mogami.playground.controller.Controller
 import org.scalajs.dom.html.{Div, Heading}
 
 import scalatags.JsDom.all._
@@ -14,18 +15,18 @@ object SideBar {
 
   val COLLAPSED_WIDTH: Int = 60
 
-  val titleExpanded: Heading = h4(
-    a(href := "#", onclick := { () => collapseSideBar() }, span(cls := "glyphicon glyphicon-minus")),
+  lazy val titleExpanded: Heading = h4(
+    a(href := "#", onclick := { () => Controller.collapseSideBar() }, span(cls := "glyphicon glyphicon-minus")),
     span(paddingLeft := 14.px, "Menu")
   ).render
 
-  val titleCollapsed: Heading = h4(
+  lazy val titleCollapsed: Heading = h4(
     display := display.none.v,
-    a(href := "#", onclick := { () => expandSideBar() }, span(cls := "glyphicon glyphicon-plus"))
+    a(href := "#", onclick := { () => Controller.expandSideBar() }, span(cls := "glyphicon glyphicon-plus"))
   ).render
 
 
-  val output: Div = div(cls := "hidden-xs sidebar sidebar-right",
+  lazy val output: Div = div(cls := "hidden-xs sidebar sidebar-right",
     width := EXPANDED_WIDTH,
     div(
       titleExpanded,

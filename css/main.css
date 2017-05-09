@@ -207,6 +207,14 @@ select {
   overflow: hidden;
 }
 
+.main-area-wrapper {
+  -webkit-transition: width 0.3s;
+  -moz-transition: width 0.3s;
+  -ms-transition: width 0.3s;
+  -o-transition: width 0.3s;
+  transition: width 0.3s;
+}
+
 .main-area {
   margin-left: auto;
   margin-right: auto;

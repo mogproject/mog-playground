@@ -1,5 +1,6 @@
 package com.mogproject.mogami.playground.view.parts.common
 
+import com.mogproject.mogami.playground.controller.Controller
 import com.mogproject.mogami.playground.view.section.SideBar
 import org.scalajs.dom.html.Div
 import com.mogproject.mogami.util.Implicits._
@@ -65,7 +66,7 @@ case class AccordionMenu(ident: String, title: String, icon: String, isExpanded:
 
     // set events
     jQuery(mainElem)
-      .on("show.bs.collapse", { () => f(true); SideBar.expandSideBar() })
+      .on("show.bs.collapse", { () => f(true); Controller.expandSideBar() })
       .on("hide.bs.collapse", () => f(false))
 
     expandTitle()

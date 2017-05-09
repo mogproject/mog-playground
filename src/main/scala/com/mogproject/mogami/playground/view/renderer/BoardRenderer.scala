@@ -11,6 +11,7 @@ import com.mogproject.mogami.playground.view.section.{ControlSection, SideBar}
 import org.scalajs.dom
 import org.scalajs.dom.html.Div
 
+import scalatags.JsDom.TypedTag
 import scalatags.JsDom.all._
 
 /**
@@ -27,9 +28,14 @@ trait BoardRenderer {
   lazy val mainArea: Div = div().render
 
   lazy val mainPane: Div = div(
-    paddingTop := 5, display := display.`inline-block`.v, width := "100%",
+    cls := "main-area-wrapper",
+    paddingTop := 5, display := display.`inline-block`.v,
     mainArea
   ).render
+
+  def widenMainPane(): Unit = {
+    mainPane.style.width = 100.pct
+  }
 
   def contractMainPane(): Unit = {
     mainPane.style.width = s"calc(100% - 240px - ${SideBar.EXPANDED_WIDTH}px)"
@@ -60,69 +66,61 @@ trait BoardRenderer {
       case (_, _, isDoubleBoard) => createPCPortraitMain(config.canvasWidth, isDoubleBoard.fold(2, 1))
     }
     mainArea.innerHTML = ""
-    mainArea.appendChild(node)
+    mainArea.appendChild(div(cls := "container-fluid", node).render)
 
     mainBoards.foreach(_.initialize())
   }
 
 
-  private[this] def createPCPortraitMain(canvasWidth: Int, numBoards: Int): Div = div(cls := "container-fluid",
-    div(cls := "main-area",
-      width := canvasWidth * numBoards + 30,
-      paddingLeft := 15.px, paddingRight := 15.px, paddingBottom := 15.px,
-      if (numBoards == 2) {
-        div(cls := "row",
-          div(cls := "col-xs-6",
-            mainBoards.head.canvasContainer,
-            controlSection.output
-          ),
-          div(cls := "col-xs-6",
-            mainBoards(1).canvasContainer
-          )
-        )
-      } else {
-        div(
+  private[this] def createPCPortraitMain(canvasWidth: Int, numBoards: Int): TypedTag[Div] = div(cls := "main-area",
+    width := canvasWidth * numBoards + 30,
+    paddingLeft := 15.px, paddingRight := 15.px, paddingBottom := 15.px,
+    if (numBoards == 2) {
+      div(cls := "row",
+        div(cls := "col-xs-6",
           mainBoards.head.canvasContainer,
           controlSection.output
+        ),
+        div(cls := "col-xs-6",
+          mainBoards(1).canvasContainer
         )
-      }
-    )
-  ).render
-
-  private[this] def createMobilePortraitMain(canvasWidth: Int) = div(cls := "container-fluid",
-    div(cls := "main-area",
-      width := canvasWidth,
-      padding := 0,
-      marginLeft := "auto",
-      marginRight := "auto",
-      mainBoards.head.canvasContainer,
-      controlSection.output
-    )
-  ).render
-
-  private[this] def createMobileLandscapeMain(canvasWidth: Int) = div(cls := "container-fluid",
-    div(cls := "main-area",
-      width := canvasWidth * 2 + 30,
-      div(cls := "row",
-        div(cls := "col-xs-6", mainBoards.head.canvasContainer), div(cls := "col-xs-6", controlSection.outputComment)
-      ),
-      div(cls := "row",
-        div(cls := "col-xs-12", controlSection.outputControlBar)
       )
-    )
-  ).render
-
-  private[this] def createMobileLandscapeMainDouble(canvasWidth: Int) = div(cls := "container-fluid",
-    div(cls := "main-area",
-      width := canvasWidth * 2 + 30, padding := 0,
-      div(cls := "row",
-        div(cls := "col-xs-6", mainBoards.head.canvasContainer), div(cls := "col-xs-6", mainBoards(1).canvasContainer)
-      ),
-      div(cls := "row",
-        div(cls := "col-xs-12", controlSection.outputControlBar)
+    } else {
+      div(
+        mainBoards.head.canvasContainer,
+        controlSection.output
       )
+    }
+  )
+
+  private[this] def createMobilePortraitMain(canvasWidth: Int): TypedTag[Div] = div(cls := "main-area",
+    width := canvasWidth,
+    padding := 0,
+    marginLeft := "auto",
+    marginRight := "auto",
+    mainBoards.head.canvasContainer,
+    controlSection.output
+  )
+
+  private[this] def createMobileLandscapeMain(canvasWidth: Int): TypedTag[Div] = div(cls := "main-area",
+    width := canvasWidth * 2 + 30,
+    div(cls := "row",
+      div(cls := "col-xs-6", mainBoards.head.canvasContainer), div(cls := "col-xs-6", controlSection.outputComment)
+    ),
+    div(cls := "row",
+      div(cls := "col-xs-12", controlSection.outputControlBar)
     )
-  ).render
+  )
+
+  private[this] def createMobileLandscapeMainDouble(canvasWidth: Int): TypedTag[Div] = div(cls := "main-area",
+    width := canvasWidth * 2 + 30, padding := 0,
+    div(cls := "row",
+      div(cls := "col-xs-6", mainBoards.head.canvasContainer), div(cls := "col-xs-6", mainBoards(1).canvasContainer)
+    ),
+    div(cls := "row",
+      div(cls := "col-xs-12", controlSection.outputControlBar)
+    )
+  )
 
   //
   // Actions
