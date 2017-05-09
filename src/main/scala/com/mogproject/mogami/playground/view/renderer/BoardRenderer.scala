@@ -73,7 +73,7 @@ trait BoardRenderer {
 
 
   private[this] def createPCPortraitMain(canvasWidth: Int, numBoards: Int): TypedTag[Div] = div(cls := "main-area",
-    width := canvasWidth * numBoards + 30,
+    width := canvasWidth * numBoards + 100,
     paddingLeft := 15.px, paddingRight := 15.px, paddingBottom := 15.px,
     if (numBoards == 2) {
       div(cls := "row",
@@ -95,15 +95,12 @@ trait BoardRenderer {
 
   private[this] def createMobilePortraitMain(canvasWidth: Int): TypedTag[Div] = div(cls := "main-area",
     width := canvasWidth,
-    padding := 0,
-    marginLeft := "auto",
-    marginRight := "auto",
     mainBoards.head.canvasContainer,
     controlSection.output
   )
 
   private[this] def createMobileLandscapeMain(canvasWidth: Int): TypedTag[Div] = div(cls := "main-area",
-    width := canvasWidth * 2 + 30,
+    width := canvasWidth * 2 + 60,
     div(cls := "row",
       div(cls := "col-xs-6", mainBoards.head.canvasContainer), div(cls := "col-xs-6", controlSection.outputComment)
     ),
@@ -113,7 +110,7 @@ trait BoardRenderer {
   )
 
   private[this] def createMobileLandscapeMainDouble(canvasWidth: Int): TypedTag[Div] = div(cls := "main-area",
-    width := canvasWidth * 2 + 30, padding := 0,
+    width := canvasWidth * 2 + 60,
     div(cls := "row",
       div(cls := "col-xs-6", mainBoards.head.canvasContainer), div(cls := "col-xs-6", mainBoards(1).canvasContainer)
     ),

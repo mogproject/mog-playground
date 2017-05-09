@@ -23,6 +23,7 @@ case class ControlSection(canvasWidth: Int, isMobile: Boolean, isSmall: Boolean)
   }
 
   override lazy val output: Div = div(
+    cls := "center-block",
     width := sectionWidth,
     paddingTop := "5px",
     controlBar.output,
