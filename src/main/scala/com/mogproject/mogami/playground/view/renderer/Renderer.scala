@@ -60,13 +60,12 @@ class Renderer extends BoardRenderer {
 
   def initialize(elem: Element, config: Configuration, isEditMode: Boolean): Unit = {
     // create elements
-    controlSection = ControlSection(config.canvasWidth, config.isMobile, config.isMobile && config.isLandscape)
+    initializeControlSection(config)
     val mainPane = createMainPane(config.canvasWidth, (config.flip == DoubleBoard).fold(2, 1), config.isMobile, config.isLandscape)
     elem.appendChild(mainPane)
 
     initializeBoardRenderer(config, isEditMode)
     if (!config.isMobile) contractMainPane()
-    controlSection.initialize()
     NavigatorSection.initialize()
     MenuPane.initialize()
 
@@ -83,6 +82,11 @@ class Renderer extends BoardRenderer {
 
     // initialize settings
     SettingsSection.updateDoubleBoardButton(config.flip == DoubleBoard)
+  }
+
+  def initializeControlSection(config: Configuration): Unit = {
+    controlSection = ControlSection(config.canvasWidth, config.isMobile, config.isMobile && config.isLandscape)
+    controlSection.initialize()
   }
 
   /**

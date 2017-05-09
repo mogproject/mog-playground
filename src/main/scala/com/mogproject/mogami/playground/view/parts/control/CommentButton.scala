@@ -80,8 +80,8 @@ case class CommentButton(isDisplayOnly: Boolean, isModal: Boolean, text: String 
     if (isDisplayOnly) "" else div(
       cls := "row",
       marginTop := 3,
-      div(cls := "col-xs-4 col-lg-3", textClearButton),
-      div(cls := "col-xs-offset-4 col-xs-4 col-lg-offset-6 col-lg-3", textUpdateButton)
+      div(cls := "col-xs-4", textClearButton),
+      div(cls := "col-xs-offset-4 col-xs-4", textUpdateButton)
     )
   ).render
 

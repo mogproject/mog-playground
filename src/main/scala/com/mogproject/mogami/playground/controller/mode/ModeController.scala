@@ -77,6 +77,7 @@ trait ModeController {
   }
 
   def refreshBoard(): Unit = {
+    renderer.initializeControlSection(config)
     renderer.initializeBoardRenderer(config, mode == Editing)
     renderer.drawPieceBox() // for Edit Mode todo: refactor
     renderAll()
