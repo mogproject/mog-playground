@@ -3,6 +3,7 @@ package com.mogproject.mogami.playground.view.renderer
 import com.mogproject.mogami.{BoardType, _}
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.controller.{Configuration, Cursor}
+import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.parts.board.MainBoard
 import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipEnabled}
 import com.mogproject.mogami.playground.view.renderer.piece.PieceRenderer
@@ -40,6 +41,8 @@ trait BoardRenderer {
 
   /**
     * Initialize or reload main boards
+    *
+    * `controlSection` should be updated.
     *
     * @param config configuration
     */

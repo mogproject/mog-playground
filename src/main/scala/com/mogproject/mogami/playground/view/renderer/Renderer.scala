@@ -9,6 +9,7 @@ import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.playground.view.renderer.BoardRenderer.DoubleBoard
 import com.mogproject.mogami.{BranchNo, _}
 import org.scalajs.dom.UIEvent
+import org.scalajs.dom.html.Div
 
 // todo: don't use parts directly but use only sections
 import com.mogproject.mogami.playground.view.parts.edit.EditReset
@@ -30,7 +31,10 @@ class Renderer extends BoardRenderer {
   //
   // HTML elements
   //
+  // todo: refactor to use val
   protected var controlSection: ControlSection = ControlSection(0, isMobile = false, isSmall = false)
+
+  private[this] val longSelector: Div = div(width := 168.px, marginLeft := "auto", marginRight := "auto", controlSection.outputLongSelector).render
 
   private[this] def createMainPane(canvasWidth: Int, numBoards: Int, isMobile: Boolean, isLandscape: Boolean) = div(
     div(cls := "navbar",
@@ -47,7 +51,7 @@ class Renderer extends BoardRenderer {
           cls := "hidden-xs hidden-sm sidebar sidebar-left",
           width := 240.px,
           h4(marginLeft := 14.px, "Moves"),
-          div(width := 168.px, marginLeft := "auto", marginRight := "auto", controlSection.outputLongSelector)
+          longSelector
         ),
 
         // main content
@@ -86,6 +90,8 @@ class Renderer extends BoardRenderer {
 
   def initializeControlSection(config: Configuration): Unit = {
     controlSection = ControlSection(config.canvasWidth, config.isMobile, config.isMobile && config.isLandscape)
+    longSelector.innerHTML = ""
+    longSelector.appendChild(controlSection.outputLongSelector)
     controlSection.initialize()
   }
 
