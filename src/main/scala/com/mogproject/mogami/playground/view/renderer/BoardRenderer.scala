@@ -52,11 +52,11 @@ trait BoardRenderer {
     *
     * @param config configuration
     */
-  def initializeBoardRenderer(config: Configuration, isEditMode: Boolean): Unit = {
+  def initializeBoardRenderer(config: Configuration): Unit = {
     mainBoards = if (config.flip == DoubleBoard) {
-      Seq(false, true).map(f => MainBoard(config.canvasWidth, f, config.pieceLang, config.recordLang, isEditMode))
+      Seq(false, true).map(f => MainBoard(config.canvasWidth, f, config.pieceLang, config.recordLang))
     } else {
-      Seq(MainBoard(config.canvasWidth, config.flip == FlipEnabled, config.pieceLang, config.recordLang, isEditMode))
+      Seq(MainBoard(config.canvasWidth, config.flip == FlipEnabled, config.pieceLang, config.recordLang))
     }
 
     val node = (config.isMobile, config.isLandscape, config.flip == DoubleBoard) match {

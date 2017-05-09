@@ -57,6 +57,13 @@ case class EditModeController(renderer: Renderer,
     renderer.drawEditingPieces(board, hand, box)
   }
 
+  override def initializeBoardControl(): Unit = {
+    renderer.hideControlSection()
+    renderer.expandCanvas()
+    renderer.drawPieceBox()
+    renderAll()
+  }
+
   override def canActivate(cursor: Cursor): Boolean = true
 
   override def canSelect(cursor: Cursor): Boolean = (config.flip == FlipEnabled).when[Cursor](!_)(cursor) match {

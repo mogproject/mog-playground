@@ -76,11 +76,12 @@ trait ModeController {
     renderer.updateFlip(config)
   }
 
+  def initializeBoardControl(): Unit
+
   def refreshBoard(): Unit = {
     renderer.initializeControlSection(config)
-    renderer.initializeBoardRenderer(config, mode == Editing)
-    renderer.drawPieceBox() // for Edit Mode todo: refactor
-    renderAll()
+    renderer.initializeBoardRenderer(config)
+    initializeBoardControl()
   }
 
   def renderAfterUpdatingComment(updateTextArea: Boolean): Unit = {}

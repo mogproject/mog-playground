@@ -37,7 +37,7 @@ object Controller {
 
     // create renderer
     val renderer = new Renderer
-    renderer.initialize(elem, config, isEditMode = false)
+    renderer.initialize(elem, config)
 
     // update mode
     val isSnapshot = game.trunk.moves.isEmpty && game.trunk.finalAction.isEmpty && game.branches.isEmpty

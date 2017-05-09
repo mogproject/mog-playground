@@ -172,6 +172,10 @@ trait GameController extends ModeController {
     renderComment()
   }
 
+  override def initializeBoardControl(): Unit = {
+    renderAll()
+  }
+
   override def renderAfterUpdatingComment(updateTextArea: Boolean): Unit = {
     if (updateTextArea) renderComment()
     renderControl()

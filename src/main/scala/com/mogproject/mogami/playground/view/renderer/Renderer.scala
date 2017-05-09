@@ -62,13 +62,13 @@ class Renderer extends BoardRenderer {
     )
   ).render
 
-  def initialize(elem: Element, config: Configuration, isEditMode: Boolean): Unit = {
+  def initialize(elem: Element, config: Configuration): Unit = {
     // create elements
     initializeControlSection(config)
     val mainPane = createMainPane(config.canvasWidth, (config.flip == DoubleBoard).fold(2, 1), config.isMobile, config.isLandscape)
     elem.appendChild(mainPane)
 
-    initializeBoardRenderer(config, isEditMode)
+    initializeBoardRenderer(config)
     config.isMobile.fold(widenMainPane(), contractMainPane())
     NavigatorSection.initialize()
     MenuPane.initialize()

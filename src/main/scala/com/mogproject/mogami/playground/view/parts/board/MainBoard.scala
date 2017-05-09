@@ -19,8 +19,7 @@ import scalatags.JsDom.all._
 case class MainBoard(canvasWidth: Int,
                      flip: Boolean,
                      pieceLang: Language,
-                     recordLang: Language,
-                     isEditMode: Boolean
+                     recordLang: Language
                     ) extends CursorManageable with MoveNextEffect {
 
   protected val layout = BoardLayout(canvasWidth)
@@ -49,14 +48,14 @@ case class MainBoard(canvasWidth: Int,
   // elements
   lazy val canvasContainer: Div = div(
     padding := 0,
-    height := isEditMode.fold(layout.canvasHeight, layout.canvasHeightCompact),
+    height := layout.canvasHeightCompact,
     canvases
   ).render
 
   private[this] def createCanvas(zIndexVal: Int): Canvas = {
     canvas(
       widthA := layout.canvasWidth,
-      heightA := isEditMode.fold(layout.canvasHeight, layout.canvasHeightCompact),
+      heightA := layout.canvasHeightCompact,
       marginLeft := "auto",
       marginRight := "auto",
       left := 0,
