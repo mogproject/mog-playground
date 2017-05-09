@@ -9,7 +9,6 @@ import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.playground.view.renderer.BoardRenderer.DoubleBoard
 import com.mogproject.mogami.{BranchNo, _}
 import org.scalajs.dom.UIEvent
-import org.scalajs.dom.html.Div
 
 // todo: don't use parts directly but use only sections
 import com.mogproject.mogami.playground.view.parts.edit.EditReset
@@ -31,9 +30,7 @@ class Renderer extends BoardRenderer {
   //
   // HTML elements
   //
-  private[this] var controlSection: ControlSection = ControlSection(0, false, false)
-
-  private[this] var mainPane: Div = div().render
+  protected var controlSection: ControlSection = ControlSection(0, isMobile = false, isSmall = false)
 
   private[this] def createMainPane(canvasWidth: Int, numBoards: Int, isMobile: Boolean, isLandscape: Boolean) = div(
     div(cls := "navbar",
@@ -54,101 +51,23 @@ class Renderer extends BoardRenderer {
         ),
 
         // main content
-        div(
-          paddingTop := 5, display := display.`inline-block`.v, width := "calc(100% - 240px - 460px)",
-          (isMobile, isLandscape, numBoards == 2) match {
-            case (true, true, true) => createMobileLandscapeMainDouble(canvasWidth)
-            case (true, true, false) => createMobileLandscapeMain(canvasWidth)
-            case (true, false, _) => createMobilePortraitMain(canvasWidth)
-            case _ => createPCPortraitMain(canvasWidth, numBoards)
-          }
-        )
+        mainPane
       ),
       hr(),
       small(p(textAlign := "right", marginRight := 20, "Shogi Playground © 2017 ", a(href := "http://mogproject.com", target := "_blank", "mogproject")))
     )
   ).render
 
-  // todo: create a class
-  private[this] def createPCPortraitMain(canvasWidth: Int, numBoards: Int) = div(
-    div(cls := "container-fluid center-block",
-      // boards
-      div(
-        width := canvasWidth * numBoards + 30,
-        /* overflowX := overflow.auto.v, */
-        marginLeft := "auto",
-        marginRight := "auto",
-        paddingLeft := 15.px, paddingRight := 15.px, paddingBottom := 15.px,
-        if (numBoards == 2) {
-          div(cls := "row",
-            div(cls := "col-xs-6",
-              boardRendererElement1,
-              controlSection.output
-            ),
-            div(cls := "col-xs-6",
-              boardRendererElement2
-            )
-          )
-        } else {
-          div(
-            boardRendererElement1,
-            controlSection.output
-          )
-        }
-      )
-    )
-  )
-
-  private[this] def createMobilePortraitMain(canvasWidth: Int) = div(
-    cls := "container-fluid", width := canvasWidth, padding := 0,
-    boardRendererElement1,
-    controlSection.output
-  ).render
-
-  private[this] def createMobileLandscapeMain(canvasWidth: Int) = div(
-    cls := "container-fluid", width := canvasWidth * 2 + 30, padding := 0,
-    div(cls := "row",
-      div(cls := "col-xs-6",
-        boardRendererElement1
-      ),
-      div(cls := "col-xs-6",
-        controlSection.outputComment
-      )
-    ),
-    div(cls := "row",
-      div(cls := "col-xs-12",
-        controlSection.outputControlBar
-      )
-    )
-  ).render
-
-  private[this] def createMobileLandscapeMainDouble(canvasWidth: Int) = div(
-    cls := "container-fluid", width := canvasWidth * 2 + 30, padding := 0,
-    div(cls := "row",
-      div(cls := "col-xs-6",
-        boardRendererElement1
-      ),
-      div(cls := "col-xs-6",
-        boardRendererElement2
-      )
-    ),
-    div(cls := "row",
-      div(cls := "col-xs-12",
-        controlSection.outputControlBar
-      )
-    )
-  ).render
-
-  def initialize(elem: Element, config: Configuration): Unit = {
+  def initialize(elem: Element, config: Configuration, isEditMode: Boolean): Unit = {
     // create elements
     controlSection = ControlSection(config.canvasWidth, config.isMobile, config.isMobile && config.isLandscape)
-    mainPane = createMainPane(config.canvasWidth, (config.flip == DoubleBoard).fold(2, 1), config.isMobile, config.isLandscape)
+    val mainPane = createMainPane(config.canvasWidth, (config.flip == DoubleBoard).fold(2, 1), config.isMobile, config.isLandscape)
     elem.appendChild(mainPane)
 
-    initializeBoardRenderer(config)
-    NavigatorSection.initialize()
+    initializeBoardRenderer(config, isEditMode)
+    if (!config.isMobile) contractMainPane()
     controlSection.initialize()
-
+    NavigatorSection.initialize()
     MenuPane.initialize()
 
     // initialize clipboard.js

@@ -37,10 +37,10 @@ object SettingsSection extends Section {
         BoardSizeButton.output
       ),
       div(cls := "row",
-        marginLeft := -10.px,
+        marginLeft := (-10).px,
         marginBottom := 10.px,
-        div(cls := "col-xs-8 col-lg-9 small-padding", label(marginTop := 6, "Double Board Mode")),
-        div(cls := "col-xs-4 col-lg-3", doubleBoardButton.output)
+        div(cls := "col-xs-7 col-lg-9 small-padding", label(marginTop := 6, "Double Board Mode")),
+        div(cls := "col-xs-5 col-lg-3", doubleBoardButton.output)
       ),
       MessageLanguageSelector.output,
       RecordLanguageSelector.output,

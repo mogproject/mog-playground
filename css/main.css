@@ -182,8 +182,8 @@ select {
   padding-top: 5px;
   padding-right: 5px;
   padding-left: 5px;
-  margin-bottom: -9999px;
-  padding-bottom: 9999px;
+  margin-bottom: -10000px;
+  padding-bottom: 10000px;
 
   -webkit-transition: width 0.3s;
   -moz-transition: width 0.3s;
@@ -195,6 +195,7 @@ select {
 .sidebar-right {
   border-left: 6px groove #F8F8F8;
   float: right;
+  min-height: 10660px !important;
 }
 
 .sidebar-left {
@@ -202,6 +203,11 @@ select {
   float: left;
 }
 
-.row{
+.row {
   overflow: hidden;
+}
+
+.main-area {
+  margin-left: auto;
+  margin-right: auto;
 }

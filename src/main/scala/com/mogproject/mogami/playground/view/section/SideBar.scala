@@ -8,11 +8,11 @@ import scalatags.JsDom.all._
   *
   */
 object SideBar {
-  private[this] var isCollapsed = false
+  private[this] var isCollapsedValue = false
 
-  private[this] val EXPANDED_WIDTH = 460.px
+  val EXPANDED_WIDTH: Int = 460
 
-  private[this] val COLLAPSED_WIDTH = 60.px
+  val COLLAPSED_WIDTH: Int = 60
 
   val titleExpanded: Heading = h4(
     a(href := "#", onclick := { () => collapseSideBar() }, span(cls := "glyphicon glyphicon-minus")),
@@ -34,19 +34,21 @@ object SideBar {
     )
   ).render
 
-  def collapseSideBar(): Unit = if (!isCollapsed) {
-    output.style.width = COLLAPSED_WIDTH
+  def collapseSideBar(): Unit = if (!isCollapsedValue) {
+    output.style.width = COLLAPSED_WIDTH.px
     titleExpanded.style.display = display.none.v
     titleCollapsed.style.display = display.block.v
     MenuPane.collapseMenu()
-    isCollapsed = true
+    isCollapsedValue = true
   }
 
-  def expandSideBar(): Unit = if (isCollapsed) {
-    output.style.width = EXPANDED_WIDTH
+  def expandSideBar(): Unit = if (isCollapsedValue) {
+    output.style.width = EXPANDED_WIDTH.px
     titleCollapsed.style.display = display.none.v
     titleExpanded.style.display = display.block.v
     MenuPane.expandMenu()
-    isCollapsed = false
+    isCollapsedValue = false
   }
+
+  def isCollapsed: Boolean = isCollapsedValue
 }

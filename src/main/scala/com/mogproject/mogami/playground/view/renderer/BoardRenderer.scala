@@ -1,10 +1,12 @@
 package com.mogproject.mogami.playground.view.renderer
 
 import com.mogproject.mogami.{BoardType, _}
+import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.controller.{Configuration, Cursor}
 import com.mogproject.mogami.playground.view.parts.board.MainBoard
 import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipEnabled}
 import com.mogproject.mogami.playground.view.renderer.piece.PieceRenderer
+import com.mogproject.mogami.playground.view.section.{ControlSection, SideBar}
 import org.scalajs.dom
 import org.scalajs.dom.html.Div
 
@@ -17,35 +19,107 @@ trait BoardRenderer {
 
   private[this] var mainBoards: Seq[MainBoard] = Seq.empty
 
-  lazy val boardRendererElement1: Div = div().render
-
-  lazy val boardRendererElement2: Div = div().render
+  protected def controlSection: ControlSection
 
   def getPieceRenderer: PieceRenderer = mainBoards.head.pieceRenderer
+
+  lazy val mainArea: Div = div().render
+
+  lazy val mainPane: Div = div(
+    paddingTop := 5, display := display.`inline-block`.v, width := "100%",
+    mainArea
+  ).render
+
+  def contractMainPane(): Unit = {
+    mainPane.style.width = s"calc(100% - 240px - ${SideBar.EXPANDED_WIDTH}px)"
+  }
+
+  def expandMainPane(): Unit = {
+    mainPane.style.width = s"calc(100% - 240px - ${SideBar.COLLAPSED_WIDTH}px)"
+  }
 
   /**
     * Initialize or reload main boards
     *
     * @param config configuration
     */
-  def initializeBoardRenderer(config: Configuration): Unit = {
+  def initializeBoardRenderer(config: Configuration, isEditMode: Boolean): Unit = {
     mainBoards = if (config.flip == DoubleBoard) {
-      Seq(false, true).map(f => MainBoard(config.canvasWidth, f, config.pieceLang, config.recordLang))
+      Seq(false, true).map(f => MainBoard(config.canvasWidth, f, config.pieceLang, config.recordLang, isEditMode))
     } else {
-      Seq(MainBoard(config.canvasWidth, config.flip == FlipEnabled, config.pieceLang, config.recordLang))
+      Seq(MainBoard(config.canvasWidth, config.flip == FlipEnabled, config.pieceLang, config.recordLang, isEditMode))
     }
 
-    boardRendererElement1.innerHTML = ""
-    boardRendererElement2.innerHTML = ""
-    // todo: finalize layout
-    boardRendererElement1.appendChild(mainBoards.head.canvasContainer)
-    if (mainBoards.length == 2) {
-      boardRendererElement2.appendChild(mainBoards(1).canvasContainer)
+    val node = (config.isMobile, config.isLandscape, config.flip == DoubleBoard) match {
+      case (true, true, true) => createMobileLandscapeMainDouble(config.canvasWidth)
+      case (true, true, false) => createMobileLandscapeMain(config.canvasWidth)
+      case (true, false, _) => createMobilePortraitMain(config.canvasWidth)
+      case (_, _, isDoubleBoard) => createPCPortraitMain(config.canvasWidth, isDoubleBoard.fold(2, 1))
     }
+    mainArea.innerHTML = ""
+    mainArea.appendChild(node)
 
-//    boardRendererElement1.style.width = config.canvasWidth * mainBoards.length + 30 + "px"
     mainBoards.foreach(_.initialize())
   }
+
+
+  private[this] def createPCPortraitMain(canvasWidth: Int, numBoards: Int): Div = div(cls := "container-fluid",
+    div(cls := "main-area",
+      width := canvasWidth * numBoards + 30,
+      paddingLeft := 15.px, paddingRight := 15.px, paddingBottom := 15.px,
+      if (numBoards == 2) {
+        div(cls := "row",
+          div(cls := "col-xs-6",
+            mainBoards.head.canvasContainer,
+            controlSection.output
+          ),
+          div(cls := "col-xs-6",
+            mainBoards(1).canvasContainer
+          )
+        )
+      } else {
+        div(
+          mainBoards.head.canvasContainer,
+          controlSection.output
+        )
+      }
+    )
+  ).render
+
+  private[this] def createMobilePortraitMain(canvasWidth: Int) = div(cls := "container-fluid",
+    div(cls := "main-area",
+      width := canvasWidth,
+      padding := 0,
+      marginLeft := "auto",
+      marginRight := "auto",
+      mainBoards.head.canvasContainer,
+      controlSection.output
+    )
+  ).render
+
+  private[this] def createMobileLandscapeMain(canvasWidth: Int) = div(cls := "container-fluid",
+    div(cls := "main-area",
+      width := canvasWidth * 2 + 30,
+      div(cls := "row",
+        div(cls := "col-xs-6", mainBoards.head.canvasContainer), div(cls := "col-xs-6", controlSection.outputComment)
+      ),
+      div(cls := "row",
+        div(cls := "col-xs-12", controlSection.outputControlBar)
+      )
+    )
+  ).render
+
+  private[this] def createMobileLandscapeMainDouble(canvasWidth: Int) = div(cls := "container-fluid",
+    div(cls := "main-area",
+      width := canvasWidth * 2 + 30, padding := 0,
+      div(cls := "row",
+        div(cls := "col-xs-6", mainBoards.head.canvasContainer), div(cls := "col-xs-6", mainBoards(1).canvasContainer)
+      ),
+      div(cls := "row",
+        div(cls := "col-xs-12", controlSection.outputControlBar)
+      )
+    )
+  ).render
 
   //
   // Actions

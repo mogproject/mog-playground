@@ -1,7 +1,6 @@
 package com.mogproject.mogami.playground.controller.mode
 
-import com.mogproject.mogami._
-import com.mogproject.mogami.{Player, State}
+import com.mogproject.mogami.{BranchNo, _}
 import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.io.RecordFormat
 import com.mogproject.mogami.playground.view.renderer.Renderer
@@ -78,7 +77,8 @@ trait ModeController {
   }
 
   def refreshBoard(): Unit = {
-    renderer.initializeBoardRenderer(config)
+    renderer.initializeBoardRenderer(config, mode == Editing)
+    renderer.drawPieceBox() // for Edit Mode todo: refactor
     renderAll()
   }
 
