@@ -1,5 +1,6 @@
 package com.mogproject.mogami.playground.controller
 
+import com.mogproject.mogami.playground.api.MobileScreen
 import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipDisabled, FlipEnabled, FlipType}
 import org.scalajs.dom
 
@@ -73,7 +74,7 @@ object Configuration {
 
   lazy val defaultIsMobile: Boolean = dom.window.screen.width < 768
 
-  def defaultIsLandscape: Boolean = dom.window.screen.height < dom.window.screen.width
+  def defaultIsLandscape: Boolean = MobileScreen.isLandscape
 
   lazy val defaultCanvasWidth: Int = getDefaultCanvasWidth(dom.window.screen.width, dom.window.screen.height)
 
