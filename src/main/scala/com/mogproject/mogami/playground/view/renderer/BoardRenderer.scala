@@ -60,8 +60,7 @@ trait BoardRenderer {
     }
 
     val node = (config.isMobile, config.isLandscape, config.flip == DoubleBoard) match {
-      case (true, true, true) => createMobileLandscapeMainDouble(config.canvasWidth)
-      case (true, true, false) => createMobileLandscapeMain(config.canvasWidth)
+      case (true, true, isDoubleBoard) => createMobileLandscapeMain(config.canvasWidth, isDoubleBoard.fold(2, 1))
       case (true, false, _) => createMobilePortraitMain(config.canvasWidth)
       case (_, _, isDoubleBoard) => createPCPortraitMain(config.canvasWidth, isDoubleBoard.fold(2, 1))
     }
@@ -71,58 +70,38 @@ trait BoardRenderer {
     mainBoards.foreach(_.initialize())
   }
 
-
   private[this] def createPCPortraitMain(canvasWidth: Int, numBoards: Int): TypedTag[Div] = div(cls := "main-area",
-    width := (canvasWidth + 70) * numBoards - 40, // +30 for 1 board, +100 for 2 boards
-    paddingLeft := 15.px, paddingRight := 15.px, paddingBottom := 15.px,
+    width := (canvasWidth + 70) * numBoards - 50, // +20 for 1 board, +90 for 2 boards
+    paddingLeft := 10.px, paddingRight := 10.px, paddingBottom := 15.px,
     if (numBoards == 2) {
-      div(
-        div(cls := "row",
-          div(cls := "col-xs-6",
-            mainBoards.head.canvasContainer
-          ),
-          div(cls := "col-xs-6",
-            mainBoards(1).canvasContainer
-          )
-        ),
-        div(
-          controlSection.outputControlBar,
-          controlSection.outputComment
-        )
+      div(cls := "row",
+        div(cls := "col-xs-6", mainBoards.head.canvasContainer), div(cls := "col-xs-6", mainBoards(1).canvasContainer)
       )
     } else {
       div(
-        mainBoards.head.canvasContainer,
-        div(
-          controlSection.outputControlBar,
-          controlSection.outputComment
-        )
+        mainBoards.head.canvasContainer
       )
-    }
+    },
+    div(
+      controlSection.outputControlBar,
+      controlSection.outputComment
+    )
   )
 
   private[this] def createMobilePortraitMain(canvasWidth: Int): TypedTag[Div] = div(cls := "main-area",
     width := canvasWidth,
     mainBoards.head.canvasContainer,
     div(
-//      paddingTop := "5px",
       controlSection.outputControlBar,
       controlSection.outputComment
     )
   )
 
-  private[this] def createMobileLandscapeMain(canvasWidth: Int): TypedTag[Div] = div(cls := "main-area",
+  private[this] def createMobileLandscapeMain(canvasWidth: Int, numBoards: Int): TypedTag[Div] = div(cls := "main-area",
     width := canvasWidth * 2 + 60,
     div(cls := "row",
-      div(cls := "col-xs-6", mainBoards.head.canvasContainer), div(cls := "col-xs-6", controlSection.outputComment)
-    ),
-    div(cls := "row", controlSection.outputControlBar)
-  )
-
-  private[this] def createMobileLandscapeMainDouble(canvasWidth: Int): TypedTag[Div] = div(cls := "main-area",
-    width := canvasWidth * 2 + 60,
-    div(cls := "row",
-      div(cls := "col-xs-6", mainBoards.head.canvasContainer), div(cls := "col-xs-6", mainBoards(1).canvasContainer)
+      div(cls := "col-xs-6", mainBoards.head.canvasContainer),
+      div(cls := "col-xs-6", (numBoards == 2).fold(mainBoards(1).canvasContainer,  controlSection.outputComment))
     ),
     div(cls := "row", controlSection.outputControlBar)
   )

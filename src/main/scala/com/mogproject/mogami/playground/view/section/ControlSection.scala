@@ -12,11 +12,11 @@ import scalatags.JsDom.all._
 /**
   *
   */
-case class ControlSection(canvasWidth: Int, isMobile: Boolean, isLandscape: Boolean) extends Section {
+case class ControlSection(canvasWidth: Int, isMobile: Boolean, isMobileLandscape: Boolean) extends Section {
 
   private[this] val sectionWidth = math.max(300, canvasWidth)
 
-  private[this] lazy val controlBar = ControlBar(sectionWidth, isSmall = isLandscape)
+  private[this] lazy val controlBar = ControlBar(sectionWidth, isSmall = isMobileLandscape)
   private[this] lazy val commentButton = CommentButton(isDisplayOnly = isMobile, isModal = false)
 
   override def initialize(): Unit = {
@@ -34,8 +34,7 @@ case class ControlSection(canvasWidth: Int, isMobile: Boolean, isLandscape: Bool
 
   lazy val outputComment: Div = div(
     cls := "center-block",
-    width := isLandscape.fold(canvasWidth, sectionWidth),
-    paddingTop := "5px",
+    width := isMobileLandscape.fold(canvasWidth, sectionWidth),
     commentButton.output
   ).render
 
