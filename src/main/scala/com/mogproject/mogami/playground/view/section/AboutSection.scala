@@ -11,8 +11,9 @@ object AboutSection extends Section {
   override val accordions: Seq[AccordionMenu] = Seq(AccordionMenu(
     "About",
     "About This Site",
-    false,
-    true,
+    "info-sign",
+    isExpanded = false,
+    isVisible = true,
     div(
       p(i(""""Run anywhere. Needs NO installation."""")),
       p("Shogi Playground is a platform for all shogi --Japanese chess-- fans in the world." +

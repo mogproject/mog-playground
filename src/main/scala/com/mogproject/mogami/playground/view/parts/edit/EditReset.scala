@@ -58,7 +58,7 @@ object EditReset extends ButtonLike[(State, Boolean), Button, Div] {
   }
 
   override val output: Div = div(
-    cls := "row", inputs.map(e => div(cls := "col-lg-4 col-xs-6", e))
+    cls := "row", inputs.map(e => div(cls := "col-xs-6 col-sm-4", e))
   ).render
 
 }

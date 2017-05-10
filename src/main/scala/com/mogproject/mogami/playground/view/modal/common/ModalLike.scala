@@ -32,12 +32,11 @@ trait ModalLike {
 
   def initialize(dialog: JQuery): Unit = {}
 
-  //todo: something is wrong!
   private[this] lazy val closeButton = button(tpe := "button", cls := "close", data("dismiss") := "modal", aria.label := "Close",
     span(aria.hidden := true, raw("&times;"))
   )
 
-  lazy val elem: Div =
+  protected lazy val elem: Div =
     div(cls := "modal face", tabindex := "-1", role := "dialog", isStatic.fold(data("backdrop") := "static", Seq.empty[JsDom.Modifier]),
       div(cls := "modal-dialog", role := "document",
         div(cls := "modal-content",

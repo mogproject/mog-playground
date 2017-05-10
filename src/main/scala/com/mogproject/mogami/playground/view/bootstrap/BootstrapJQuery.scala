@@ -11,6 +11,10 @@ trait BootstrapJQuery extends JQuery {
   def modal(options: js.Any): BootstrapJQuery = js.native
 
   def tooltip(options: js.Any = ???): BootstrapJQuery = js.native
+
+  def collapse(action: String): BootstrapJQuery = js.native
+
+  def collapse(options: js.Any = ???): BootstrapJQuery = js.native
 }
 
 @js.native

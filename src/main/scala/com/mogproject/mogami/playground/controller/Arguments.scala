@@ -4,6 +4,7 @@ import com.mogproject.mogami._
 import com.mogproject.mogami.core.game.Game.{HistoryHash, Position}
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.core.state.StateCache.Implicits._
+import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipEnabled}
 
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -62,8 +63,9 @@ case class Arguments(sfen: Option[String] = None, // deprecated
           f(sofar, xs)
       }
       case ("flip" :: s :: Nil) :: xs => s.toLowerCase match {
-        case "true" => f(sofar.copy(config = sofar.config.copy(flip = true)), xs)
+        case "true" => f(sofar.copy(config = sofar.config.copy(flip = FlipEnabled)), xs)
         case "false" => f(sofar, xs)
+        case "double" => f(sofar.copy(config = sofar.config.copy(flip = DoubleBoard)), xs)
         case _ =>
           println(s"Invalid parameter: flip=${s}")
           f(sofar, xs)
@@ -75,14 +77,14 @@ case class Arguments(sfen: Option[String] = None, // deprecated
           f(sofar, xs)
       }
       case ("size" :: s :: Nil) :: xs => Try(s.toInt) match {
-        case Success(n) if n > 0 => f(sofar.copy(config = sofar.config.copy(layoutSize = n)), xs)
+        case Success(n) if n > 0 => f(sofar.copy(config = sofar.config.copy(canvasWidth = n)), xs)
         case _ =>
           println(s"Invalid parameter: size=${s}")
           f(sofar, xs)
       }
       case ("mobile" :: s :: Nil) :: xs => s.toLowerCase match {
-        case "true" => f(sofar.copy(config = sofar.config.copy(defaultIsMobile = Some(true))), xs)
-        case "false" => f(sofar.copy(config = sofar.config.copy(defaultIsMobile = Some(false))), xs)
+        case "true" => f(sofar.copy(config = sofar.config.copy(isMobile = true)), xs)
+        case "false" => f(sofar.copy(config = sofar.config.copy(isMobile = false)), xs)
         case _ =>
           println(s"Invalid parameter: mobile=${s}")
           f(sofar, xs)
@@ -100,8 +102,8 @@ case class Arguments(sfen: Option[String] = None, // deprecated
     val pattern = raw"(?:([\d])+[.])?([\d]+)".r
 
     s match {
-      case pattern(null, y) => for {yy <- Try(y.toInt).toOption}  yield GamePosition(0, yy)
-      case pattern(x, y) => for {xx <- Try(x.toInt).toOption; yy <- Try(y.toInt).toOption}  yield GamePosition(xx, yy)
+      case pattern(null, y) => for {yy <- Try(y.toInt).toOption} yield GamePosition(0, yy)
+      case pattern(x, y) => for {xx <- Try(x.toInt).toOption; yy <- Try(y.toInt).toOption} yield GamePosition(xx, yy)
       case _ => None
     }
   }

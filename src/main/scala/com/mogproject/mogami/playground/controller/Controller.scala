@@ -2,11 +2,13 @@ package com.mogproject.mogami.playground.controller
 
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.core.state.StateCache.Implicits._
-import com.mogproject.mogami.playground.view.Renderer
-import com.mogproject.mogami._
+import com.mogproject.mogami.{BranchNo, _}
 import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller.mode._
 import com.mogproject.mogami.playground.io.RecordFormat
+import com.mogproject.mogami.playground.view.parts.settings.BoardSizeButton.PresetBoardSize
+import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipDisabled, FlipEnabled}
+import com.mogproject.mogami.playground.view.renderer.Renderer
 import org.scalajs.dom.Element
 
 import scala.util.{Failure, Success, Try}
@@ -30,34 +32,12 @@ object Controller {
   def initialize(elem: Element, args: Arguments): Unit = {
     val config = args.config
 
-    // create game
-    def loadGame(game: => Game): Game = Try(game) match {
-      case Success(g) => g
-      case Failure(e) =>
-        println(s"Failed to create a game: ${e}")
-        Game()
-    }
-
     // load game
-    val gg: Game = ((args.usen, args.sfen) match {
-      case (Some(u), _) => loadGame(Game.parseUsenString(u)) // parse USEN string
-      case (_, Some(s)) => loadGame(Game.parseSfenString(s)) // parse SFEN string
-      case _ => Game()
-    }).copy(gameInfo = args.gameInfo)
-
-    // update comments
-    val comments = for {
-      (b, m) <- args.comments
-      (pos, c) <- m
-      h <- gg.getHistoryHash(GamePosition(b, pos))
-    } yield h -> c
-    val game = gg.copy(comments = comments)
+    val game = createGameFromArgs(args)
 
     // create renderer
-    val renderer = Renderer(elem, args.config.layout)
-
-    // draw board (do only one in the life time)
-    renderer.drawBoard()
+    val renderer = new Renderer
+    renderer.initialize(elem, config)
 
     // update mode
     val isSnapshot = game.trunk.moves.isEmpty && game.trunk.finalAction.isEmpty && game.branches.isEmpty
@@ -72,6 +52,29 @@ object Controller {
 
     // create image if the action is ImageAction
     if (args.action == ImageAction) renderer.drawAsImage()
+  }
+
+  private[this] def createGameFromArgs(args: Arguments): Game = {
+    def loadGame(game: => Game): Game = Try(game) match {
+      case Success(g) => g
+      case Failure(e) =>
+        println(s"Failed to create a game: ${e}")
+        Game()
+    }
+
+    val gg: Game = ((args.usen, args.sfen) match {
+      case (Some(u), _) => loadGame(Game.parseUsenString(u)) // parse USEN string
+      case (_, Some(s)) => loadGame(Game.parseSfenString(s)) // parse SFEN string
+      case _ => Game()
+    }).copy(gameInfo = args.gameInfo)
+
+    // update comments
+    val comments = for {
+      (b, m) <- args.comments
+      (pos, c) <- m
+      h <- gg.getHistoryHash(GamePosition(b, pos))
+    } yield h -> c
+    gg.copy(comments = comments)
   }
 
   /**
@@ -116,7 +119,7 @@ object Controller {
 
   def canInvokeWithoutSelection(cursor: Cursor): Boolean = modeController.get.canInvokeWithoutSelection(cursor)
 
-  def invokeCursor(selected: Cursor, invoked: Cursor): Unit = doAction(_.invokeCursor(selected, invoked), _.renderAll())
+  def invokeCursor(selected: Cursor, invoked: Cursor, isFlipped: Boolean): Unit = doAction(_.invokeCursor(selected, invoked, isFlipped), _.renderAll())
 
   def invokeHoldEvent(invoked: Cursor): Unit = doAction(_.invokeHoldEvent(invoked), _.renderAll())
 
@@ -127,12 +130,6 @@ object Controller {
 
   // actions
   def setMode(mode: Mode): Unit = if (!modeController.exists(_.mode == mode)) doAction(_.setMode(mode), _ => {})
-
-  def setMessageLanguage(lang: Language): Unit = doAction(_.setMessageLanguage(lang), _.renderAll())
-
-  def setRecordLanguage(lang: Language): Unit = doAction(_.setRecordLanguage(lang), _.renderAll())
-
-  def setPieceLanguage(lang: Language): Unit = doAction(_.setPieceLanguage(lang), _.renderAll())
 
   def setRecord(index: Int): Unit = doAction(_.setRecord(index), _.renderAll())
 
@@ -145,7 +142,7 @@ object Controller {
 
   def setGameInfo(gameInfo: GameInfo): Unit = doAction(_.setGameInfo(gameInfo), _.renderAll())
 
-  def toggleFlip(): Unit = doAction(_.toggleFlip(), _.renderAll())
+  def toggleFlip(): Unit = doAction(_.toggleFlip(), _.refreshBoard())
 
   def showMenu(): Unit = modeController.get.renderer.showMenuModal()
 
@@ -193,4 +190,40 @@ object Controller {
     case pc: PlayModeController => pc.setResign()
     case _ => None
   }, _.renderAll())
+
+  //
+  // Settings section
+  //
+  def setMessageLanguage(lang: Language): Unit = doAction(_.setMessageLanguage(lang), _.renderAll())
+
+  def setRecordLanguage(lang: Language): Unit = doAction(_.setRecordLanguage(lang), _.refreshBoard())
+
+  def setPieceLanguage(lang: Language): Unit = doAction(_.setPieceLanguage(lang), _.refreshBoard())
+
+  def setDoubleBoard(isDoubleBoard: Boolean): Unit = doAction({ mc =>
+    (mc.config.flip, isDoubleBoard) match {
+      case (DoubleBoard, true) => None
+      case (_, true) => Some(mc.updateConfig(mc.config.copy(flip = DoubleBoard)))
+      case (DoubleBoard, false) => Some(mc.updateConfig(mc.config.copy(flip = FlipDisabled)))
+      case _ => None
+    }
+  }, _.refreshBoard())
+
+  def changeBoardSize(size: PresetBoardSize): Unit =
+    doAction({ mc => Some(mc.updateConfig(mc.config.copy(canvasWidth = size.width))) }, _.refreshBoard())
+
+  def collapseSideBarRight(): Unit = modeController.get.renderer.collapseSideBarRight()
+
+  def expandSideBarRight(): Unit = modeController.get.renderer.expandSideBarRight()
+
+  def collapseSideBarLeft(): Unit = modeController.get.renderer.collapseSideBarLeft()
+
+  def expandSideBarLeft(): Unit = modeController.get.renderer.expandSideBarLeft()
+
+  // Orientation
+  def changeScreenSize(): Unit =
+    doAction({ mc => Some(mc.updateConfig(mc.config.updateScreenSize())) }, mc => {
+      mc.collapseByDefault()
+      mc.refreshBoard()
+    })
 }

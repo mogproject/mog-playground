@@ -1,4 +1,4 @@
-package com.mogproject.mogami.playground.view.parts.language
+package com.mogproject.mogami.playground.view.parts.settings
 
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
 import com.mogproject.mogami.playground.view.parts.common.ButtonLike
@@ -21,9 +21,10 @@ sealed trait LanguageSelector extends ButtonLike[Language, Anchor, Div] {
   override protected def generateInput(key: Language): Anchor = a(cls := "btn btn-sm btn-primary").render
 
   override val output: Div = div(cls := "form-group",
-    marginBottom := 3,
+    marginBottom := 3.px,
     div(cls := "row",
-      div(cls := "col-xs-4 small-padding", textAlign := "right", label(marginTop := 6, labelString)),
+      marginLeft := -10.px,
+      div(cls := "col-xs-4 small-padding", label(marginTop := 6, labelString)),
       div(cls := "col-xs-8",
         div(cls := "input-group",
           div(cls := "btn-group btn-group-justified",

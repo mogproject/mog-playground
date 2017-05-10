@@ -1,14 +1,15 @@
-package com.mogproject.mogami.playground.view.piece
+package com.mogproject.mogami.playground.view.renderer.piece
 
-import com.mogproject.mogami.playground.view.{Layout, TextRenderer}
 import com.mogproject.mogami.Piece
+import com.mogproject.mogami.playground.view.layout.BoardLayout
+import com.mogproject.mogami.playground.view.renderer.TextRenderer
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom.CanvasRenderingContext2D
 
 /**
   * English pieces
   */
-case class EnglishPieceRenderer(layout: Layout) extends PieceRenderer {
+case class EnglishPieceRenderer(layout: BoardLayout) extends PieceRenderer {
   val yOffset: Int = layout.PIECE_HEIGHT * 40 / 1000
 
   override def drawPiece(ctx: CanvasRenderingContext2D, piece: Piece, left: Int, top: Int, scale: Double = 1.0): Unit = {

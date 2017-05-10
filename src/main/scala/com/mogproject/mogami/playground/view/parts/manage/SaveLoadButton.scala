@@ -44,7 +44,7 @@ object SaveLoadButton {
   ).render
 
   private[this] lazy val fileLoadMessage: Div = div(
-    cls := "col-lg-9 col-xs-8 text-muted",
+    cls := "col-xs-7 col-sm-9 text-muted",
     marginTop := 6
   ).render
 
@@ -79,7 +79,7 @@ object SaveLoadButton {
   ).render
 
   private[this] lazy val textLoadMessage: Div = div(
-    cls := "col-lg-9 col-xs-8 text-muted",
+    cls := "col-sm-9 col-xs-8 text-muted",
     marginTop := 6
   ).render
 
@@ -143,7 +143,7 @@ object SaveLoadButton {
     div(
       cls := "row",
       marginTop := 3,
-      div(cls := "col-xs-4 col-lg-3", fileLoadButton),
+      div(cls := "col-xs-5 col-sm-3", fileLoadButton),
       fileLoadMessage
     ),
     br(),
@@ -152,13 +152,13 @@ object SaveLoadButton {
     div(
       cls := "row",
       marginTop := 3,
-      div(cls := "col-xs-4 col-lg-3", textLoadButton),
+      div(cls := "col-xs-5 col-sm-3", textLoadButton),
       textLoadMessage
     ),
     div(
       cls := "row",
       marginTop := 3,
-      div(cls := "col-xs-4 col-lg-3", textClearButton)
+      div(cls := "col-xs-5 col-sm-3", textClearButton)
     ),
     br(),
     label("Save to File / Clipboard"),
@@ -179,7 +179,7 @@ object SaveLoadButton {
   // File I/O
   //
   private[this] def readSingleFile(callback: String => String => Unit): Unit = {
-    val maxFileSizeKB = 20
+    val maxFileSizeKB = 100
 
     val head = (fileLoadInput.files.length >= 0).option(fileLoadInput.files(0))
     (for {

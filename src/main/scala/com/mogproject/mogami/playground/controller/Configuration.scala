@@ -1,8 +1,9 @@
 package com.mogproject.mogami.playground.controller
 
-import com.mogproject.mogami.playground.view.Layout
-import com.mogproject.mogami.playground.view.piece.{EnglishPieceRenderer, PieceRenderer, SimpleJapanesePieceRenderer}
 import com.mogproject.mogami.util.Implicits._
+import com.mogproject.mogami.playground.api.MobileScreen
+import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipDisabled, FlipEnabled, FlipType}
+import com.mogproject.mogami.playground.view.section.{SideBarLeft, SideBarRight}
 import org.scalajs.dom
 
 import scala.scalajs.js.UndefOr
@@ -10,34 +11,16 @@ import scala.scalajs.js.UndefOr
 /**
   *
   */
-case class Configuration(screenWidth: Double = 375.0,
-                         defaultIsMobile: Option[Boolean] = None,
-                         layoutSize: Int = 0,
+case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
+                         isMobile: Boolean = Configuration.defaultIsMobile,
+                         isLandscape: Boolean = Configuration.getIsLandscape,
+                         canvasWidth: Int = Configuration.getDefaultCanvasWidth,
                          messageLang: Language = Configuration.browserLanguage,
                          recordLang: Language = Configuration.browserLanguage,
                          pieceLang: Language = Japanese,
-                         flip: Boolean = false,
-                         baseUrl: String = ""
+                         flip: FlipType = FlipDisabled
                         ) {
-  val layout: Layout = {
-    val isMobile: Boolean = defaultIsMobile.getOrElse(screenWidth < 768)
-
-    if (layoutSize > 0)
-      Layout(layoutSize, isMobile)
-    else
-      screenWidth match {
-        case x if x >= 1024.0 => Layout(400, isMobile)
-        case x if x >= 400.0 => Layout(375, isMobile)
-        case x if x >= 375.0 => Layout(336, isMobile)
-        case _ => Layout(300, isMobile)
-      }
-  }
-
-  lazy val pieceRenderer: PieceRenderer = pieceLang match {
-    case Japanese => SimpleJapanesePieceRenderer(layout)
-    case English => EnglishPieceRenderer(layout)
-  }
-
+  
   def toQueryParameters: List[String] = {
     type Parser = List[String] => List[String]
 
@@ -58,11 +41,20 @@ case class Configuration(screenWidth: Double = 375.0,
       case English => "plang=en" :: xs
     }
 
-    val parseFlip: Parser = xs => flip.fold("flip=true" :: xs, xs)
+    val parseFlip: Parser = xs => flip match {
+      case FlipDisabled => xs
+      case FlipEnabled => "flip=true" :: xs
+      case DoubleBoard => "flip=double" :: xs
+    }
 
     (parseMessageLang andThen parseRecordLang andThen parsePieceLang andThen parseFlip) (List.empty)
   }
 
+  def updateScreenSize(): Configuration = {
+    this.copy(isLandscape = Configuration.getIsLandscape, canvasWidth = Configuration.getDefaultCanvasWidth)
+  }
+
+  def collapseByDefault: Boolean = !isMobile && Configuration.getComputedScreenWidth < canvasWidth + SideBarLeft.EXPANDED_WIDTH + SideBarRight.EXPANDED_WIDTH
 }
 
 object Configuration {
@@ -77,5 +69,20 @@ object Configuration {
       case Some("ja") => Japanese
       case _ => English
     }
+  }
+
+  lazy val defaultBaseUrl = s"${dom.window.location.protocol}//${dom.window.location.host}${dom.window.location.pathname}"
+
+  lazy val defaultIsMobile: Boolean = dom.window.screen.width < 768
+
+  def getIsLandscape: Boolean = MobileScreen.isLandscape
+
+  def getComputedScreenWidth: Int = getIsLandscape.fold(math.max(dom.window.screen.width, dom.window.screen.height), dom.window.screen.width).toInt
+
+  def getDefaultCanvasWidth: Int = getDefaultCanvasWidth(dom.window.screen.width, dom.window.screen.height, getIsLandscape)
+
+  def getDefaultCanvasWidth(screenWidth: Double, screenHeight: Double, isLandscape: Boolean): Int = {
+    val (k, w, h) = isLandscape.fold((90, math.max(screenWidth, screenHeight), math.min(screenWidth, screenHeight)), (160, screenWidth, screenHeight))
+    math.max(100, math.min(math.min(w - 10, (h - k) * 400 / 576).toInt, 400))
   }
 }

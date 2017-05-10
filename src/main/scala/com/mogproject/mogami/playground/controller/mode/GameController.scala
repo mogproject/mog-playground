@@ -8,6 +8,7 @@ import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.io._
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.core.state.StateCache.Implicits._
+import com.mogproject.mogami.playground.view.renderer.BoardRenderer.FlipEnabled
 
 import scala.util.{Failure, Success, Try}
 
@@ -134,7 +135,7 @@ trait GameController extends ModeController {
       case 2 =>
         if (statusPosition < currentMoves.length) {
           val sq = currentMoves(statusPosition).to
-          renderer.flashCursor(Cursor(config.flip.fold(!sq, sq)))
+          renderer.flashCursor(Cursor((config.flip == FlipEnabled).fold(!sq, sq)))
         }
         Some(this.copy(displayPosition = renderer.getSelectedIndex + 1))
       case 3 => Some(this.copy(displayPosition = lastDisplayPosition))
@@ -155,6 +156,11 @@ trait GameController extends ModeController {
   override def setComment(comment: String): Option[ModeController] =
     game.updateComment(gamePosition, comment).map(g => this.copy(game = g))
 
+  /**
+    * Set new config
+    */
+  override def updateConfig(config: Configuration): ModeController = this.copy(config = config)
+
   //
   // renderer
   //
@@ -166,6 +172,10 @@ trait GameController extends ModeController {
     renderComment()
   }
 
+  override def initializeBoardControl(): Unit = {
+    renderAll()
+  }
+
   override def renderAfterUpdatingComment(updateTextArea: Boolean): Unit = {
     if (updateTextArea) renderComment()
     renderControl()
@@ -174,12 +184,12 @@ trait GameController extends ModeController {
 
   protected def renderState(): Unit = {
     (lastStatusPosition < displayPosition, displayBranch.finalAction) match {
-      case (true, Some(IllegalMove(mv))) => renderer.drawIllegalStatePieces(config, selectedState, mv)
-      case _ => renderer.drawPieces(config, selectedState)
+      case (true, Some(IllegalMove(mv))) => renderer.drawIllegalStatePieces(selectedState, mv)
+      case _ => renderer.drawPieces(selectedState)
     }
 
-    renderer.drawIndicators(config, selectedState.turn, isLastStatusPosition.fold(displayBranch.status, GameStatus.Playing))
-    renderer.drawLastMove(config, getLastMove)
+    renderer.drawIndicators(selectedState.turn, isLastStatusPosition.fold(displayBranch.status, GameStatus.Playing))
+    renderer.drawLastMove(getLastMove)
   }
 
   protected def renderControl(): Unit = {

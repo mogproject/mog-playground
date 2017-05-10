@@ -40,7 +40,7 @@ case class CommentButton(isDisplayOnly: Boolean, isModal: Boolean, text: String 
     tpe := "button",
     cls := "btn btn-default btn-block",
     data("toggle") := "tooltip",
-    data("placement") := "bottom",
+    data("placement") := "top",
     data("original-title") := s"Clear this comment",
     data("dismiss") := "modal",
     onclick := { () =>
@@ -59,7 +59,7 @@ case class CommentButton(isDisplayOnly: Boolean, isModal: Boolean, text: String 
     tpe := "button",
     cls := "btn btn-default btn-block",
     data("toggle") := "tooltip",
-    data("placement") := "bottom",
+    data("placement") := "top",
     data("original-title") := s"Update this comment",
     data("dismiss") := "modal",
     onclick := { () =>
@@ -80,8 +80,8 @@ case class CommentButton(isDisplayOnly: Boolean, isModal: Boolean, text: String 
     if (isDisplayOnly) "" else div(
       cls := "row",
       marginTop := 3,
-      div(cls := "col-xs-4 col-lg-3", textClearButton),
-      div(cls := "col-xs-offset-4 col-xs-4 col-lg-offset-6 col-lg-3", textUpdateButton)
+      div(cls := "col-xs-4", textClearButton),
+      div(cls := "col-xs-offset-4 col-xs-4", textUpdateButton)
     )
   ).render
 

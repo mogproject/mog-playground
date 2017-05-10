@@ -1,10 +1,13 @@
-package com.mogproject.mogami.playground.view
+package com.mogproject.mogami.playground.view.parts.board
 
 import com.mogproject.mogami._
-import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor}
-import org.scalajs.dom.html.Canvas
+import com.mogproject.mogami.playground.controller.{Controller, Cursor}
+import com.mogproject.mogami.playground.view.layout.BoardLayout
+import com.mogproject.mogami.playground.view.parts.common.EventManageable
+import com.mogproject.mogami.playground.view.renderer.Rectangle
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
+import org.scalajs.dom.html.Canvas
 import org.scalajs.dom.{CanvasRenderingContext2D, MouseEvent, TouchEvent}
 
 /**
@@ -18,13 +21,14 @@ trait CursorManageable extends EventManageable {
   // constants
   private[this] val boxPtypes: Seq[Ptype] = Ptype.KING +: Ptype.inHand
 
-  protected val layout: Layout
+  protected val layout: BoardLayout
 
   protected val canvas2: Canvas
   protected val layer0: CanvasRenderingContext2D
   protected val layer3: CanvasRenderingContext2D
   protected val layer4: CanvasRenderingContext2D
 
+  def isFlipped: Boolean
 
   /**
     * Convert MouseEvent to Cursor
@@ -32,13 +36,10 @@ trait CursorManageable extends EventManageable {
     * @return Cursor if the mouse position is inside the specific area
     */
   def getCursor(clientX: Double, clientY: Double): Option[Cursor] = {
-    // todo: refactor
-    // flip the cursor here when config.flip=true
-
     val rect = canvas2.getBoundingClientRect()
     val (x, y) = (clientX - rect.left, clientY - rect.top)
 
-    if (layout.board.isInside(x, y)) {
+    val c = if (layout.board.isInside(x, y)) {
       val file = 9 - ((x - layout.board.left) / layout.PIECE_WIDTH).toInt
       val rank = 1 + ((y - layout.board.top) / layout.PIECE_HEIGHT).toInt
       Some(Cursor(Square(file, rank)))
@@ -57,6 +58,7 @@ trait CursorManageable extends EventManageable {
     } else {
       None
     }
+    isFlipped.when[Option[Cursor]](_.map(!_))(c)
   }
 
   private[this] def getCursorHand(x: Double, isBlack: Boolean): Option[Cursor] = {
@@ -70,7 +72,7 @@ trait CursorManageable extends EventManageable {
   /**
     * Convert Cursor object to Rectangle.
     */
-  private[this] def cursorToRect(cursor: Cursor, isFlipped: Boolean = false): Rectangle = {
+  private[this] def cursorToRect(cursor: Cursor): Rectangle = {
     isFlipped.when[Cursor](!_)(cursor) match {
       case Cursor(None, Some(Hand(Player.BLACK, pt)), None, None) =>
         Rectangle(
@@ -149,7 +151,7 @@ trait CursorManageable extends EventManageable {
   /**
     * Draw the last move area.
     */
-  def drawLastMove(config: Configuration, move: Option[Move]): Unit = {
+  def drawLastMove(move: Option[Move]): Unit = {
     val newArea: Set[Cursor] = move match {
       case None => Set.empty
       case Some(mv) =>
@@ -161,7 +163,7 @@ trait CursorManageable extends EventManageable {
     }
 
     clearLastMove()
-    newArea.foreach(a => cursorToRect(a, config.flip).drawFill(layer0, layout.color.light, 1))
+    newArea.foreach(a => cursorToRect(a).drawFill(layer0, layout.color.light, 1))
   }
 
   def clearLastMove(): Unit = {
@@ -194,11 +196,11 @@ trait CursorManageable extends EventManageable {
     cursor.foreach(c => if (Controller.canActivate(c)) flashCursor(c))
     (selectedCursor, cursor) match {
       case (_, Some(invoked)) if Controller.canInvokeWithoutSelection(invoked) =>
-        Controller.invokeCursor(invoked, invoked)
+        Controller.invokeCursor(invoked, invoked, isFlipped)
         registerHoldEvent(() => Controller.invokeHoldEvent(invoked))
       case (Some(sel), Some(invoked)) =>
         clearSelectedArea()
-        Controller.invokeCursor(sel, invoked)
+        Controller.invokeCursor(sel, invoked, isFlipped)
         clearHoldEvent()
       case (Some(sel), None) =>
         clearSelectedArea()

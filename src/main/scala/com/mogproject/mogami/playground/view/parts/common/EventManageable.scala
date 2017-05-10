@@ -1,9 +1,9 @@
-package com.mogproject.mogami.playground.view
+package com.mogproject.mogami.playground.view.parts.common
 
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
 import org.scalajs.dom
-import org.scalajs.dom.{MouseEvent, TouchEvent}
 import org.scalajs.dom.raw.{HTMLElement, UIEvent}
+import org.scalajs.dom.{MouseEvent, TouchEvent}
 import org.scalajs.jquery.JQuery
 
 /**
@@ -29,7 +29,7 @@ trait EventManageable {
 
     if (hasTouchEvent) {
       // touch
-      val f = (evt: TouchEvent) => if (elem.disabled.forall(_ != true) && evt.changedTouches.length == 1) onClickEvent(evt)
+      val f = (evt: TouchEvent) => if (evt.changedTouches.length == 1) onClickEvent(evt)
       val g = (_: TouchEvent) => clearHoldEvent()
 
       elem.addEventListener("touchstart", f, useCapture = false)

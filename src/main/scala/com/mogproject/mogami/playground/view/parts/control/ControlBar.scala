@@ -1,10 +1,10 @@
 package com.mogproject.mogami.playground.view.parts.control
 
-import com.mogproject.mogami.{Game, GameStatus, Move, BranchNo, GamePosition}
+import com.mogproject.mogami.{BranchNo, Game, GamePosition, GameStatus, Move}
 import com.mogproject.mogami.core.move.SpecialMove
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
-import com.mogproject.mogami.playground.view.EventManageable
+import com.mogproject.mogami.playground.view.parts.common.EventManageable
 import org.scalajs.dom.html.Div
 import org.scalajs.dom.raw.HTMLSelectElement
 
@@ -13,10 +13,10 @@ import scalatags.JsDom.all._
 /**
   *
   */
-case class ControlBar(canvasWidth: Int) extends EventManageable {
+case class ControlBar(sectionWidth: Int, isSmall: Boolean) extends EventManageable {
 
   private[this] val CONTROL_WIDTH = 48
-  private[this] val LONG_LIST_SIZE = 36
+  private[this] val LONG_LIST_SIZE = 29
 
   private[this] val controlInput0 = createControlInput("step-backward")
   private[this] val controlInput1 = createControlInput("backward")
@@ -24,8 +24,8 @@ case class ControlBar(canvasWidth: Int) extends EventManageable {
   private[this] val controlInput3 = createControlInput("step-forward")
 
   private[this] val recordSelector: HTMLSelectElement = select(
-    cls := "form-control rect-select",
-    width := canvasWidth - CONTROL_WIDTH * 4 + 4,
+    cls := "form-control rect-select" + isSmall.fold(" control-small", ""),
+    width := sectionWidth - CONTROL_WIDTH * 4 + 4,
     onchange := (() => Controller.setRecord(recordSelector.selectedIndex))
   ).render
 
@@ -86,7 +86,7 @@ case class ControlBar(canvasWidth: Int) extends EventManageable {
       // moves
       val xs = (prefix +: getMoves(game, branchNo, lng)).zipWithIndex.map { case (m, i) =>
         val pos = i + game.trunk.offset
-        val symbolMark = game.hasFork(GamePosition(branchNo, pos)).fold("+", game.hasComment(GamePosition(branchNo,pos)).fold("*", ""))
+        val symbolMark = game.hasFork(GamePosition(branchNo, pos)).fold("+", game.hasComment(GamePosition(branchNo, pos)).fold("*", ""))
         val indexNotation = if (i == 0) "" else s"${i}: " + (i % 2 == 0).fold(!initTurn, initTurn).toSymbolString()
         symbolMark + indexNotation + m
       }
@@ -118,7 +118,7 @@ case class ControlBar(canvasWidth: Int) extends EventManageable {
     setClickEvent(controlInput3, () => Controller.setControl(3))
   }
 
-  private[this] def createControlInput(glyph: String) = button(cls := "btn btn-default",
+  private[this] def createControlInput(glyph: String) = button(cls := "btn btn-default" + isSmall.fold(" control-small input-small", ""),
     width := CONTROL_WIDTH,
     span(cls := s"glyphicon glyphicon-${glyph}", aria.hidden := true)
   ).render

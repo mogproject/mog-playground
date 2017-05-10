@@ -10,19 +10,15 @@ import scalatags.JsDom.all._
   *
   */
 object ActionSection extends Section {
-
-  override def initialize(): Unit = {
-    super.initialize()
-  }
-
   override val accordions: Seq[AccordionMenu] = Seq(
     AccordionMenu(
       "Action",
       "Action",
+      "tower",
       isExpanded = false,
       isVisible = false,
       div(cls := "row",
-        div(cls := "col-xs-6 col-lg-4",
+        div(cls := "col-xs-6 col-sm-4",
           ResignButton.output
         )
       )

@@ -1,6 +1,6 @@
 package com.mogproject.mogami.playground.controller
 
-import com.mogproject.mogami._
+import com.mogproject.mogami.{MoveFrom, _}
 import com.mogproject.mogami.util.Implicits._
 
 /**

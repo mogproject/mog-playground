@@ -1,4 +1,4 @@
-package com.mogproject.mogami.playground.view
+package com.mogproject.mogami.playground.view.renderer
 
 import org.scalajs.dom.CanvasRenderingContext2D
 

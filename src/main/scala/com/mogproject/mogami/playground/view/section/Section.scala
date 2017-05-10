@@ -22,4 +22,8 @@ trait Section {
   def show(): Unit = outputs.foreach(_.style.display = display.block.v)
 
   def hide(): Unit = outputs.foreach(_.style.display = display.none.v)
+
+  def collapseTitle(): Unit = accordions.foreach(_.collapseTitle())
+
+  def expandTitle(): Unit = accordions.foreach(_.expandTitle())
 }

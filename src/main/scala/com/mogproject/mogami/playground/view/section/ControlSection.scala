@@ -1,5 +1,6 @@
 package com.mogproject.mogami.playground.view.section
 
+import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.{BranchNo, Game}
 import com.mogproject.mogami.playground.controller.Language
 import com.mogproject.mogami.playground.view.parts.control.{CommentButton, ControlBar}
@@ -11,18 +12,29 @@ import scalatags.JsDom.all._
 /**
   *
   */
-case class ControlSection(canvasWidth: Int, isMobile: Boolean) extends Section {
+case class ControlSection(canvasWidth: Int, isMobile: Boolean, isMobileLandscape: Boolean) extends Section {
 
-  private[this] lazy val controlBar = ControlBar(canvasWidth)
+  private[this] val sectionWidth = math.max(300, canvasWidth)
+
+  private[this] lazy val controlBar = ControlBar(sectionWidth, isSmall = isMobileLandscape)
   private[this] lazy val commentButton = CommentButton(isDisplayOnly = isMobile, isModal = false)
 
   override def initialize(): Unit = {
     controlBar.initialize()
   }
 
-  override val output: Div = div(
+  // @note NO output
+
+  lazy val outputControlBar: Div = div(
+    cls := "center-block",
+    width := sectionWidth,
     paddingTop := "5px",
-    controlBar.output,
+    controlBar.output
+  ).render
+
+  lazy val outputComment: Div = div(
+    cls := "center-block",
+    width := isMobileLandscape.fold(canvasWidth, sectionWidth),
     commentButton.output
   ).render
 
@@ -48,12 +60,14 @@ case class ControlSection(canvasWidth: Int, isMobile: Boolean) extends Section {
   def getComment: String = commentButton.getComment
 
   override def show(): Unit = {
-    output.style.display = display.block.v
-    outputLongSelector.style.visibility = visibility.visible.v
+    outputControlBar.style.display = display.block.v
+    outputComment.style.display = display.block.v
+    outputLongSelector.style.display = display.block.v
   }
 
   override def hide(): Unit = {
-    output.style.display = display.none.v
-    outputLongSelector.style.visibility = visibility.hidden.v
+    outputControlBar.style.display = display.none.v
+    outputComment.style.display = display.none.v
+    outputLongSelector.style.display = display.none.v
   }
 }

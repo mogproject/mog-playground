@@ -1,7 +1,6 @@
 package com.mogproject.mogami.playground.view.parts.common
 
 import com.mogproject.mogami.playground.controller.Language
-import com.mogproject.mogami.playground.view.EventManageable
 import org.scalajs.dom.Element
 import org.scalajs.dom.raw.HTMLElement
 
@@ -40,4 +39,9 @@ trait ButtonLike[Key, Input <: HTMLElement, Output <: Element] extends EventMana
       }
     }
   }
+
+  def getValue: Key = inputMap.find(_._2.classList.contains("active")).map(_._1).getOrElse {
+    throw new RuntimeException("Could not find the selected value")
+  }
+
 }

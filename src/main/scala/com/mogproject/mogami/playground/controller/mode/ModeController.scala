@@ -1,10 +1,9 @@
 package com.mogproject.mogami.playground.controller.mode
 
-import com.mogproject.mogami._
-import com.mogproject.mogami.{Player, State}
+import com.mogproject.mogami.{BranchNo, _}
 import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.io.RecordFormat
-import com.mogproject.mogami.playground.view.Renderer
+import com.mogproject.mogami.playground.view.renderer.Renderer
 
 
 /**
@@ -26,6 +25,7 @@ trait ModeController {
     */
   def initialize(): Unit = {
     renderer.updateMode(mode)
+    collapseByDefault()
   }
 
   /**
@@ -58,13 +58,12 @@ trait ModeController {
 
     // player names
     renderer.drawPlayerNames(
-      config,
       gameInfo.tags.getOrElse('blackName, defaultNames(config.recordLang, BLACK)),
       gameInfo.tags.getOrElse('whiteName, defaultNames(config.recordLang, WHITE))
     )
 
     // draw indexes
-    renderer.drawIndexes(config)
+    renderer.drawIndexes()
 
     // update flip button
     renderer.updateFlip(config)
@@ -78,7 +77,19 @@ trait ModeController {
     renderer.updateFlip(config)
   }
 
+  def initializeBoardControl(): Unit
+
+  def collapseByDefault(): Unit = if (config.collapseByDefault) renderer.collapseSideBarRight()
+
+  def refreshBoard(): Unit = {
+    renderer.initializeControlSection(config)
+    renderer.initializeBoardRenderer(config)
+    initializeBoardControl()
+  }
+
   def renderAfterUpdatingComment(updateTextArea: Boolean): Unit = {}
+
+  def updateConfig(config: Configuration): ModeController
 
   // cursor check
   def canActivate(cursor: Cursor): Boolean = false
@@ -88,7 +99,7 @@ trait ModeController {
   def canInvokeWithoutSelection(cursor: Cursor): Boolean = cursor.isPlayer
 
   // cursor click
-  def invokeCursor(selected: Cursor, cursor: Cursor): Option[ModeController] = None
+  def invokeCursor(selected: Cursor, cursor: Cursor, isFlipped: Boolean): Option[ModeController] = None
 
   // cursor hold
   def invokeHoldEvent(cursor: Cursor): Option[ModeController] = None

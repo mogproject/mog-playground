@@ -18,15 +18,17 @@ object EditSection extends Section {
     AccordionMenu(
       "Reset",
       "Reset",
-      true,
-      false,
+      "erase",
+      isExpanded = false,
+      isVisible = false,
       div(EditReset.output)
     ),
     AccordionMenu(
       "EditHelp",
       "Help",
-      true,
-      false,
+      "question-sign",
+      isExpanded = false,
+      isVisible = false,
       div(
         ul(
           li("Click on a player name to set the turn to move."),

@@ -18,7 +18,8 @@ object GameMenuSection extends Section {
     AccordionMenu(
       "Share",
       "Share",
-      isExpanded = true,
+      "share",
+      isExpanded = false,
       isVisible = true,
       div(
         RecordCopyButton.output,
@@ -35,7 +36,8 @@ object GameMenuSection extends Section {
     AccordionMenu(
       "Branch",
       "Branch",
-      isExpanded = true,
+      "share-alt",
+      isExpanded = false,
       isVisible = true,
       div(
         BranchButton.output
@@ -44,6 +46,7 @@ object GameMenuSection extends Section {
     AccordionMenu(
       "Manage",
       "Manage",
+      "file",
       isExpanded = false,
       isVisible = true,
       div(

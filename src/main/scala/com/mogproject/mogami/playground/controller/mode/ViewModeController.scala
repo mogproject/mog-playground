@@ -1,9 +1,8 @@
 package com.mogproject.mogami.playground.controller.mode
 
-import com.mogproject.mogami._
-import com.mogproject.mogami.util.Implicits._
+import com.mogproject.mogami.{BranchNo, _}
 import com.mogproject.mogami.playground.controller.{Configuration, Cursor}
-import com.mogproject.mogami.playground.view.Renderer
+import com.mogproject.mogami.playground.view.renderer.Renderer
 
 /**
   * View mode
@@ -37,7 +36,7 @@ case class ViewModeController(renderer: Renderer,
 
   override def canInvokeWithoutSelection(cursor: Cursor): Boolean = true
 
-  override def invokeCursor(selected: Cursor, invoked: Cursor): Option[ModeController] = invoked match {
+  override def invokeCursor(selected: Cursor, invoked: Cursor, isFlipped: Boolean): Option[ModeController] = invoked match {
     case Cursor(Some(board), None, None, None) => invokeCursorHelper(board)
     case Cursor(_, _, _, Some(_)) => renderer.showGameInfoModal(config, game.gameInfo); None
     case _ => None

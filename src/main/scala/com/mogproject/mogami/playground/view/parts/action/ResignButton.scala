@@ -1,7 +1,7 @@
 package com.mogproject.mogami.playground.view.parts.action
 
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
-import com.mogproject.mogami.playground.view.EventManageable
+import com.mogproject.mogami.playground.view.parts.common.EventManageable
 import org.scalajs.dom.html.Button
 
 import scalatags.JsDom.all._

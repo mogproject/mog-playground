@@ -1,5 +1,6 @@
 package com.mogproject.mogami.playground.view.parts.common
 
+import com.mogproject.mogami.playground.controller.Controller
 import org.scalajs.dom.html.Div
 import com.mogproject.mogami.util.Implicits._
 
@@ -7,18 +8,15 @@ import scalatags.JsDom.TypedTag
 import scalatags.JsDom.all._
 import org.scalajs.jquery.jQuery
 
+
 /**
   *
   */
-case class AccordionMenu(ident: String, title: String, isExpanded: Boolean, isVisible: Boolean, content: TypedTag[Div]) {
+case class AccordionMenu(ident: String, title: String, icon: String, isExpanded: Boolean, isVisible: Boolean, content: TypedTag[Div]) {
 
-  private[this] val glyphCls = Map(false -> "glyphicon-menu-right", true -> "glyphicon-menu-down")
   private[this] val panelCls = Map(false -> "panel-default", true -> "panel-info")
 
-  // @note do not set a group
-  // data("parent") := "#accordion"
-
-  private[this] val glyph = span(cls := "glyphicon").render
+  private[this] val glyph = span(cls := s"glyphicon glyphicon-${icon}").render
 
   private[this] val mainElem: Div = div(
     id := s"collapse${ident}",
@@ -31,23 +29,30 @@ case class AccordionMenu(ident: String, title: String, isExpanded: Boolean, isVi
     )
   ).render
 
+  private[this] val titleElem = span().render
+
+  private[this] val titleElemHeading = h4(cls := "panel-title",
+    span(
+      cls := "accordion-toggle",
+      glyph,
+      titleElem
+    )
+  ).render
+
   val output: Div = div(
     cls := "panel",
     if (isVisible) "" else display := display.none.v,
+    data("toggle") := "tooltip",
+    data("placement") := "left",
+    marginBottom := 5.px,
     div(
       cls := "panel-heading",
       id := s"heading${ident}",
       role := "button",
       data("toggle") := "collapse",
       data("target") := s"#collapse${ident}",
-      h4(cls := "panel-title",
-        span(
-          cls := "accordion-toggle",
-          glyph,
-          " ",
-          title
-        )
-      )
+      data("parent") := "#accordion",
+      titleElemHeading
     ),
     mainElem
   ).render
@@ -56,8 +61,6 @@ case class AccordionMenu(ident: String, title: String, isExpanded: Boolean, isVi
     def f(b: Boolean): Unit = {
       output.classList.remove(panelCls(!b))
       output.classList.add(panelCls(b))
-      glyph.classList.remove(glyphCls(!b))
-      glyph.classList.add(glyphCls(b))
     }
 
     // set initial classes
@@ -65,7 +68,22 @@ case class AccordionMenu(ident: String, title: String, isExpanded: Boolean, isVi
 
     // set events
     jQuery(mainElem)
-      .on("show.bs.collapse", () => f(true))
+      .on("show.bs.collapse", { () => f(true); Controller.expandSideBarRight() })
       .on("hide.bs.collapse", () => f(false))
+
+    expandTitle()
   }
+
+  def collapseTitle(): Unit = {
+    titleElem.style.paddingLeft = 0.px
+    titleElem.innerHTML = ""
+    output.setAttribute("data-original-title", (ident == "EditHelp").fold("Help", ident))
+  }
+
+  def expandTitle(): Unit = {
+    titleElem.style.paddingLeft = 20.px
+    titleElem.innerHTML = " " + title
+    output.removeAttribute("data-original-title")
+  }
+
 }
