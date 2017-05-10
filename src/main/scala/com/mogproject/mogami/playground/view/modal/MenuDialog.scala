@@ -3,6 +3,7 @@ package com.mogproject.mogami.playground.view.modal
 import com.mogproject.mogami.playground.view.bootstrap.{BootstrapJQuery, Tooltip}
 import com.mogproject.mogami.playground.view.modal.common.ModalLike
 import com.mogproject.mogami.playground.view.section._
+import org.scalajs.dom
 import org.scalajs.jquery.jQuery
 
 import scalatags.JsDom.all._
@@ -32,6 +33,9 @@ object MenuDialog extends ModalLike {
     e.on("hidden.bs.modal", () ⇒ {
       // Hide all tooltips
       Tooltip.hideAllToolTip()
+
+      // Reset scroll
+      dom.window.scrollTo(0, 0)
     })
 
     Tooltip.enableHoverToolTip(true) // assume the device is mobile
