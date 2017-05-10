@@ -18,19 +18,21 @@ object BoardSizeButton {
     override def toString: String = s"${width} - ${label}"
   }
 
-  case object LandscapeIPhone5 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(320, 568, isLandscape = true), "iPhone 5 (Landscape)")
+  case object LandscapeIPhone5 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(568, 320 - 44, isLandscape = true), "iPhone 5 (Landscape)")
 
-  case object LandscapeIPhone6 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(375, 667, isLandscape = true), "iPhone 6 (Landscape)")
+  case object LandscapeIPhone6 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(667, 375 - 44, isLandscape = true), "iPhone 6 (Landscape)")
 
-  case object LandscapeIPhone6Plus extends PresetBoardSize(Configuration.getDefaultCanvasWidth(414, 736, isLandscape = true), "iPhone 6 Plus (Landscape)")
+  case object LandscapeIPhone6Plus extends PresetBoardSize(Configuration.getDefaultCanvasWidth(736, 414 - 44, isLandscape = true), "iPhone 6 Plus (Landscape)")
+
+  case object PortraitIPhone5 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(320, 568 - 108, isLandscape = false), "iPhone 5 (Portrait)")
+
+  case object PortraitIPhone6 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(375, 667 - 108, isLandscape = false), "iPhone 6 (Portrait)")
+
+  case object ExtraSmall extends PresetBoardSize(120, "Extra Small")
 
   case object Small extends PresetBoardSize(240, "Small")
 
-  case object PortraitIPhone5 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(320, 568, isLandscape = false), "iPhone 5 (Portrait)")
-
   case object Medium extends PresetBoardSize(320, "Medium")
-
-  case object PortraitIPhone6 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(375, 667, isLandscape = false), "iPhone 6 (Portrait)")
 
   case object Large extends PresetBoardSize(400, "Large")
 
@@ -38,8 +40,8 @@ object BoardSizeButton {
 
 
   private[this] lazy val sizeButton = DropdownMenu(
-    Vector(LandscapeIPhone5, LandscapeIPhone6, LandscapeIPhone6Plus, Small, PortraitIPhone5, Medium, PortraitIPhone6, Large, ExtraLarge),
-    7, "Board Size", _ => (), "btn-group"
+    Vector(ExtraSmall, LandscapeIPhone5, LandscapeIPhone6, LandscapeIPhone6Plus, Small, PortraitIPhone5, Medium, PortraitIPhone6, Large, ExtraLarge),
+    8, "Board Size", _ => (), "btn-group"
   )
 
   private[this] val setButton = button(

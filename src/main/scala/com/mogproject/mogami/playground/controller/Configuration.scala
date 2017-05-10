@@ -54,7 +54,7 @@ case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
     this.copy(isLandscape = Configuration.getIsLandscape, canvasWidth = Configuration.getDefaultCanvasWidth)
   }
 
-  def collapseByDefault: Boolean = !isMobile && Configuration.getComputedScreenWidth < canvasWidth + SideBarLeft.EXPANDED_WIDTH + SideBarRight.EXPANDED_WIDTH
+  def collapseByDefault: Boolean = !isMobile && Configuration.getClientWidth < canvasWidth + SideBarLeft.EXPANDED_WIDTH + SideBarRight.EXPANDED_WIDTH
 }
 
 object Configuration {
@@ -77,12 +77,13 @@ object Configuration {
 
   def getIsLandscape: Boolean = MobileScreen.isLandscape
 
-  def getComputedScreenWidth: Int = getIsLandscape.fold(math.max(dom.window.screen.width, dom.window.screen.height), dom.window.screen.width).toInt
+  def getClientWidth: Double = dom.window.innerWidth
 
-  def getDefaultCanvasWidth: Int = getDefaultCanvasWidth(dom.window.screen.width, dom.window.screen.height, getIsLandscape)
+  def getClientHeight: Double = dom.window.innerHeight
 
-  def getDefaultCanvasWidth(screenWidth: Double, screenHeight: Double, isLandscape: Boolean): Int = {
-    val (k, w, h) = isLandscape.fold((90, math.max(screenWidth, screenHeight), math.min(screenWidth, screenHeight)), (160, screenWidth, screenHeight))
-    math.max(100, math.min(math.min(w - 10, (h - k) * 400 / 576).toInt, 400))
+  def getDefaultCanvasWidth: Int = getDefaultCanvasWidth(getClientWidth, getClientHeight, getIsLandscape)
+
+  def getDefaultCanvasWidth(clientWidth: Double, clientHeight: Double, isLandscape: Boolean): Int = {
+    math.max(100, math.min(math.min(clientWidth - 10, (clientHeight - isLandscape.fold(76, 60)) * 400 / 576).toInt, 400))
   }
 }
