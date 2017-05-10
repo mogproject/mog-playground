@@ -121,7 +121,7 @@ object Controller {
 
   def invokeCursor(selected: Cursor, invoked: Cursor, isFlipped: Boolean): Unit = doAction(_.invokeCursor(selected, invoked, isFlipped), _.renderAll())
 
-  def invokeHoldEvent(invoked: Cursor): Unit = doAction(_.invokeHoldEvent(invoked), _.renderAll())
+  def invokeHoldEvent(invoked: Cursor, isFlipped: Boolean): Unit = doAction(_.invokeHoldEvent(invoked, isFlipped), _.renderAll())
 
   def processMouseUp(selected: Cursor, released: Cursor): Option[Cursor] = modeController match {
     case Some(pc: PlayModeController) => pc.processMouseUp(selected, released)

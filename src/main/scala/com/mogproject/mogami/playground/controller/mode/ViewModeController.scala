@@ -38,18 +38,18 @@ case class ViewModeController(renderer: Renderer,
   override def canInvokeWithoutSelection(cursor: Cursor): Boolean = true
 
   override def invokeCursor(selected: Cursor, invoked: Cursor, isFlipped: Boolean): Option[ModeController] = invoked match {
-    case Cursor(Some(board), None, None, None) => invokeCursorHelper(isFlipped.when[Square](!_)(board))
+    case Cursor(Some(board), None, None, None) => invokeCursorHelper(board, isFlipped)
     case Cursor(_, _, _, Some(_)) => renderer.showGameInfoModal(config, game.gameInfo); None
     case _ => None
   }
 
-  override def invokeHoldEvent(invoked: Cursor): Option[ModeController] = invoked match {
-    case Cursor(Some(board), None, None, None) => invokeCursorHelper(board)
+  override def invokeHoldEvent(invoked: Cursor, isFlipped: Boolean): Option[ModeController] = invoked match {
+    case Cursor(Some(board), None, None, None) => invokeCursorHelper(board, isFlipped)
     case _ => None
   }
 
-  private[this] def invokeCursorHelper(board: Square): Option[ModeController] = {
-    if (board.file <= 5) {
+  private[this] def invokeCursorHelper(board: Square, isFlipped: Boolean): Option[ModeController] = {
+    if (isFlipped.when[Square](!_)(board).file <= 5) {
       // move next
       if (displayPosition < renderer.getMaxRecordIndex) {
         renderer.startMoveForwardEffect()

@@ -135,7 +135,7 @@ trait GameController extends ModeController {
       case 2 =>
         if (statusPosition < currentMoves.length) {
           val sq = currentMoves(statusPosition).to
-          renderer.flashCursor(Cursor((config.flip == FlipEnabled).fold(!sq, sq)))
+          renderer.flashCursor(Cursor(sq))
         }
         Some(this.copy(displayPosition = renderer.getSelectedIndex + 1))
       case 3 => Some(this.copy(displayPosition = lastDisplayPosition))
