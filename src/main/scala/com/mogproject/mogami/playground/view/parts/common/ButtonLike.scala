@@ -39,4 +39,12 @@ trait ButtonLike[Key, Input <: HTMLElement, Output <: Element] extends EventMana
       }
     }
   }
+
+  def getValue: Key = inputMap.find(_._2.classList.contains("active")).map(_._1).getOrElse {
+    throw new RuntimeException("Could not find the selected value")
+  }
+
+  def enable(): Unit = inputs.foreach(_.disabled = false)
+
+  def disable(): Unit = inputs.foreach(_.disabled = true)
 }

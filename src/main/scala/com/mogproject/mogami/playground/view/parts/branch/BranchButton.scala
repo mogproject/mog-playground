@@ -25,7 +25,7 @@ object BranchButton {
 
   private[this] lazy val forksButtons = div("").render
 
-  private[this] lazy val newBranchButton = RadioButton(Seq(false, true), Map(English -> Seq("Off", "On")))
+  private[this] lazy val newBranchButton: RadioButton[Boolean] = RadioButton(Seq(false, true), Map(English -> Seq("Off", "On")))
 
   private[this] lazy val deleteBranchButton = button(
     tpe := "button",
@@ -92,9 +92,7 @@ object BranchButton {
   // initialize
   //
   def initialize(): Unit = {
-    newBranchButton.initialize()
-    newBranchButton.updateValue(false)
-    newBranchButton.updateLabel(English)
+    newBranchButton.initialize(false, English)
   }
 
   //

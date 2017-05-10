@@ -2,6 +2,10 @@
   html {
     overflow-y: scroll;
   }
+
+  .sidebar-heading:hover {
+    color: #5bc0de;
+  }
 }
 
 .navbar {
@@ -139,24 +143,6 @@ canvas {
   padding-right: 0px !important;
 }
 
-.panel-heading {
-  cursor: pointer;
-}
-
-.collapsing {
-  /**
-  /* fixes issue#105 *
-  height: 100% !important;
-
-  /* disable transition *
-  -webkit-transition: height 0.01s;
-  -moz-transition: height 0.01s;
-  -ms-transition: height 0.01s;
-  -o-transition: height 0.01s;
-  transition: height 0.01s;
-  **/
-}
-
 .input-small {
   font-size: 12px;
 }
@@ -201,6 +187,14 @@ select {
 .sidebar-left {
   border-right: 6px groove #F8F8F8;
   float: left;
+}
+
+.sidebar-heading {
+  cursor: pointer;
+}
+
+.panel-heading {
+  cursor: pointer;
 }
 
 .row {

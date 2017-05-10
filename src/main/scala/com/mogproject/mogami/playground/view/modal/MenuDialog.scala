@@ -15,9 +15,9 @@ object MenuDialog extends ModalLike {
 
   override val title = "Menu"
 
-  override val modalBody: ElemType = div(bodyDefinition, MenuPane.output)
+  override lazy val modalBody: ElemType = div(bodyDefinition, MenuPane.output)
 
-  override val modalFooter: ElemType = div(footerDefinition,
+  override lazy val modalFooter: ElemType = div(footerDefinition,
     div(cls := "row",
       div(cls := "col-xs-4 col-xs-offset-8 col-md-3 col-md-offset-9",
         button(tpe := "button", cls := "btn btn-default btn-block", data("dismiss") := "modal", "OK")

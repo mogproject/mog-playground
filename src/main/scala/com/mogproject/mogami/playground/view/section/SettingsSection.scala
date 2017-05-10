@@ -10,14 +10,12 @@ import scalatags.JsDom.all._
   *
   */
 object SettingsSection extends Section {
-  lazy val doubleBoardButton = RadioButton(Seq(false, true), Map(English -> Seq("Off", "On")), onClick = Controller.setDoubleBoard)
+  private[this] lazy val doubleBoardButton: RadioButton[Boolean] = RadioButton(Seq(false, true), Map(English -> Seq("Off", "On")), onClick = Controller.setDoubleBoard)
 
   override def initialize(): Unit = {
     super.initialize()
 
-    doubleBoardButton.initialize()
-    doubleBoardButton.updateValue(false)
-    doubleBoardButton.updateLabel(English)
+    doubleBoardButton.initialize(false, English)
 
     MessageLanguageSelector.initialize()
     RecordLanguageSelector.initialize()

@@ -16,13 +16,17 @@ object SideBar {
   val COLLAPSED_WIDTH: Int = 60
 
   lazy val titleExpanded: Heading = h4(
-    a(href := "#", onclick := { () => Controller.collapseSideBar() }, span(cls := "glyphicon glyphicon-minus")),
+    cls := "sidebar-heading",
+    onclick := { () => Controller.collapseSideBar() },
+    span(cls := "glyphicon glyphicon-minus"),
     span(paddingLeft := 14.px, "Menu")
   ).render
 
   lazy val titleCollapsed: Heading = h4(
+    cls := "sidebar-heading",
     display := display.none.v,
-    a(href := "#", onclick := { () => Controller.expandSideBar() }, span(cls := "glyphicon glyphicon-plus"))
+    onclick := { () => Controller.expandSideBar() },
+    span(cls := "glyphicon glyphicon-plus")
   ).render
 
 
