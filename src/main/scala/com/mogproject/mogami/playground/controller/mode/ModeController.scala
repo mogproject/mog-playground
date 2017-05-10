@@ -25,6 +25,7 @@ trait ModeController {
     */
   def initialize(): Unit = {
     renderer.updateMode(mode)
+    collapseByDefault()
   }
 
   /**
@@ -77,6 +78,8 @@ trait ModeController {
   }
 
   def initializeBoardControl(): Unit
+
+  def collapseByDefault(): Unit = if (config.collapseByDefault) renderer.collapseSideBarRight()
 
   def refreshBoard(): Unit = {
     renderer.initializeControlSection(config)

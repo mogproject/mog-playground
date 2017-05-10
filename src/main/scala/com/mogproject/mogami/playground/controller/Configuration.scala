@@ -3,6 +3,7 @@ package com.mogproject.mogami.playground.controller
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.api.MobileScreen
 import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipDisabled, FlipEnabled, FlipType}
+import com.mogproject.mogami.playground.view.section.{SideBarLeft, SideBarRight}
 import org.scalajs.dom
 
 import scala.scalajs.js.UndefOr
@@ -53,6 +54,7 @@ case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
     this.copy(isLandscape = Configuration.getIsLandscape, canvasWidth = Configuration.getDefaultCanvasWidth)
   }
 
+  def collapseByDefault: Boolean = !isMobile && Configuration.getComputedScreenWidth < canvasWidth + SideBarLeft.EXPANDED_WIDTH + SideBarRight.EXPANDED_WIDTH
 }
 
 object Configuration {
@@ -74,6 +76,8 @@ object Configuration {
   lazy val defaultIsMobile: Boolean = dom.window.screen.width < 768
 
   def getIsLandscape: Boolean = MobileScreen.isLandscape
+
+  def getComputedScreenWidth: Int = getIsLandscape.fold(math.max(dom.window.screen.width, dom.window.screen.height), dom.window.screen.width).toInt
 
   def getDefaultCanvasWidth: Int = getDefaultCanvasWidth(dom.window.screen.width, dom.window.screen.height, getIsLandscape)
 

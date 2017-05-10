@@ -222,5 +222,8 @@ object Controller {
 
   // Orientation
   def changeScreenSize(): Unit =
-    doAction({ mc => Some(mc.updateConfig(mc.config.updateScreenSize())) }, _.refreshBoard())
+    doAction({ mc => Some(mc.updateConfig(mc.config.updateScreenSize())) }, mc => {
+      mc.collapseByDefault()
+      mc.refreshBoard()
+    })
 }

@@ -31,7 +31,6 @@ trait BoardRenderer {
 
   lazy val mainPane: Div = div(
     cls := "main-area-wrapper",
-    paddingTop := 5, display := display.`inline-block`.v,
     mainArea
   ).render
 
@@ -68,9 +67,8 @@ trait BoardRenderer {
     mainBoards.foreach(_.initialize())
   }
 
-  private[this] def createPCPortraitMain(canvasWidth: Int, numBoards: Int): TypedTag[Div] = div(cls := "main-area",
+  private[this] def createPCPortraitMain(canvasWidth: Int, numBoards: Int): TypedTag[Div] = div(cls := "main-area main-area-pc",
     width := (canvasWidth + 70) * numBoards - 50, // +20 for 1 board, +90 for 2 boards
-    paddingLeft := 10.px, paddingRight := 10.px, paddingBottom := 15.px,
     if (numBoards == 2) {
       div(cls := "row",
         div(cls := "col-xs-6", mainBoards.head.canvasContainer), div(cls := "col-xs-6", mainBoards(1).canvasContainer)

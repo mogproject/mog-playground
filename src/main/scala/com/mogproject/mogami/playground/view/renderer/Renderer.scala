@@ -40,7 +40,7 @@ class Renderer extends BoardRenderer {
     div(cls := "navbar", tag("nav")(cls := "navbar navbar-default navbar-fixed-top", NavigatorSection.output)),
     div(cls := "container-fluid",
       isMobile.fold(Seq(position := position.fixed.v, width := "100%", padding := 0), ""),
-      div(cls := "row no-margin",
+      div(cls := "row no-margin no-overflow",
         SideBarRight.output, // right sidebar
         sideBarLeft.output, // left sidebar
         mainPane // main content
