@@ -77,7 +77,7 @@ object Configuration {
   def getDefaultCanvasWidth: Int = getDefaultCanvasWidth(dom.window.screen.width, dom.window.screen.height, getIsLandscape)
 
   def getDefaultCanvasWidth(screenWidth: Double, screenHeight: Double, isLandscape: Boolean): Int = {
-    val (k, w, h) = isLandscape.fold((90, screenHeight, screenWidth), (160, screenWidth, screenHeight))
+    val (k, w, h) = isLandscape.fold((90, math.max(screenWidth, screenHeight), math.min(screenWidth, screenHeight)), (160, screenWidth, screenHeight))
     math.max(100, math.min(math.min(w - 10, (h - k) * 400 / 576).toInt, 400))
   }
 }

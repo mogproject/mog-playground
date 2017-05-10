@@ -76,19 +76,27 @@ trait BoardRenderer {
     width := (canvasWidth + 70) * numBoards - 40, // +30 for 1 board, +100 for 2 boards
     paddingLeft := 15.px, paddingRight := 15.px, paddingBottom := 15.px,
     if (numBoards == 2) {
-      div(cls := "row",
-        div(cls := "col-xs-6",
-          mainBoards.head.canvasContainer,
-          controlSection.output
+      div(
+        div(cls := "row",
+          div(cls := "col-xs-6",
+            mainBoards.head.canvasContainer
+          ),
+          div(cls := "col-xs-6",
+            mainBoards(1).canvasContainer
+          )
         ),
-        div(cls := "col-xs-6",
-          mainBoards(1).canvasContainer
+        div(
+          controlSection.outputControlBar,
+          controlSection.outputComment
         )
       )
     } else {
       div(
         mainBoards.head.canvasContainer,
-        controlSection.output
+        div(
+          controlSection.outputControlBar,
+          controlSection.outputComment
+        )
       )
     }
   )
@@ -96,7 +104,11 @@ trait BoardRenderer {
   private[this] def createMobilePortraitMain(canvasWidth: Int): TypedTag[Div] = div(cls := "main-area",
     width := canvasWidth,
     mainBoards.head.canvasContainer,
-    controlSection.output
+    div(
+//      paddingTop := "5px",
+      controlSection.outputControlBar,
+      controlSection.outputComment
+    )
   )
 
   private[this] def createMobileLandscapeMain(canvasWidth: Int): TypedTag[Div] = div(cls := "main-area",
@@ -104,9 +116,7 @@ trait BoardRenderer {
     div(cls := "row",
       div(cls := "col-xs-6", mainBoards.head.canvasContainer), div(cls := "col-xs-6", controlSection.outputComment)
     ),
-    div(cls := "row",
-      div(cls := "col-xs-12", controlSection.outputControlBar)
-    )
+    div(cls := "row", controlSection.outputControlBar)
   )
 
   private[this] def createMobileLandscapeMainDouble(canvasWidth: Int): TypedTag[Div] = div(cls := "main-area",
@@ -114,9 +124,7 @@ trait BoardRenderer {
     div(cls := "row",
       div(cls := "col-xs-6", mainBoards.head.canvasContainer), div(cls := "col-xs-6", mainBoards(1).canvasContainer)
     ),
-    div(cls := "row",
-      div(cls := "col-xs-12", controlSection.outputControlBar)
-    )
+    div(cls := "row", controlSection.outputControlBar)
   )
 
   //

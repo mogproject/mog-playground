@@ -32,7 +32,7 @@ class Renderer extends BoardRenderer {
   // HTML elements
   //
   // todo: refactor to use val
-  protected var controlSection: ControlSection = ControlSection(0, isMobile = false, isSmall = false)
+  protected var controlSection: ControlSection = ControlSection(0, isMobile = false, isLandscape = false)
 
   private[this] val longSelector: Div = div(width := 168.px, marginLeft := "auto", marginRight := "auto", controlSection.outputLongSelector).render
 
@@ -89,7 +89,7 @@ class Renderer extends BoardRenderer {
   }
 
   def initializeControlSection(config: Configuration): Unit = {
-    controlSection = ControlSection(config.canvasWidth, config.isMobile, config.isMobile && config.isLandscape)
+    controlSection = ControlSection(config.canvasWidth, config.isMobile, config.isLandscape)
     longSelector.innerHTML = ""
     longSelector.appendChild(controlSection.outputLongSelector)
     controlSection.initialize()

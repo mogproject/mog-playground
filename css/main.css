@@ -216,6 +216,7 @@ select {
 }
 
 .main-area {
+  min-width: 330px;
   margin-left: auto;
   margin-right: auto;
 }

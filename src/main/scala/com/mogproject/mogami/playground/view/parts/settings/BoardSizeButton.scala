@@ -38,7 +38,7 @@ object BoardSizeButton {
 
 
   private[this] lazy val sizeButton = DropdownMenu(
-    Vector(LandscapeIPhone5, LandscapeIPhone6, Small, LandscapeIPhone6Plus, PortraitIPhone5, Medium, PortraitIPhone6, Large, ExtraLarge),
+    Vector(LandscapeIPhone5, LandscapeIPhone6, LandscapeIPhone6Plus, Small, PortraitIPhone5, Medium, PortraitIPhone6, Large, ExtraLarge),
     7, "Board Size", _ => (), "btn-group"
   )
 

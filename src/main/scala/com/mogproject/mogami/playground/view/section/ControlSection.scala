@@ -1,5 +1,6 @@
 package com.mogproject.mogami.playground.view.section
 
+import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.{BranchNo, Game}
 import com.mogproject.mogami.playground.controller.Language
 import com.mogproject.mogami.playground.view.parts.control.{CommentButton, ControlBar}
@@ -11,24 +12,18 @@ import scalatags.JsDom.all._
 /**
   *
   */
-case class ControlSection(canvasWidth: Int, isMobile: Boolean, isSmall: Boolean) extends Section {
+case class ControlSection(canvasWidth: Int, isMobile: Boolean, isLandscape: Boolean) extends Section {
 
   private[this] val sectionWidth = math.max(300, canvasWidth)
 
-  private[this] lazy val controlBar = ControlBar(sectionWidth, isSmall = isSmall)
+  private[this] lazy val controlBar = ControlBar(sectionWidth, isSmall = isLandscape)
   private[this] lazy val commentButton = CommentButton(isDisplayOnly = isMobile, isModal = false)
 
   override def initialize(): Unit = {
     controlBar.initialize()
   }
 
-  override lazy val output: Div = div(
-    cls := "center-block",
-    width := sectionWidth,
-    paddingTop := "5px",
-    controlBar.output,
-    commentButton.output
-  ).render
+  // @note NO output
 
   lazy val outputControlBar: Div = div(
     cls := "center-block",
@@ -37,7 +32,12 @@ case class ControlSection(canvasWidth: Int, isMobile: Boolean, isSmall: Boolean)
     controlBar.output
   ).render
 
-  def outputComment: Div = commentButton.output
+  lazy val outputComment: Div = div(
+    cls := "center-block",
+    width := isLandscape.fold(canvasWidth, sectionWidth),
+    paddingTop := "5px",
+    commentButton.output
+  ).render
 
   def outputLongSelector: HTMLSelectElement = controlBar.outputLongSelector
 
@@ -61,12 +61,14 @@ case class ControlSection(canvasWidth: Int, isMobile: Boolean, isSmall: Boolean)
   def getComment: String = commentButton.getComment
 
   override def show(): Unit = {
-    output.style.display = display.block.v
-    outputLongSelector.style.visibility = visibility.visible.v
+    outputControlBar.style.display = display.block.v
+    outputComment.style.display = display.block.v
+    outputLongSelector.style.display = display.block.v
   }
 
   override def hide(): Unit = {
-    output.style.display = display.none.v
-    outputLongSelector.style.visibility = visibility.hidden.v
+    outputControlBar.style.display = display.none.v
+    outputComment.style.display = display.none.v
+    outputLongSelector.style.display = display.none.v
   }
 }
