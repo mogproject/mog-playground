@@ -102,7 +102,7 @@ trait ModeController {
   def invokeCursor(selected: Cursor, cursor: Cursor, isFlipped: Boolean): Option[ModeController] = None
 
   // cursor hold
-  def invokeHoldEvent(cursor: Cursor): Option[ModeController] = None
+  def invokeHoldEvent(cursor: Cursor, isFlipped: Boolean): Option[ModeController] = None
 
   // actions
   def setMode(nextMode: Mode): Option[ModeController]

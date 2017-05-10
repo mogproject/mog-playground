@@ -197,7 +197,7 @@ trait CursorManageable extends EventManageable {
     (selectedCursor, cursor) match {
       case (_, Some(invoked)) if Controller.canInvokeWithoutSelection(invoked) =>
         Controller.invokeCursor(invoked, invoked, isFlipped)
-        registerHoldEvent(() => Controller.invokeHoldEvent(invoked))
+        registerHoldEvent(() => Controller.invokeHoldEvent(invoked, isFlipped))
       case (Some(sel), Some(invoked)) =>
         clearSelectedArea()
         Controller.invokeCursor(sel, invoked, isFlipped)
@@ -206,7 +206,7 @@ trait CursorManageable extends EventManageable {
         clearSelectedArea()
       case (None, Some(sel)) if Controller.canSelect(sel) =>
         drawSelectedArea(sel)
-        registerHoldEvent(() => Controller.invokeHoldEvent(sel))
+        registerHoldEvent(() => Controller.invokeHoldEvent(sel, isFlipped))
       case _ => // do nothing
     }
   }
