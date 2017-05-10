@@ -72,8 +72,8 @@ object BranchButton {
     ),
     br(),
     div(cls := "row",
-      div(cls := "col-xs-8 col-sm-9", label(paddingTop := "6px", "Delete This Branch")),
-      div(cls := "col-xs-4 col-sm-3", deleteBranchButton)
+      div(cls := "col-xs-7 col-sm-9", label(paddingTop := "6px", "Delete This Branch")),
+      div(cls := "col-xs-5 col-sm-3", deleteBranchButton)
     )
   ).render
 
