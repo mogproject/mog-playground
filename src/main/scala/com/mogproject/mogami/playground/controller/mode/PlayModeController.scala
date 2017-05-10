@@ -118,11 +118,11 @@ case class PlayModeController(renderer: Renderer,
     (selected.isBoard, selected.isHand, released.isBoard) match {
       case (true, false, true) =>
         for {
-          from <- selected.toSquare(config.flip == FlipEnabled)
-          to <- released.toSquare(config.flip == FlipEnabled)
+          from <- selected.board
+          to <- released.board
           p <- selectedState.board.get(from)
           sq <- adjustMovement(p, from, to)
-        } yield Cursor(sq, config.flip == FlipEnabled)
+        } yield Cursor(sq)
       case (false, true, true) => Some(released) // no adjustment for hand pieces
       case _ => None
     }
