@@ -5,7 +5,6 @@ import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.util.MapUtil
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.core.state.StateCache.Implicits._
-import com.mogproject.mogami.playground.view.renderer.BoardRenderer.FlipEnabled
 import com.mogproject.mogami.playground.view.renderer.Renderer
 
 import scala.util.{Failure, Success, Try}
@@ -53,7 +52,7 @@ case class EditModeController(renderer: Renderer,
 
     renderer.updateEditResetLabel(config.messageLang)
 
-    renderer.drawIndicators( turn, GameStatus.Playing)
+    renderer.drawIndicators(turn, GameStatus.Playing)
     renderer.drawEditingPieces(board, hand, box)
   }
 
@@ -66,7 +65,7 @@ case class EditModeController(renderer: Renderer,
 
   override def canActivate(cursor: Cursor): Boolean = true
 
-  override def canSelect(cursor: Cursor): Boolean = (config.flip == FlipEnabled).when[Cursor](!_)(cursor) match {
+  override def canSelect(cursor: Cursor): Boolean = cursor match {
     case Cursor(Some(sq), None, None, None) => board.contains(sq)
     case Cursor(None, Some(h), None, None) => hand(h) > 0
     case Cursor(None, None, Some(pt), None) => box(pt) > 0
@@ -79,8 +78,8 @@ case class EditModeController(renderer: Renderer,
     * @param selected from
     * @param invoked  to
     */
-  override def invokeCursor(selected: Cursor, invoked: Cursor): Option[ModeController] = {
-    ((config.flip == FlipEnabled).when[Cursor](!_)(selected), (config.flip == FlipEnabled).when[Cursor](!_)(invoked)) match {
+  override def invokeCursor(selected: Cursor, invoked: Cursor, isFlipped: Boolean): Option[ModeController] = {
+    (selected, invoked) match {
       // square is selected
       case (Cursor(Some(s1), None, None, None), Cursor(Some(s2), None, None, None)) =>
         (board(s1), board.get(s2)) match {

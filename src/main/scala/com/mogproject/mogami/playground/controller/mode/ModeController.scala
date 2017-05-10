@@ -99,7 +99,7 @@ trait ModeController {
   def canInvokeWithoutSelection(cursor: Cursor): Boolean = cursor.isPlayer
 
   // cursor click
-  def invokeCursor(selected: Cursor, cursor: Cursor): Option[ModeController] = None
+  def invokeCursor(selected: Cursor, cursor: Cursor, isFlipped: Boolean): Option[ModeController] = None
 
   // cursor hold
   def invokeHoldEvent(cursor: Cursor): Option[ModeController] = None

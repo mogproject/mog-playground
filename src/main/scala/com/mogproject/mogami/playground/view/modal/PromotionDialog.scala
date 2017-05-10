@@ -4,7 +4,6 @@ import com.mogproject.mogami.Piece
 import com.mogproject.mogami.playground.controller.{Configuration, English, Japanese}
 import com.mogproject.mogami.playground.view.modal.common.ModalLike
 import com.mogproject.mogami.playground.view.parts.common.EventManageable
-import com.mogproject.mogami.playground.view.renderer.BoardRenderer.FlipEnabled
 import com.mogproject.mogami.playground.view.renderer.piece.PieceRenderer
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom.CanvasRenderingContext2D
@@ -18,6 +17,7 @@ import scalatags.JsDom.all._
   */
 // todo: draw on canvas
 case class PromotionDialog(config: Configuration,
+                           isFlipped: Boolean, // can differ from config.flip in Double Board Mode
                            pieceRenderer: PieceRenderer,
                            piece: Piece,
                            callbackUnpromote: () => Unit,
@@ -88,8 +88,8 @@ case class PromotionDialog(config: Configuration,
     // todo: detect board ID
 
     // draw large pieces
-    pieceRenderer.drawPiece(contextUnpromote, (config.flip == FlipEnabled).when[Piece](!_)(piece), 0, 0, textScale)
-    pieceRenderer.drawPiece(contextPromote, (config.flip == FlipEnabled).when[Piece](!_)(piece.promoted), 0, 0, textScale)
+    pieceRenderer.drawPiece(contextUnpromote, isFlipped.when[Piece](!_)(piece), 0, 0, textScale)
+    pieceRenderer.drawPiece(contextPromote, isFlipped.when[Piece](!_)(piece.promoted), 0, 0, textScale)
   }
 
 }

@@ -119,7 +119,7 @@ object Controller {
 
   def canInvokeWithoutSelection(cursor: Cursor): Boolean = modeController.get.canInvokeWithoutSelection(cursor)
 
-  def invokeCursor(selected: Cursor, invoked: Cursor): Unit = doAction(_.invokeCursor(selected, invoked), _.renderAll())
+  def invokeCursor(selected: Cursor, invoked: Cursor, isFlipped: Boolean): Unit = doAction(_.invokeCursor(selected, invoked, isFlipped), _.renderAll())
 
   def invokeHoldEvent(invoked: Cursor): Unit = doAction(_.invokeHoldEvent(invoked), _.renderAll())
 

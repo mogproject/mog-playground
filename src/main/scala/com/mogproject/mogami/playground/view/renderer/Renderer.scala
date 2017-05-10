@@ -93,8 +93,8 @@ class Renderer extends BoardRenderer {
 
   def hideControlSection(): Unit = List(controlSection, GameMenuSection, GameHelpSection).foreach(_.hide())
 
-  def askPromote(config: Configuration, piece: Piece, callbackUnpromote: () => Unit, callbackPromote: () => Unit): Unit = {
-    PromotionDialog(config, getPieceRenderer, piece, callbackUnpromote, callbackPromote).show()
+  def askPromote(config: Configuration, isFlipped: Boolean, piece: Piece, callbackUnpromote: () => Unit, callbackPromote: () => Unit): Unit = {
+    PromotionDialog(config, isFlipped, getPieceRenderer, piece, callbackUnpromote, callbackPromote).show()
   }
 
   def askConfirm(lang: Language, callback: () => Unit): Unit = {

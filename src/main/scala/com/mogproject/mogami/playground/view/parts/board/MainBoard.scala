@@ -17,7 +17,7 @@ import scalatags.JsDom.all._
   *
   */
 case class MainBoard(canvasWidth: Int,
-                     flip: Boolean,
+                     isFlipped: Boolean,
                      pieceLang: Language,
                      recordLang: Language
                     ) extends CursorManageable with MoveNextEffect {
@@ -120,7 +120,7 @@ case class MainBoard(canvasWidth: Int,
   }
 
   def drawPlayerIcon(): Unit = {
-    val (b, w) = flip.fold((layout.color.white, layout.color.fg), (layout.color.fg, layout.color.white))
+    val (b, w) = isFlipped.fold((layout.color.white, layout.color.fg), (layout.color.fg, layout.color.white))
     val ctx = layer2
 
     // clear
@@ -149,8 +149,8 @@ case class MainBoard(canvasWidth: Int,
 
     // draw
     List(
-      (flip.fold(whiteName, blackName), layout.playerNameBlack, false),
-      (flip.fold(blackName, whiteName), layout.playerNameWhite, true)).foreach { case (t, r, rot) =>
+      (isFlipped.fold(whiteName, blackName), layout.playerNameBlack, false),
+      (isFlipped.fold(blackName, whiteName), layout.playerNameWhite, true)).foreach { case (t, r, rot) =>
       TextRenderer(ctx, t, layout.font.playerName, layout.color.fg, r.left, r.top, r.width, r.height)
         .withTrim.alignLeft.alignMiddle.withRotate(rot).render()
     }
@@ -176,7 +176,7 @@ case class MainBoard(canvasWidth: Int,
 
     // file
     for (i <- 0 until 9) {
-      val text = fileIndex.charAt(flip.fold(8 - i, i)).toString
+      val text = fileIndex.charAt(isFlipped.fold(8 - i, i)).toString
       val left = layout.fileIndex.left + layout.PIECE_WIDTH * (8 - i)
       val top = layout.fileIndex.top
 
@@ -186,7 +186,7 @@ case class MainBoard(canvasWidth: Int,
 
     //rank
     for (i <- 0 until 9) {
-      val text = rankIndex.charAt(flip.fold(8 - i, i)).toString
+      val text = rankIndex.charAt(isFlipped.fold(8 - i, i)).toString
       val left = layout.rankIndex.left
       val top = layout.rankIndex.top + layout.PIECE_HEIGHT * i
       TextRenderer(ctx, text, layout.font.numberIndex, layout.color.fg, left, top, layout.rankIndex.width, layout.PIECE_HEIGHT)
@@ -196,8 +196,8 @@ case class MainBoard(canvasWidth: Int,
 
   private[this] def drawPieces(board: BoardType, hand: HandType): Unit = {
     clearPieces()
-    board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, flip.when[Piece](!_)(pc), flip.when[Square](!_)(sq)) }
-    hand.withFilter(_._2 > 0).foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, flip.when[Hand](!_)(pc), n) }
+    board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, isFlipped.when[Piece](!_)(pc), isFlipped.when[Square](!_)(sq)) }
+    hand.withFilter(_._2 > 0).foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, isFlipped.when[Hand](!_)(pc), n) }
   }
 
   def drawPieces(state: State): Unit = drawPieces(state.board, state.hand)
@@ -224,8 +224,8 @@ case class MainBoard(canvasWidth: Int,
   def drawEditingPieces(board: BoardType, hand: HandType, box: Map[Ptype, Int]): Unit = {
     clearPieces()
     clearPiecesInBox()
-    board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, flip.when[Piece](!_)(pc), flip.when[Square](!_)(sq)) }
-    hand.withFilter(_._2 > 0).foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, flip.when[Hand](!_)(pc), n) }
+    board.foreach { case (sq, pc) => pieceRenderer.drawOnBoard(layer2, isFlipped.when[Piece](!_)(pc), isFlipped.when[Square](!_)(sq)) }
+    hand.withFilter(_._2 > 0).foreach { case (pc, n) => pieceRenderer.drawInHand(layer2, isFlipped.when[Hand](!_)(pc), n) }
     box.withFilter(_._2 > 0).foreach { case (pt, n) => pieceRenderer.drawInBox(layer2, pt, n) }
   }
 
@@ -234,7 +234,7 @@ case class MainBoard(canvasWidth: Int,
   }
 
   def drawIndicators(turn: Player, status: GameStatus): Unit = {
-    val t = flip.fold(!turn, turn) // flip turn
+    val t = isFlipped.fold(!turn, turn) // flip turn
 
     def f(r: Rectangle, text: String, rotated: Boolean): Unit = {
       TextRenderer(layer0, text, layout.font.indicator, layout.color.white, r.left, r.top, r.width, r.height)
