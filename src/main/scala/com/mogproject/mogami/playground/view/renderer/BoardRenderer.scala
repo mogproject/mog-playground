@@ -84,7 +84,7 @@ trait BoardRenderer {
     )
   )
 
-  private[this] def createMobilePortraitMain(canvasWidth: Int): TypedTag[Div] = div(cls := "main-area",
+  private[this] def createMobilePortraitMain(canvasWidth: Int): TypedTag[Div] = div(cls := "main-area main-area-mobile-portrait",
     width := canvasWidth,
     mainBoards.head.canvasContainer,
     div(
