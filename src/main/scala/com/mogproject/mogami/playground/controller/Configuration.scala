@@ -19,6 +19,9 @@ case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
                          pieceLang: Language = Japanese,
                          flip: FlipType = FlipDisabled
                         ) {
+
+  println(isMobile, isLandscape, canvasWidth)
+
   def toQueryParameters: List[String] = {
     type Parser = List[String] => List[String]
 

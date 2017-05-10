@@ -6,17 +6,31 @@ import scala.scalajs.js
 import scala.scalajs.js.UndefOr
 
 @js.native
-class MobileWindow extends js.Object {
+sealed class MobileWindow extends js.Object {
   @js.native
   def orientation: UndefOr[Int] = js.native
 }
 
+@js.native
+sealed class MobileScreen extends js.Object {
+  @js.native
+  def orientation: UndefOr[Orientation] = js.native
+}
+
+@js.native
+sealed class Orientation extends js.Object {
+  @js.native
+  def angle: UndefOr[Int] = js.native
+}
+
 object MobileScreen {
+  private[this] def getAngle1: UndefOr[Int] = dom.window.asInstanceOf[MobileWindow].orientation
+
+  private[this] def getAngle2: UndefOr[Int] = dom.window.screen.asInstanceOf[MobileScreen].orientation.flatMap(_.angle)
+
   /**
     *
     * @return true if the orientation is the landscape mode, false if the portrait mode
     */
-  def isLandscape: Boolean = {
-    dom.window.asInstanceOf[MobileWindow].orientation.map(math.abs(_) == 90).getOrElse(false)
-  }
+  def isLandscape: Boolean = math.abs(getAngle1.getOrElse(getAngle2.getOrElse(0))) == 90
 }
