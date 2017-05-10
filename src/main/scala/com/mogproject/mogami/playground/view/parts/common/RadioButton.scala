@@ -1,6 +1,6 @@
 package com.mogproject.mogami.playground.view.parts.common
 
-import com.mogproject.mogami.playground.controller.{English, Language}
+import com.mogproject.mogami.playground.controller.Language
 import org.scalajs.dom.html.{Anchor, Div}
 
 import scalatags.JsDom.all._
@@ -14,12 +14,10 @@ case class RadioButton[Key](keys: Seq[Key],
                             buttonGroupClasses: Seq[String] = Seq("btn-group-justified"),
                             onClick: Key => Unit = { _: Key => {} }) extends ButtonLike[Key, Anchor, Div] {
 
-  override protected def generateInput(key: Key): Anchor = {
-    println("gen input")
-    a(
-      cls := ("btn" :: "btn-primary" :: buttonClasses.toList).mkString(" ")
-    ).render
-  }
+  override protected def generateInput(key: Key): Anchor = a(
+    cls := ("btn" :: "btn-primary" :: buttonClasses.toList).mkString(" ")
+  ).render
+
 
   private[this] def inputs: Seq[Anchor] = keys.map(inputMap)
 
