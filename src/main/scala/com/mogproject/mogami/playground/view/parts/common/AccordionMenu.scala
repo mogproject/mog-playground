@@ -1,7 +1,6 @@
 package com.mogproject.mogami.playground.view.parts.common
 
 import com.mogproject.mogami.playground.controller.Controller
-import com.mogproject.mogami.playground.view.section.SideBarRight
 import org.scalajs.dom.html.Div
 import com.mogproject.mogami.util.Implicits._
 
@@ -43,6 +42,9 @@ case class AccordionMenu(ident: String, title: String, icon: String, isExpanded:
   val output: Div = div(
     cls := "panel",
     if (isVisible) "" else display := display.none.v,
+    data("toggle") := "tooltip",
+    data("placement") := "left",
+    marginBottom := 5.px,
     div(
       cls := "panel-heading",
       id := s"heading${ident}",
@@ -75,11 +77,13 @@ case class AccordionMenu(ident: String, title: String, icon: String, isExpanded:
   def collapseTitle(): Unit = {
     titleElem.style.paddingLeft = 0.px
     titleElem.innerHTML = ""
+    output.setAttribute("data-original-title", (ident == "EditHelp").fold("Help", ident))
   }
 
   def expandTitle(): Unit = {
     titleElem.style.paddingLeft = 20.px
     titleElem.innerHTML = " " + title
+    output.removeAttribute("data-original-title")
   }
 
 }

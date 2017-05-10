@@ -12,8 +12,8 @@ object AboutSection extends Section {
     "About",
     "About This Site",
     "info-sign",
-    false,
-    true,
+    isExpanded = false,
+    isVisible = true,
     div(
       p(i(""""Run anywhere. Needs NO installation."""")),
       p("Shogi Playground is a platform for all shogi --Japanese chess-- fans in the world." +

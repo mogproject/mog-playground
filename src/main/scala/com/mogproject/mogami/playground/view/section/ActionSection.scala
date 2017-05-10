@@ -10,11 +10,6 @@ import scalatags.JsDom.all._
   *
   */
 object ActionSection extends Section {
-
-  override def initialize(): Unit = {
-    super.initialize()
-  }
-
   override val accordions: Seq[AccordionMenu] = Seq(
     AccordionMenu(
       "Action",

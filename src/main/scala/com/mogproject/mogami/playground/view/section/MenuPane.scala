@@ -34,7 +34,7 @@ object MenuPane {
     jQuery(".panel-collapse").asInstanceOf[BootstrapJQuery].collapse {
       val r = js.Dynamic.literal()
       r.toggle = false
-      r.parent = "#accordion"
+      r.parent = "#accordion" // necessary to keep group settings
       r
     }
     jQuery(".panel-collapse").asInstanceOf[BootstrapJQuery].collapse("hide")
