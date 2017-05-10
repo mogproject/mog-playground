@@ -34,28 +34,16 @@ class Renderer extends BoardRenderer {
   // todo: refactor to use val
   protected var controlSection: ControlSection = ControlSection(0, isMobile = false, isMobileLandscape = false)
 
-  private[this] val longSelector: Div = div(width := 168.px, marginLeft := "auto", marginRight := "auto", controlSection.outputLongSelector).render
+  protected val sideBarLeft: SideBarLeft = new SideBarLeft(controlSection)
 
   private[this] def createMainPane(canvasWidth: Int, numBoards: Int, isMobile: Boolean, isLandscape: Boolean) = div(
-    div(cls := "navbar",
-      tag("nav")(cls := "navbar navbar-default navbar-fixed-top", NavigatorSection.output)
-    ),
+    div(cls := "navbar", tag("nav")(cls := "navbar navbar-default navbar-fixed-top", NavigatorSection.output)),
     div(cls := "container-fluid",
       isMobile.fold(Seq(position := position.fixed.v, width := "100%", padding := 0), ""),
       div(cls := "row no-margin",
-        // sidebar
-        SideBar.output,
-
-        // long selector
-        div(
-          cls := "hidden-xs hidden-sm sidebar sidebar-left",
-          width := 240.px,
-          h4(marginLeft := 14.px, "Moves"),
-          longSelector
-        ),
-
-        // main content
-        mainPane
+        SideBarRight.output, // right sidebar
+        sideBarLeft.output, // left sidebar
+        mainPane // main content
       ),
       hr(),
       small(p(textAlign := "right", marginRight := 20, "Shogi Playground © 2017 ", a(href := "http://mogproject.com", target := "_blank", "mogproject")))
@@ -69,7 +57,7 @@ class Renderer extends BoardRenderer {
     elem.appendChild(mainPane)
 
     initializeBoardRenderer(config)
-    config.isMobile.fold(widenMainPane(), contractMainPane())
+    config.isMobile.fold(widenMainPane(), recenterMainPane())
     NavigatorSection.initialize()
     MenuPane.initialize()
 
@@ -90,8 +78,7 @@ class Renderer extends BoardRenderer {
 
   def initializeControlSection(config: Configuration): Unit = {
     controlSection = ControlSection(config.canvasWidth, config.isMobile, config.isLandscape)
-    longSelector.innerHTML = ""
-    longSelector.appendChild(controlSection.outputLongSelector)
+    sideBarLeft.updateControlSection(controlSection)
     controlSection.initialize()
   }
 
@@ -221,17 +208,30 @@ class Renderer extends BoardRenderer {
   }
 
   // side bar
-  def collapseSideBar(): Unit = {
-    SideBar.collapseSideBar()
-    expandMainPane()
+  def collapseSideBarRight(): Unit = {
+    SideBarRight.collapseSideBar()
+    recenterMainPane()
+  }
+
+  def collapseSideBarLeft(): Unit = {
+    sideBarLeft.collapseSideBar()
+    recenterMainPane()
   }
 
   /**
     * @note Never happens on mobile
     */
-  def expandSideBar(): Unit = if (SideBar.isCollapsed) {
-    contractMainPane()
-    SideBar.expandSideBar()
+  def expandSideBarRight(): Unit = if (SideBarRight.isCollapsed) {
+    SideBarRight.expandSideBar()
+    recenterMainPane()
+  }
+
+  /**
+    * @note Never happens on mobile
+    */
+  def expandSideBarLeft(): Unit = if (sideBarLeft.isCollapsed) {
+    sideBarLeft.expandSideBar()
+    recenterMainPane()
   }
 
 }

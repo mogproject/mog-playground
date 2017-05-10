@@ -1,5 +1,6 @@
 package com.mogproject.mogami.playground.view.section
 
+import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.controller.Controller
 import org.scalajs.dom.html.{Div, Heading}
 
@@ -8,7 +9,7 @@ import scalatags.JsDom.all._
 /**
   *
   */
-object SideBar {
+object SideBarRight {
   private[this] var isCollapsedValue = false
 
   val EXPANDED_WIDTH: Int = 460
@@ -17,7 +18,7 @@ object SideBar {
 
   lazy val titleExpanded: Heading = h4(
     cls := "sidebar-heading",
-    onclick := { () => Controller.collapseSideBar() },
+    onclick := { () => Controller.collapseSideBarRight() },
     span(cls := "glyphicon glyphicon-minus"),
     span(paddingLeft := 14.px, "Menu")
   ).render
@@ -25,7 +26,7 @@ object SideBar {
   lazy val titleCollapsed: Heading = h4(
     cls := "sidebar-heading",
     display := display.none.v,
-    onclick := { () => Controller.expandSideBar() },
+    onclick := { () => Controller.expandSideBarRight() },
     span(cls := "glyphicon glyphicon-plus")
   ).render
 
@@ -56,4 +57,6 @@ object SideBar {
   }
 
   def isCollapsed: Boolean = isCollapsedValue
+
+  def currentWidth: Int = isCollapsed.fold(COLLAPSED_WIDTH, EXPANDED_WIDTH)
 }

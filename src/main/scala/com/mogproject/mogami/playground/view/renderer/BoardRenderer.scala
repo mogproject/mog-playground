@@ -7,7 +7,7 @@ import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.parts.board.MainBoard
 import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipEnabled}
 import com.mogproject.mogami.playground.view.renderer.piece.PieceRenderer
-import com.mogproject.mogami.playground.view.section.{ControlSection, SideBar}
+import com.mogproject.mogami.playground.view.section.{ControlSection, SideBarLeft, SideBarRight}
 import org.scalajs.dom
 import org.scalajs.dom.html.Div
 
@@ -18,6 +18,8 @@ import scalatags.JsDom.all._
   *
   */
 trait BoardRenderer {
+
+  protected def sideBarLeft: SideBarLeft
 
   private[this] var mainBoards: Seq[MainBoard] = Seq.empty
 
@@ -37,12 +39,8 @@ trait BoardRenderer {
     mainPane.style.width = 100.pct
   }
 
-  def contractMainPane(): Unit = {
-    mainPane.style.width = s"calc(100% - 240px - ${SideBar.EXPANDED_WIDTH}px)"
-  }
-
-  def expandMainPane(): Unit = {
-    mainPane.style.width = s"calc(100% - 240px - ${SideBar.COLLAPSED_WIDTH}px)"
+  def recenterMainPane(): Unit = {
+    mainPane.style.width = s"calc(100% - ${sideBarLeft.currentWidth + SideBarRight.currentWidth}px)"
   }
 
   /**
