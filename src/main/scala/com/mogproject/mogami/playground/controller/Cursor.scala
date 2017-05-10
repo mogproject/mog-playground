@@ -29,8 +29,6 @@ case class Cursor(board: Option[Square], hand: Option[Hand], box: Option[Ptype],
     case Cursor(_, _, _, Some(p)) => Cursor(None, None, None, Some(!p))
     case _ => this
   }
-
-  def toSquare(isFlipped: Boolean): Option[Square] = isFlipped.when[Cursor](!_)(this).board
 }
 
 object Cursor {
