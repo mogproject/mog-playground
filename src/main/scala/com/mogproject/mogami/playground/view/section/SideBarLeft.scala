@@ -14,7 +14,7 @@ class SideBarLeft(private[this] var controlSection: ControlSection) extends Side
 
   override protected val outputClass: String = "sidebar-left"
 
-  private[this] val longSelector: Div = div(width := 168, marginLeft := "auto", marginRight := "auto", controlSection.outputLongSelector).render
+  private[this] val longSelector: Div = div(cls := "long-select", controlSection.outputLongSelector).render
 
   override def content: Div = longSelector
 
@@ -29,17 +29,18 @@ class SideBarLeft(private[this] var controlSection: ControlSection) extends Side
     cls := "sidebar-heading",
     display := display.none.v,
     onclick := { () => Controller.expandSideBarLeft() },
-    span(cls := "pull-right glyphicon glyphicon-plus")
+    span(cls := "pull-right glyphicon glyphicon-plus"),
+    raw("&nbsp;")
   ).render
 
   override def collapseSideBar(): Unit = if (!isCollapsed) {
     super.collapseSideBar()
-    longSelector.style.display = display.none.v
+    longSelector.style.marginLeft = (-EXPANDED_WIDTH).px
   }
 
   override def expandSideBar(): Unit = if (isCollapsed) {
     super.expandSideBar()
-    longSelector.style.display = display.block.v
+    longSelector.style.marginLeft = "calc(50% - 84px)"
   }
 
   def updateControlSection(cs: ControlSection): Unit = {

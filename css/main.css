@@ -117,6 +117,18 @@
   -webkit-appearance:none;
 }
 
+.long-select {
+  width: 168px;
+  margin-left: calc(50% - 84px);
+  margin-right: auto;
+
+  -webkit-transition: margin-left 0.3s;
+  -moz-transition: margin-left 0.3s;
+  -ms-transition: margin-left 0.3s;
+  -o-transition: margin-left 0.3s;
+  transition: margin-left 0.3s;
+}
+
 .notActive{
   color: #3276b1;
   background-color: #fff;
