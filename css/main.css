@@ -6,7 +6,26 @@
   .sidebar-heading:hover {
     color: #5bc0de;
   }
+
+  .panel-heading:hover {
+    color: #5bc0de;
+  }
 }
+
+@media screen and (max-width: 767px) {
+  .collapsing {
+    /* fixes issue#105 */
+    height: 100% !important;
+
+    /* disable transition */
+    -webkit-transition: height 0.01s;
+    -moz-transition: height 0.01s;
+    -ms-transition: height 0.01s;
+    -o-transition: height 0.01s;
+    transition: height 0.01s;
+  }
+}
+
 
 .navbar {
   display: block;
