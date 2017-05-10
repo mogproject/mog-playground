@@ -44,7 +44,4 @@ trait ButtonLike[Key, Input <: HTMLElement, Output <: Element] extends EventMana
     throw new RuntimeException("Could not find the selected value")
   }
 
-  def enable(): Unit = inputs.foreach(_.disabled = false)
-
-  def disable(): Unit = inputs.foreach(_.disabled = true)
 }

@@ -29,7 +29,7 @@ trait EventManageable {
 
     if (hasTouchEvent) {
       // touch
-      val f = (evt: TouchEvent) => if (elem.disabled.forall(_ != true) && evt.changedTouches.length == 1) onClickEvent(evt)
+      val f = (evt: TouchEvent) => if (evt.changedTouches.length == 1) onClickEvent(evt)
       val g = (_: TouchEvent) => clearHoldEvent()
 
       elem.addEventListener("touchstart", f, useCapture = false)

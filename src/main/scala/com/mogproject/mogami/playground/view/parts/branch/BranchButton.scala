@@ -121,9 +121,6 @@ object BranchButton {
         buttons.map(div(cls := "col-sm-4 col-xs-6", _))
       ).render)
     }
-
-    val isLastPosition = game.withBranch(gamePosition.branch)(br => br.offset + br.moves.length >= gamePosition.position).getOrElse(false)
-    if (isLastPosition) newBranchButton.disable() else newBranchButton.enable()
   }
 
   def getIsNewBranchMode: Boolean = newBranchButton.getValue
