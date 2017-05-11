@@ -79,7 +79,7 @@ case class PlayModeController(renderer: Renderer,
               case Some(m) if m == mv => Some(this.copy(displayPosition = displayPosition + 1)) // move next
               case Some(_) => game.getForks(gamePosition).find(_._1 == mv) match {
                 case Some((_, br)) => moveToBranch(br)
-                case None => println("creating!"); createNewBranch(mv)
+                case None => createNewBranch(mv)
               }
               case None => makeMoveOnCurrentBranch(mv)
             }

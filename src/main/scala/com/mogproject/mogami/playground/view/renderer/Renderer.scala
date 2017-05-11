@@ -163,8 +163,10 @@ class Renderer extends BoardRenderer {
   def getSelectedIndex: Int = controlSection.getSelectedIndex
 
   // control section
-  def updateControlBar(backwardEnabled: Boolean, forwardEnabled: Boolean): Unit =
+  def updateControlBar(backwardEnabled: Boolean, forwardEnabled: Boolean): Unit = {
+    controlSection.clearHoldEvent() // click -> disabled => event still remains
     controlSection.updateLabels(backwardEnabled: Boolean, forwardEnabled: Boolean)
+  }
 
   def updateEditResetLabel(lang: Language): Unit = EditReset.updateLabel(lang)
 
