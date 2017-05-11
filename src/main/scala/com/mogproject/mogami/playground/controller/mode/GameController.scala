@@ -90,7 +90,7 @@ trait GameController extends ModeController {
     case Editing =>
       val st = selectedState
       val mc = Some(EditModeController(renderer, config, st.turn, st.board, st.hand, st.unusedPtypeCount, game.gameInfo))
-      currentMoves.isEmpty.fold(mc, {
+      (game.trunk.moves.isEmpty && game.branches.isEmpty && game.comments.isEmpty).fold(mc, {
         renderer.askConfirm(config.messageLang, () => Controller.update(mc))
         None
       })
