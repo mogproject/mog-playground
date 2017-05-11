@@ -265,3 +265,10 @@ select {
   &::before {left:auto !important; right:9px;}
   &::after {left:auto !important; right:10px;}
 }
+
+.setting-alert {
+  margin-top: 20px;
+  margin-bottom: 0px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
