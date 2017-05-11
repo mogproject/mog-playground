@@ -21,6 +21,9 @@ case class Arguments(sfen: Option[String] = None, // deprecated
                      comments: Map[BranchNo, Map[Position, String]] = Map.empty,
                      action: Action = PlayAction,
                      config: Configuration = Configuration()) {
+
+  def loadLocalStorage(): Arguments = this.copy(config = config.loadLocalStorage())
+
   def parseQueryString(query: String): Arguments = {
     @tailrec
     def f(sofar: Arguments, ls: List[List[String]]): Arguments = ls match {

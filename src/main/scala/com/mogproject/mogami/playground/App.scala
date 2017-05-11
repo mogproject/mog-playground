@@ -9,6 +9,6 @@ import org.scalajs.dom
   */
 object App extends JSApp {
   def main(): Unit = {
-    Controller.initialize(dom.document.getElementById("app"), Arguments().parseQueryString(dom.window.location.search))
+    Controller.initialize(dom.document.getElementById("app"), Arguments().loadLocalStorage().parseQueryString(dom.window.location.search))
   }
 }

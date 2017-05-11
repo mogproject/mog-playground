@@ -91,6 +91,8 @@ trait ModeController {
 
   def updateConfig(config: Configuration): ModeController
 
+  def updateGameInfo(gameInfo: GameInfo): ModeController
+
   // cursor check
   def canActivate(cursor: Cursor): Boolean = false
 
@@ -107,11 +109,17 @@ trait ModeController {
   // actions
   def setMode(nextMode: Mode): Option[ModeController]
 
-  def setMessageLanguage(lang: Language): Option[ModeController]
+  /**
+    * Change language settings
+    *
+    * @param lang language
+    */
+  def setMessageLanguage(lang: Language): Option[ModeController] = Some(updateConfig(config.copy(messageLang = lang)))
 
-  def setRecordLanguage(lang: Language): Option[ModeController]
+  def setRecordLanguage(lang: Language): Option[ModeController] =
+    Some(updateConfig(config.copy(recordLang = lang)).updateGameInfo(getConvertedPlayerNames(config.recordLang, lang)))
 
-  def setPieceLanguage(lang: Language): Option[ModeController]
+  def setPieceLanguage(lang: Language): Option[ModeController] = Some(updateConfig(config.copy(pieceLang = lang)))
 
   def setRecord(index: Int): Option[ModeController] = None
 
