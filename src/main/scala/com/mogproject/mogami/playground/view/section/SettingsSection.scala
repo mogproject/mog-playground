@@ -31,8 +31,8 @@ object SettingsSection extends Section {
     div(
       div(
         marginBottom := 10.px,
-        label(marginRight := 53.px, "Board Size"),
-        BoardSizeButton.output
+        BoardSizeButton.output,
+        label("Board Size")
       ),
       div(cls := "row",
         marginLeft := (-10).px,
