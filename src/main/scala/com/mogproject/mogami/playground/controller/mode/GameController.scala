@@ -8,7 +8,6 @@ import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.io._
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.core.state.StateCache.Implicits._
-import com.mogproject.mogami.playground.view.renderer.BoardRenderer.FlipEnabled
 
 import scala.util.{Failure, Success, Try}
 
@@ -98,18 +97,6 @@ trait GameController extends ModeController {
   }
 
   /**
-    * Change language settings
-    *
-    * @param lang language
-    */
-  override def setMessageLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(messageLang = lang)))
-
-  override def setRecordLanguage(lang: Language): Option[ModeController] =
-    Some(this.copy(config = config.copy(recordLang = lang), game = game.copy(gameInfo = getConvertedPlayerNames(config.recordLang, lang))))
-
-  override def setPieceLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(pieceLang = lang)))
-
-  /**
     * Flip the board
     *
     * @return
@@ -160,6 +147,8 @@ trait GameController extends ModeController {
     * Set new config
     */
   override def updateConfig(config: Configuration): ModeController = this.copy(config = config)
+
+  override def updateGameInfo(gameInfo: GameInfo): ModeController = this.copy(game = game.copy(gameInfo = gameInfo))
 
   //
   // renderer

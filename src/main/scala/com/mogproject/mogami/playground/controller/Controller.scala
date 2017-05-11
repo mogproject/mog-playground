@@ -7,7 +7,7 @@ import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller.mode._
 import com.mogproject.mogami.playground.io.RecordFormat
 import com.mogproject.mogami.playground.view.parts.settings.BoardSizeButton.PresetBoardSize
-import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipDisabled, FlipEnabled}
+import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipDisabled}
 import com.mogproject.mogami.playground.view.renderer.Renderer
 import org.scalajs.dom.Element
 
@@ -194,13 +194,23 @@ object Controller {
   //
   // Settings section
   //
-  def setMessageLanguage(lang: Language): Unit = doAction(_.setMessageLanguage(lang), _.renderAll())
+  def setMessageLanguage(lang: Language): Unit = doAction({ mc =>
+    LocalStorage.saveMessageLang(lang)
+    mc.setMessageLanguage(lang)
+  }, _.renderAll())
 
-  def setRecordLanguage(lang: Language): Unit = doAction(_.setRecordLanguage(lang), _.refreshBoard())
+  def setRecordLanguage(lang: Language): Unit = doAction({ mc =>
+    LocalStorage.saveRecordLang(lang)
+    mc.setRecordLanguage(lang)
+  }, _.refreshBoard())
 
-  def setPieceLanguage(lang: Language): Unit = doAction(_.setPieceLanguage(lang), _.refreshBoard())
+  def setPieceLanguage(lang: Language): Unit = doAction({ mc =>
+    LocalStorage.savePieceLang(lang)
+    mc.setPieceLanguage(lang)
+  }, _.refreshBoard())
 
   def setDoubleBoard(isDoubleBoard: Boolean): Unit = doAction({ mc =>
+    LocalStorage.saveDoubleBoardMode(isDoubleBoard)
     (mc.config.flip, isDoubleBoard) match {
       case (DoubleBoard, true) => None
       case (_, true) => Some(mc.updateConfig(mc.config.copy(flip = DoubleBoard)))
@@ -209,8 +219,10 @@ object Controller {
     }
   }, _.refreshBoard())
 
-  def changeBoardSize(size: PresetBoardSize): Unit =
-    doAction({ mc => Some(mc.updateConfig(mc.config.copy(canvasWidth = size.width))) }, _.refreshBoard())
+  def changeBoardSize(size: PresetBoardSize): Unit = doAction({ mc =>
+    LocalStorage.saveSize(size.width)
+    Some(mc.updateConfig(mc.config.copy(canvasWidth = size.width)))
+  }, _.refreshBoard())
 
   def collapseSideBarRight(): Unit = modeController.get.renderer.collapseSideBarRight()
 

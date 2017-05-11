@@ -20,34 +20,18 @@ case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
                          pieceLang: Language = Japanese,
                          flip: FlipType = FlipDisabled
                         ) {
-  
+
   def toQueryParameters: List[String] = {
     type Parser = List[String] => List[String]
 
-    val parseMessageLang: Parser = xs => messageLang match {
-      case Configuration.browserLanguage => xs
-      case Japanese => "mlang=ja" :: xs
-      case English => "mlang=en" :: xs
-    }
-
-    val parseRecordLang: Parser = xs => recordLang match {
-      case Configuration.browserLanguage => xs
-      case Japanese => "rlang=ja" :: xs
-      case English => "rlang=en" :: xs
-    }
-
-    val parsePieceLang: Parser = xs => pieceLang match {
-      case Japanese => xs
-      case English => "plang=en" :: xs
-    }
+    // @note do not add lang parameters anymore
 
     val parseFlip: Parser = xs => flip match {
-      case FlipDisabled => xs
       case FlipEnabled => "flip=true" :: xs
-      case DoubleBoard => "flip=double" :: xs
+      case _ => xs
     }
 
-    (parseMessageLang andThen parseRecordLang andThen parsePieceLang andThen parseFlip) (List.empty)
+    parseFlip(List.empty)
   }
 
   def updateScreenSize(): Configuration = {
@@ -55,6 +39,17 @@ case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
   }
 
   def collapseByDefault: Boolean = !isMobile && Configuration.getClientWidth < canvasWidth + SideBarLeft.EXPANDED_WIDTH + SideBarRight.EXPANDED_WIDTH
+
+  def loadLocalStorage(): Configuration = {
+    val ls = LocalStorage.load()
+    this.copy(
+      canvasWidth = ls.canvasSize.getOrElse(canvasWidth),
+      flip = ls.doubleBoardMode.contains(true).fold(DoubleBoard, flip),
+      messageLang = ls.messageLang.getOrElse(messageLang),
+      recordLang = ls.recordLang.getOrElse(recordLang),
+      pieceLang = ls.pieceLang.getOrElse(pieceLang)
+    )
+  }
 }
 
 object Configuration {

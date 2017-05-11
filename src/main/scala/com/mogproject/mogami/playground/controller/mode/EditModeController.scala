@@ -47,6 +47,8 @@ case class EditModeController(renderer: Renderer,
     */
   override def updateConfig(config: Configuration): ModeController = this.copy(config = config)
 
+  override def updateGameInfo(gameInfo: GameInfo): ModeController = this.copy(gameInfo = gameInfo)
+
   override def renderAll(): Unit = {
     super.renderAll()
 
@@ -142,13 +144,6 @@ case class EditModeController(renderer: Renderer,
         None
     }
   } else None
-
-  override def setMessageLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(messageLang = lang)))
-
-  override def setRecordLanguage(lang: Language): Option[ModeController] =
-    Some(this.copy(config = config.copy(recordLang = lang), gameInfo = getConvertedPlayerNames(config.recordLang, lang)))
-
-  override def setPieceLanguage(lang: Language): Option[ModeController] = Some(this.copy(config = config.copy(pieceLang = lang)))
 
   override def toggleFlip(): Option[ModeController] = Some(this.copy(config = config.copy(flip = !config.flip)))
 

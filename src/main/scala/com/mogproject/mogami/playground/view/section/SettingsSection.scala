@@ -42,7 +42,11 @@ object SettingsSection extends Section {
       ),
       MessageLanguageSelector.output,
       RecordLanguageSelector.output,
-      PieceLanguageSelector.output
+      PieceLanguageSelector.output,
+      div(
+        cls := "alert alert-success setting-alert",
+        "These settings will be saved for your browser."
+      )
     )
   ))
 
