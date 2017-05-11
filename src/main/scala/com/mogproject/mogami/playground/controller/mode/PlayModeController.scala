@@ -7,7 +7,6 @@ import com.mogproject.mogami.core.state.State.PromotionFlag
 import com.mogproject.mogami.{Game, Square}
 import com.mogproject.mogami.playground.controller.{Configuration, Controller, Cursor}
 import com.mogproject.mogami.core.state.StateCache.Implicits._
-import com.mogproject.mogami.playground.view.renderer.BoardRenderer.FlipEnabled
 import com.mogproject.mogami.playground.view.renderer.Renderer
 
 
@@ -73,22 +72,21 @@ case class PlayModeController(renderer: Renderer,
       val from = selected.moveFrom
 
       def f(to: Square, promote: Boolean): Option[GameController] = {
-        val mv = MoveBuilderSfen(from, to, promote).toMove(selectedState, getLastMove.map(_.to))
-
-        val newBranchController = for {
-          m <- mv
-          if renderer.getIsNewBranchMode
-          g <- game.createBranch(gamePosition, m)
-        } yield this.copy(game = g, displayBranchNo = game.branches.length + 1, displayPosition = displayPosition + 1)
-
-
-        if (newBranchController.isDefined)
-          newBranchController
-        else
-          for {
-            m <- mv
-            g <- game.truncated(gamePosition).updateBranch(displayBranchNo)(_.makeMove(m))
-          } yield this.copy(game = g, displayPosition = displayPosition + 1)
+        MoveBuilderSfen(from, to, promote).toMove(selectedState, getLastMove.map(_.to)).flatMap { mv =>
+          if (renderer.getIsNewBranchMode) {
+            // New Branch Mode
+            game.getMove(gamePosition) match {
+              case Some(m) if m == mv => Some(this.copy(displayPosition = displayPosition + 1)) // move next
+              case Some(_) => game.getForks(gamePosition).find(_._1 == mv) match {
+                case Some((_, br)) => moveToBranch(br)
+                case None => createNewBranch(mv)
+              }
+              case None => makeMoveOnCurrentBranch(mv)
+            }
+          } else {
+            makeMoveOnCurrentBranch(mv) // Normal Mode
+          }
+        }
       }
 
       invoked match {
@@ -113,6 +111,15 @@ case class PlayModeController(renderer: Renderer,
       }
     }
   }
+
+  private[this] def moveToBranch(branchNo: BranchNo): Option[GameController] =
+    Some(this.copy(displayBranchNo = branchNo, displayPosition = displayPosition + 1))
+
+  private[this] def createNewBranch(move: Move): Option[GameController] =
+    game.createBranch(gamePosition, move).map(g => this.copy(game = g, displayBranchNo = game.branches.length + 1, displayPosition = displayPosition + 1))
+
+  private[this] def makeMoveOnCurrentBranch(move: Move): Option[GameController] =
+    game.truncated(gamePosition).updateBranch(displayBranchNo)(_.makeMove(move)).map(g => this.copy(game = g, displayPosition = displayPosition + 1))
 
   def processMouseUp(selected: Cursor, released: Cursor): Option[Cursor] = {
     (selected.isBoard, selected.isHand, released.isBoard) match {
