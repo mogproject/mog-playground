@@ -99,8 +99,8 @@ class Renderer extends BoardRenderer {
 
   def askConfirm(lang: Language, callback: () => Unit): Unit = {
     val s = lang match {
-      case Japanese => p("棋譜の情報が失われますが、よろしいですか?")
-      case English => p("The record will be discarded. Are you sure?")
+      case Japanese => p("棋譜およびコメントの情報が失われますが、よろしいですか?")
+      case English => p("The record and comments will be discarded. Are you sure?")
     }
     YesNoDialog(lang, s, callback).show()
   }

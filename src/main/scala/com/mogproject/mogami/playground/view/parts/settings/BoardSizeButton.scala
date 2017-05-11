@@ -41,7 +41,7 @@ object BoardSizeButton {
 
   private[this] lazy val sizeButton = DropdownMenu(
     Vector(ExtraSmall, LandscapeIPhone5, LandscapeIPhone6, LandscapeIPhone6Plus, Small, PortraitIPhone5, Medium, PortraitIPhone6, Large, ExtraLarge),
-    8, "Board Size", _ => (), "btn-group"
+    8, "Board Size", _ => (), "btn-group", "left"
   )
 
   private[this] val setButton = button(
@@ -51,7 +51,7 @@ object BoardSizeButton {
   ).render
 
   lazy val output: Div = div(
-    cls := "btn-group", role := "group", sizeButton.output, setButton
+    cls := "btn-group pull-right", role := "group", marginTop := (-8).px, sizeButton.output, setButton
   ).render
 
 }
