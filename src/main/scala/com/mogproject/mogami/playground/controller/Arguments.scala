@@ -163,7 +163,7 @@ case class ArgumentsBuilder(game: Game,
 
   private[this] def positionParams: Seq[(String, String)] = {
     val prefix = (gamePosition.branch == 0).fold("", s"${gamePosition.branch}.")
-    (gamePosition.branch != 0 || gamePosition.position != 0).option(("move", s"${prefix}${gamePosition.position}")).toSeq
+    (gamePosition.branch != 0 || gamePosition.position != game.trunk.offset).option(("move", s"${prefix}${gamePosition.position}")).toSeq
   }
 
   private[this] def imageActionParams: Seq[(String, String)] = Seq(("action", "image"))
