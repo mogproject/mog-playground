@@ -87,7 +87,7 @@ case class ControlBar(sectionWidth: Int, isSmall: Boolean) extends EventManageab
       val xs = (prefix +: getMoves(game, branchNo, lng)).zipWithIndex.map { case (m, i) =>
         val pos = i + game.trunk.offset
         val symbolMark = game.hasFork(GamePosition(branchNo, pos)).fold("+", game.hasComment(GamePosition(branchNo, pos)).fold("*", ""))
-        val indexNotation = if (i == 0) "" else s"${i}: " + (i % 2 == 0).fold(!initTurn, initTurn).toSymbolString()
+        val indexNotation = if (i == 0) "" else s"${pos}: " + (i % 2 == 0).fold(!initTurn, initTurn).toSymbolString()
         symbolMark + indexNotation + m
       }
 
