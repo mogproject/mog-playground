@@ -44,7 +44,7 @@ object Controller {
 
     modeController = Some(isSnapshot.fold(
       PlayModeController(renderer, config, game, 0, 0),
-      ViewModeController(renderer, config, game, args.gamePosition.branch, args.gamePosition.position)
+      ViewModeController(renderer, config, game, args.gamePosition.branch, math.max(0,  args.gamePosition.position - game.trunk.offset))
     ))
 
     // render all parts
