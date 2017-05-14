@@ -85,13 +85,13 @@ class Renderer extends BoardRenderer {
   /**
     * Display
     */
-  def showEditSection(): Unit = EditSection.show()
+  def showEditSection(): Unit = List(EditSection, EditHelpSection).foreach(_.show())
 
-  def hideEditSection(): Unit = EditSection.hide()
+  def hideEditSection(): Unit = List(EditSection, EditHelpSection).foreach(_.hide())
 
-  def showControlSection(): Unit = List(controlSection, GameMenuSection, GameHelpSection).foreach(_.show())
+  def showControlSection(): Unit = List(controlSection, GameMenuSection, GameHelpSection, AnalyzeSection).foreach(_.show())
 
-  def hideControlSection(): Unit = List(controlSection, GameMenuSection, GameHelpSection).foreach(_.hide())
+  def hideControlSection(): Unit = List(controlSection, GameMenuSection, GameHelpSection, AnalyzeSection).foreach(_.hide())
 
   def askPromote(config: Configuration, isFlipped: Boolean, piece: Piece, callbackUnpromote: () => Unit, callbackPromote: () => Unit): Unit = {
     PromotionDialog(config, isFlipped, getPieceRenderer, piece, callbackUnpromote, callbackPromote).show()

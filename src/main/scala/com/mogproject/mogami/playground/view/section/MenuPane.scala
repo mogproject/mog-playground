@@ -15,9 +15,11 @@ object MenuPane {
   private[this] val sections = Seq(
     GameMenuSection,
     ActionSection,
-    GameHelpSection,
+    AnalyzeSection,
     EditSection,
     SettingsSection,
+    GameHelpSection,
+    EditHelpSection,
     AboutSection
   )
 
