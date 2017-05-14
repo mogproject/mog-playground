@@ -31,7 +31,7 @@ trait PieceRenderer {
     val (left, top) = if (piece.owner.isBlack) {
       (layout.handBlack.left + layout.HAND_PIECE_WIDTH * (piece.ptype.sortId - 1), layout.handBlack.top)
     } else {
-      (layout.handWhite.left + layout.HAND_PIECE_WIDTH * (7 - piece.ptype.sortId), layout.handWhite.top)
+      (layout.handWhite.right - layout.HAND_PIECE_WIDTH * piece.ptype.sortId, layout.handWhite.top)
     }
     drawPiece(ctx, piece.toPiece, left, top, 6.0 / 7)
 
