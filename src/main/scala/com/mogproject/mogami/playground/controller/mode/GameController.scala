@@ -8,6 +8,9 @@ import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.io._
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.core.state.StateCache.Implicits._
+import com.mogproject.mogami.mate.MateSolver
+import com.mogproject.mogami.playground.view.parts.analyze.CheckmateButton
+import org.scalajs.dom
 
 import scala.util.{Failure, Success, Try}
 
@@ -296,4 +299,28 @@ trait GameController extends ModeController {
   override def deleteBranch(branchNo: BranchNo): Option[ModeController] = game.deleteBranch(branchNo).map(g =>
     this.copy(game = g, displayBranchNo = 0, displayPosition = 0)
   )
+
+  //
+  // Analyze operations
+  //
+  def analyzeCheckmate(timeoutSec: Int): Unit = {
+    CheckmateButton.displayCheckmateMessage("Analyzing...")
+
+    dom.window.setTimeout(() => {
+      MateSolver.solve(game.getState(gamePosition).get, getLastMove.map(_.to), timeLimitMillis = timeoutSec * 1000) match {
+        case None =>
+          CheckmateButton.displayCheckmateMessage("This position is too difficult to solve.")
+        case Some(Nil) =>
+          CheckmateButton.displayCheckmateMessage("No checkmates.")
+        case Some(mv) =>
+          val s = mv.map(m => m.player.toSymbolString() + (config.recordLang match {
+            case Japanese => m.toJapaneseNotationString
+            case English => m.toWesternNotationString
+          }))
+          CheckmateButton.displayCheckmateMessage(s"Found a checkmate:\n${s.mkString(" ")}")
+      }
+      dom.window.setTimeout(() => CheckmateButton.enableAnalyzeButton(), 500)
+    }, 100)
+
+  }
 }

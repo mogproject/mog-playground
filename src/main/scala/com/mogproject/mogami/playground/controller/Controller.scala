@@ -192,6 +192,14 @@ object Controller {
   }, _.renderAll())
 
   //
+  // Analyze section
+  //
+  def analyzeCheckmate(timeoutSec: Int): Unit = modeController match {
+    case Some(gc: GameController) => gc.analyzeCheckmate(timeoutSec)
+    case _ =>
+  }
+
+  //
   // Settings section
   //
   def setMessageLanguage(lang: Language): Unit = doAction({ mc =>
