@@ -106,6 +106,9 @@ trait ModeController {
   // cursor hold
   def invokeHoldEvent(cursor: Cursor, isFlipped: Boolean): Option[ModeController] = None
 
+  // cursor mouse up
+  def processMouseUp(selected: Cursor, released: Cursor): Option[Cursor] = None
+
   // actions
   def setMode(nextMode: Mode): Option[ModeController]
 
