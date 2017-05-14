@@ -123,10 +123,7 @@ object Controller {
 
   def invokeHoldEvent(invoked: Cursor, isFlipped: Boolean): Unit = doAction(_.invokeHoldEvent(invoked, isFlipped), _.renderAll())
 
-  def processMouseUp(selected: Cursor, released: Cursor): Option[Cursor] = modeController match {
-    case Some(pc: PlayModeController) => pc.processMouseUp(selected, released)
-    case _ => None
-  }
+  def processMouseUp(selected: Cursor, released: Cursor): Option[Cursor] = modeController.get.processMouseUp(selected, released)
 
   // actions
   def setMode(mode: Mode): Unit = if (!modeController.exists(_.mode == mode)) doAction(_.setMode(mode), _ => {})

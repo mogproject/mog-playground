@@ -128,6 +128,15 @@ case class EditModeController(renderer: Renderer,
     }
   }
 
+  /**
+    * Mouse up event in Edit Mode
+    *
+    * @param selected from
+    * @param released to
+    * @return
+    */
+  override def processMouseUp(selected: Cursor, released: Cursor): Option[Cursor] = (!selected.isPlayer).option(released)
+
   //
   // Actions
   //

@@ -121,7 +121,7 @@ case class PlayModeController(renderer: Renderer,
   private[this] def makeMoveOnCurrentBranch(move: Move): Option[GameController] =
     game.truncated(gamePosition).updateBranch(displayBranchNo)(_.makeMove(move)).map(g => this.copy(game = g, displayPosition = displayPosition + 1))
 
-  def processMouseUp(selected: Cursor, released: Cursor): Option[Cursor] = {
+  override def processMouseUp(selected: Cursor, released: Cursor): Option[Cursor] = {
     (selected.isBoard, selected.isHand, released.isBoard) match {
       case (true, false, true) =>
         for {
