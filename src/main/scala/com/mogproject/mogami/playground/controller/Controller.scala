@@ -6,7 +6,7 @@ import com.mogproject.mogami.{BranchNo, _}
 import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller.mode._
 import com.mogproject.mogami.playground.io.RecordFormat
-import com.mogproject.mogami.playground.view.parts.settings.BoardSizeButton.PresetBoardSize
+import com.mogproject.mogami.playground.view.parts.settings.BoardSizeButton.{Automatic, PresetBoardSize}
 import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipDisabled}
 import com.mogproject.mogami.playground.view.renderer.Renderer
 import org.scalajs.dom.Element
@@ -225,8 +225,14 @@ object Controller {
   }, _.refreshBoard())
 
   def changeBoardSize(size: PresetBoardSize): Unit = doAction({ mc =>
-    LocalStorage.saveSize(size.width)
-    Some(mc.updateConfig(mc.config.copy(canvasWidth = size.width)))
+    val newConfig = if (size == Automatic) {
+      LocalStorage.clearSize()
+      mc.config.updateScreenSize()
+    } else {
+      LocalStorage.saveSize(size.width)
+      mc.config.copy(canvasWidth = size.width)
+    }
+    Some(mc.updateConfig(newConfig))
   }, _.refreshBoard())
 
   def collapseSideBarRight(): Unit = modeController.get.renderer.collapseSideBarRight()
