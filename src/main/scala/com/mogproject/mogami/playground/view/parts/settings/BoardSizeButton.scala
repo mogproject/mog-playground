@@ -1,5 +1,6 @@
 package com.mogproject.mogami.playground.view.parts.settings
 
+import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.controller.{Configuration, Controller}
 import com.mogproject.mogami.playground.view.parts.common.DropdownMenu
 import org.scalajs.dom.html.Div
@@ -15,8 +16,10 @@ object BoardSizeButton {
     * definitions of board sizes
     */
   sealed abstract class PresetBoardSize(val width: Int, val label: String) {
-    override def toString: String = s"${width} - ${label}"
+    override def toString: String = (width == 0).fold("", width + " -") + label
   }
+
+  case object Automatic extends PresetBoardSize(0, "Automatic")
 
   case object LandscapeIPhone5 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(568, 320 - 44, isLandscape = true), "iPhone 5 (Landscape)")
 
@@ -40,8 +43,8 @@ object BoardSizeButton {
 
 
   private[this] lazy val sizeButton = DropdownMenu(
-    Vector(ExtraSmall, LandscapeIPhone5, LandscapeIPhone6, LandscapeIPhone6Plus, Small, PortraitIPhone5, Medium, PortraitIPhone6, Large, ExtraLarge),
-    8, "Board Size", _ => (), "btn-group", "left"
+    Vector(Automatic, ExtraSmall, LandscapeIPhone5, LandscapeIPhone6, LandscapeIPhone6Plus, Small, PortraitIPhone5, Medium, PortraitIPhone6, Large, ExtraLarge),
+    0, "Board Size", _ => (), "btn-group", "left"
   )
 
   private[this] val setButton = button(

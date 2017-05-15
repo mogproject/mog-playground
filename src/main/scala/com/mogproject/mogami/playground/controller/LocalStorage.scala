@@ -27,6 +27,8 @@ object LocalStorage {
 
   def saveSize(size: Int): Unit = setItem("size", size)
 
+  def clearSize(): Unit = dom.window.localStorage.removeItem("size")
+
   def saveDoubleBoardMode(enabled: Boolean): Unit = setItem("double", enabled)
 
   def saveMessageLang(lang: Language): Unit = setItem("mlang", lang)
