@@ -196,6 +196,11 @@ object Controller {
     case _ =>
   }
 
+  def countPoints(): Unit = modeController match {
+    case Some(gc: GameController) => gc.countPoints()
+    case _ =>
+  }
+
   //
   // Settings section
   //
