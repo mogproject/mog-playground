@@ -53,6 +53,10 @@ case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
 }
 
 object Configuration {
+
+  val LANDSCAPE_MARGIN_HEIGHT: Int = 44
+  val PORTRAIT_MARGIN_HEIGHT: Int = LANDSCAPE_MARGIN_HEIGHT * 2 + 20
+
   lazy val browserLanguage: Language = {
     def f(n: UndefOr[String]): Option[String] = n.toOption.flatMap(Option.apply)
 
@@ -72,9 +76,27 @@ object Configuration {
 
   def getIsLandscape: Boolean = MobileScreen.isLandscape
 
-  def getClientWidth: Double = dom.window.innerWidth
+  // possibly using an in-app browser
+  private[this] def isInAppBrowser: Boolean = defaultIsMobile && (getIsLandscape ^ dom.window.innerWidth > dom.window.innerHeight)
 
-  def getClientHeight: Double = dom.window.innerHeight
+  def getScreenWidth: Double = (defaultIsMobile, getIsLandscape) match {
+    case (true, true) => math.max(dom.window.screen.width, dom.window.screen.height)
+    case (true, false) => math.min(dom.window.screen.width, dom.window.screen.height)
+    case (false, _) => dom.window.screen.width
+  }
+
+  def getScreenHeight: Double = (defaultIsMobile, getIsLandscape) match {
+    case (true, true) => math.min(dom.window.screen.width, dom.window.screen.height)
+    case (true, false) => math.max(dom.window.screen.width, dom.window.screen.height)
+    case (false, _) => dom.window.screen.height
+  }
+
+  def getClientWidth: Double = isInAppBrowser.fold(getScreenWidth, dom.window.innerWidth)
+
+  def getClientHeight: Double = if (isInAppBrowser)
+    getScreenHeight - getIsLandscape.fold(LANDSCAPE_MARGIN_HEIGHT, PORTRAIT_MARGIN_HEIGHT)
+  else
+    math.min(dom.window.innerHeight, getScreenHeight - LANDSCAPE_MARGIN_HEIGHT)
 
   def getDefaultCanvasWidth: Int = getDefaultCanvasWidth(getClientWidth, getClientHeight, getIsLandscape)
 
