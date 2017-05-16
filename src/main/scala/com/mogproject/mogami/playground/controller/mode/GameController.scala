@@ -1,7 +1,6 @@
 package com.mogproject.mogami.playground.controller.mode
 
 import com.mogproject.mogami._
-import com.mogproject.mogami.core.game.Game.{BranchNo, GamePosition}
 import com.mogproject.mogami.core.move.IllegalMove
 import com.mogproject.mogami.playground.api.google.URLShortener
 import com.mogproject.mogami.playground.controller._
@@ -9,7 +8,7 @@ import com.mogproject.mogami.playground.io._
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.core.state.StateCache.Implicits._
 import com.mogproject.mogami.mate.MateSolver
-import com.mogproject.mogami.playground.view.parts.analyze.CheckmateButton
+import com.mogproject.mogami.playground.view.parts.analyze.{CheckmateButton, PointCountButton}
 import org.scalajs.dom
 
 import scala.util.{Failure, Success, Try}
@@ -162,6 +161,7 @@ trait GameController extends ModeController {
     renderControl()
     renderUrls()
     renderComment()
+    PointCountButton.clearMessage() // todo: refactor to use Renderer
   }
 
   override def initializeBoardControl(): Unit = {
@@ -307,7 +307,7 @@ trait GameController extends ModeController {
     CheckmateButton.displayCheckmateMessage("Analyzing...")
 
     dom.window.setTimeout(() => {
-      MateSolver.solve(game.getState(gamePosition).get, getLastMove.map(_.to), timeLimitMillis = timeoutSec * 1000) match {
+      MateSolver.solve(selectedState, getLastMove.map(_.to), timeLimitMillis = timeoutSec * 1000) match {
         case None =>
           CheckmateButton.displayCheckmateMessage("This position is too difficult to solve.")
         case Some(Nil) =>
@@ -322,5 +322,26 @@ trait GameController extends ModeController {
       dom.window.setTimeout(() => CheckmateButton.enableAnalyzeButton(), 500)
     }, 100)
 
+  }
+
+  def countPoints(): Unit = {
+    def f: Ptype => Int = {
+      case BISHOP | ROOK => 5
+      case KING => 0
+      case _ => 1
+    }
+
+    val t = selectedState.turn
+    val points = selectedState.board.filter(_._2.owner == t).map(x => f(x._2.ptype.demoted)).sum +
+      selectedState.hand.filter(_._1.owner == t).map { case (k, v) => f(k.ptype) * v }.sum
+    val isKingInPromotionZone = selectedState.turnsKing.exists(_.isPromotionZone(t))
+    val numPiecesInPromotionZone = selectedState.board.count { case (k, v) => k.isPromotionZone(t) && v.owner == t && v.ptype != KING}
+    val plural = (1 < numPiecesInPromotionZone).fold("s", "")
+
+    val msg = Seq(
+      s"Points: ${points}",
+      "In the promotion zone: " + isKingInPromotionZone.fold("King + ", "") + s"${numPiecesInPromotionZone} piece${plural}"
+    ).mkString("\n")
+    PointCountButton.displayMessage(msg)
   }
 }

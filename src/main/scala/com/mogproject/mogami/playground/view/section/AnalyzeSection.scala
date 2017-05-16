@@ -1,8 +1,6 @@
 package com.mogproject.mogami.playground.view.section
 
-import com.mogproject.mogami.playground.controller.Language
-import com.mogproject.mogami.playground.view.parts.action.ResignButton
-import com.mogproject.mogami.playground.view.parts.analyze.CheckmateButton
+import com.mogproject.mogami.playground.view.parts.analyze.{CheckmateButton, PointCountButton}
 import com.mogproject.mogami.playground.view.parts.common.AccordionMenu
 
 import scalatags.JsDom.all._
@@ -20,7 +18,10 @@ object AnalyzeSection extends Section {
       isVisible = true,
       div(
         label("Analyze for Checkmate"),
-        CheckmateButton.output
+        CheckmateButton.output,
+        br(),
+        label("Count points"),
+        PointCountButton.output
       )
     )
   )
