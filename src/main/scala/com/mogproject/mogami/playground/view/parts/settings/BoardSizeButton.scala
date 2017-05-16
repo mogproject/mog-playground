@@ -2,6 +2,7 @@ package com.mogproject.mogami.playground.view.parts.settings
 
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.controller.{Configuration, Controller}
+import com.mogproject.mogami.playground.controller.Configuration.{LANDSCAPE_MARGIN_HEIGHT, PORTRAIT_MARGIN_HEIGHT}
 import com.mogproject.mogami.playground.view.parts.common.DropdownMenu
 import org.scalajs.dom.html.Div
 
@@ -21,15 +22,15 @@ object BoardSizeButton {
 
   case object Automatic extends PresetBoardSize(0, "Automatic")
 
-  case object LandscapeIPhone5 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(568, 320 - 44, isLandscape = true), "iPhone 5 (Landscape)")
+  case object LandscapeIPhone5 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(568, 320 - LANDSCAPE_MARGIN_HEIGHT, isLandscape = true), "iPhone 5 (Landscape)")
 
-  case object LandscapeIPhone6 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(667, 375 - 44, isLandscape = true), "iPhone 6 (Landscape)")
+  case object LandscapeIPhone6 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(667, 375 - LANDSCAPE_MARGIN_HEIGHT, isLandscape = true), "iPhone 6 (Landscape)")
 
-  case object LandscapeIPhone6Plus extends PresetBoardSize(Configuration.getDefaultCanvasWidth(736, 414 - 44, isLandscape = true), "iPhone 6 Plus (Landscape)")
+  case object LandscapeIPhone6Plus extends PresetBoardSize(Configuration.getDefaultCanvasWidth(736, 414 - LANDSCAPE_MARGIN_HEIGHT, isLandscape = true), "iPhone 6 Plus (Landscape)")
 
-  case object PortraitIPhone5 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(320, 568 - 108, isLandscape = false), "iPhone 5 (Portrait)")
+  case object PortraitIPhone5 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(320, 568 - PORTRAIT_MARGIN_HEIGHT, isLandscape = false), "iPhone 5 (Portrait)")
 
-  case object PortraitIPhone6 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(375, 667 - 108, isLandscape = false), "iPhone 6 (Portrait)")
+  case object PortraitIPhone6 extends PresetBoardSize(Configuration.getDefaultCanvasWidth(375, 667 - PORTRAIT_MARGIN_HEIGHT, isLandscape = false), "iPhone 6 (Portrait)")
 
   case object ExtraSmall extends PresetBoardSize(120, "Extra Small")
 
