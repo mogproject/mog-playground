@@ -46,7 +46,7 @@ class Renderer extends BoardRenderer {
         mainPane // main content
       ),
       hr(),
-      small(p(textAlign := "right", marginRight := 20, "Shogi Playground © 2017 ", a(href := "http://mogproject.com", target := "_blank", "mogproject")))
+      small(p(textAlign := "right", marginRight := 20, "Shogi Playground © 2017 ", a(href := "https://mogproject.com", target := "_blank", "mogproject")))
     )
   ).render
 
