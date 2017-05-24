@@ -8,7 +8,7 @@ import scala.scalajs.js
   *
   */
 case class URLShortener(
-                         baseUrl: String = "http://play.mogproject.com/",
+                         baseUrl: String = "https://play.mogproject.com/",
                          apiKey: String = "AIzaSyD5UJMg2z6OHFo-AnQPJLK0oV8tf6BH6Nc" // todo: application.conf
                        ) {
   private[this] var initialized: Option[Thenable] = None
