@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport"
+        content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <meta name="description" content="A mobile-friendly shogi playground">
+  <meta name="author" content="mogproject">
+  <link rel="shortcut icon" href="assets/ico/favicon.ico" type="image/x-icon" />
+  <link rel="apple-touch-icon" sizes="57x57" href="assets/ico/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="assets/ico/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="assets/ico/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="assets/ico/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="assets/ico/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="assets/ico/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="assets/ico/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="assets/ico/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/ico/apple-touch-icon-180x180.png">
+  <link rel="icon" type="image/png" href="assets/ico/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="assets/ico/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="assets/ico/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/png" href="assets/ico/android-chrome-192x192.png" sizes="192x192">
+  <meta name="msapplication-config" content="/browserconfig.xml" />
+
+  <title>Shogi Bot Help</title>
+  <!-- Google Analytics -->
+  <script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-82861110-2', 'auto');
+ga('send', 'pageview');
+  </script>
+</head>
+
+<body>
+<h3>Shogi Bot - How to text a move</h3>
+<p>Shogi Bot recognizes vague descriptions. Each section is optional and case-insensitive. The notation order does not matter except <i>Origin</i> (must be before <i>Destination</i>) and <i>Promotion</i> (must be at the end). </p>
+
+<h4>1. Destination</h4>
+<p>The simplest way to text your move is just to put a destination. Western, Japanese, and CSA notations are acceptable.</p>
+<ul>
+  <li>Western notation: '1a', '7f', '9i', etc.</li>
+  <li>Japanese notation: '１一', '７六', '９九', '１１', '７６', '９９' etc.</li>
+  <li>CSA notation: '11', '76', '99', etc.</li>
+</ul>
+<p>If your notation is ambiguous, additional choice buttons will show up.</p>
+<p>You can omit this notation if your destination is <strong>the same as the preceding piece</strong>.</p>
+
+<h4>2. Origin</h4>
+<p>TBD</p>
+
+<h4>3. Piece</h4>
+<p>Shogi Bot accepts both Western and CSA notations.</p>
+<ul>
+  <li>Pawn: 'P', 'F', 'FU'</li>
+  <li>Promoted Pawn: '+P', 'PP', 'T', 'TO'</li>
+  
+  <li>Lance: 'L', 'KY'</li>
+  <li>Promoted Lance: '+L', 'PL', 'NY'</li>
+  
+  <li>Knight: 'N', 'KE'</li>
+  <li>Promoted Knight: '+N', 'PN', 'NK'</li>
+
+  <li>Silver: 'S', 'GI'</li>
+  <li>Promoted Silver: '+S', 'PS', 'NG'</li>
+
+  <li>Gold: 'G', 'KI'</li>
+
+  <li>Bishop: 'B', 'KA'</li>
+  <li>Promoted Bishop: '+B', 'PB', 'U', 'UM'</li>
+
+  <li>Rook: 'R', 'H', 'HI'</li>
+  <li>Promoted Rook: '+R', 'PR', 'RY'</li>
+
+  <li>King: 'K', 'OU'</li>
+</ul>
+
+<h4>4. Drop or Simple Move</h4>
+<ul>
+  <li>Drop: '*', '00'</li>
+  <li>Simple Move: '-', 'x'</li>
+</ul>
+
+<h4>5. Promotion</h4>
+<p>You can specify a promotion flag <strong>at the end of your test</strong></p>
+<ul>
+  <li>Promote: '+'</li>
+  <li>Unpromote: '='</li>
+</ul>
+</body>
+
+</html>
