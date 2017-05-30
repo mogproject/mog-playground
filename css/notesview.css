@@ -15,7 +15,7 @@
 
 .shogi-body {
   padding: 0px 0px 0px 8px;
-  font-family: "Hiragino Mincho ProN", serif;
+  font-family: "Source Han Serif", "Hiragino Mincho ProN", serif;
   font-size: 18px;
 }
 
@@ -70,6 +70,7 @@
 
 /* shogi piece last move */
 .sp-b {
+  font-family: "Hiragino Kaku Gothic ProN", sans-serif;
   font-weight: bold;
 }
 
