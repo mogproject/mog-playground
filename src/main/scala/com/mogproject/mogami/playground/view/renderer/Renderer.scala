@@ -8,6 +8,7 @@ import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.modal._
 import com.mogproject.mogami.playground.view.renderer.BoardRenderer.DoubleBoard
 import com.mogproject.mogami.{BranchNo, GamePosition, _}
+import com.mogproject.mogami.core.state.StateCache
 import org.scalajs.dom.UIEvent
 import org.scalajs.dom.html.Div
 
@@ -236,4 +237,11 @@ class Renderer extends BoardRenderer {
     recenterMainPane()
   }
 
+  //
+  // Notes action
+  //
+  def drawNotes(game: Game, recordLang: Language)(implicit stateCache: StateCache): Unit = {
+    dom.window.document.head.appendChild(link(rel := "stylesheet", tpe := "text/css", href :="assets/css/notesview.css").render)
+    dom.window.document.body.innerHTML = game.trunk.toHtmlString(recordLang == Japanese)
+  }
 }

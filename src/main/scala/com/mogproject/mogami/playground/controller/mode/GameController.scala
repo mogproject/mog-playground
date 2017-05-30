@@ -137,7 +137,7 @@ trait GameController extends ModeController {
     *
     * @param gameInfo game info
     */
-  override def setGameInfo(gameInfo: GameInfo): Option[ModeController] = Some(this.copy(game = game.copy(gameInfo = gameInfo)))
+  override def setGameInfo(gameInfo: GameInfo): Option[ModeController] = Some(this.copy(game = game.copy(newGameInfo = gameInfo)))
 
   /**
     * Set comments
@@ -150,7 +150,7 @@ trait GameController extends ModeController {
     */
   override def updateConfig(config: Configuration): ModeController = this.copy(config = config)
 
-  override def updateGameInfo(gameInfo: GameInfo): ModeController = this.copy(game = game.copy(gameInfo = gameInfo))
+  override def updateGameInfo(gameInfo: GameInfo): ModeController = this.copy(game = game.copy(newGameInfo = gameInfo))
 
   //
   // renderer

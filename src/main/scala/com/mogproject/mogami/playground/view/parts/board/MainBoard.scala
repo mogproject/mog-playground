@@ -206,13 +206,8 @@ case class MainBoard(canvasWidth: Int,
     * Draw illegal state
     */
   def drawIllegalStatePieces(state: State, move: Move): Unit = {
-    val releaseBoard: BoardType => BoardType = move.from.when(sq => b => b - sq)
-    val releaseHand: HandType => HandType = move.isDrop.when(MapUtil.decrementMap(_, Hand(move.newPiece)))
-    val obtainHand: HandType => HandType = move.capturedPiece.when(p => h => MapUtil.incrementMap(h, Hand(!p.demoted)))
-
-    val board = releaseBoard(state.board) + (move.to -> move.newPiece)
-    val hand = (releaseHand andThen obtainHand) (state.hand)
-    drawPieces(board, hand)
+    val (newBoard, newHand) = state.makeNextPosition(move)
+    drawPieces(newBoard, newHand)
   }
 
   def clearPieces(): Unit = {

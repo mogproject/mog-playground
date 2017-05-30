@@ -75,6 +75,7 @@ case class Arguments(sfen: Option[String] = None, // deprecated
       }
       case ("action" :: s :: Nil) :: xs => s match {
         case "image" => f(sofar.copy(action = ImageAction), xs)
+        case "notes" => f(sofar.copy(action = NotesAction), xs)
         case _ =>
           println(s"Invalid parameter: action=${s}")
           f(sofar, xs)
