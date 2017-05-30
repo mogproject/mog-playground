@@ -51,7 +51,11 @@ object Controller {
     modeController.get.initialize()
 
     // create image if the action is ImageAction
-    if (args.action == ImageAction) renderer.drawAsImage()
+    args.action match {
+      case ImageAction => renderer.drawAsImage()
+      case NotesAction => renderer.drawNotes(game, config.recordLang)
+      case _ =>
+    }
   }
 
   private[this] def createGameFromArgs(args: Arguments): Game = {

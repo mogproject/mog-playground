@@ -32,8 +32,8 @@
 
 .shogi-board>tbody>tr>td {
   border: 1px solid #000000;
-  width: 19px;
-  height: 19px;
+  width: 21px;
+  height: 21px;
   text-align: center;
 }
 
@@ -59,7 +59,7 @@
 /* shogi piece inverted */
 .sp-i {
   transform: rotate(180deg);
-  transform-origin: 11px 11px;
+  transform-origin: 50% 50%;
   padding-left: 0px !important;
 }
 
