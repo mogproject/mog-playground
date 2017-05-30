@@ -1,0 +1,75 @@
+.shogi-state {
+  background-color: #f0f0f0;
+  border: 1px solid #cccccc;
+  line-height: 1.0;
+  width: 216px;
+  height: 300px;
+  margin: 14px;
+  padding: 0;
+}
+
+.shogi-header {
+  background-color: #ffffff;
+  padding: 8px 0px 8px 14px;
+}
+
+.shogi-body {
+  padding: 0px 0px 0px 8px;
+  font-family: "Hiragino Mincho ProN", serif;
+  font-size: 18px;
+}
+
+.shogi-hand {
+  padding: 6px 0px 6px 0px;
+  font-size: 16px;
+}
+
+.shogi-board {
+  border-collapse: collapse;
+  background-color: #ffffff;
+  margin-left: 4px;
+}
+
+.shogi-board>tbody>tr>td {
+  border: 1px solid #000000;
+  width: 19px;
+  height: 19px;
+  text-align: center;
+}
+
+/* shogi board index (filewise) */
+.sb-f {
+  border: none !important;
+  height: 10px !important;
+  border-top: 1px solid #f0f0f0 !important;
+  background-color: #f0f0f0 !important;
+  font-size: 12px;
+  vertical-align: bottom;
+}
+
+/* shogi board index (rankwise) */
+.sb-r {
+  border: 1px solid #f0f0f0 !important;
+  background-color: #f0f0f0 !important;
+  width: 10px !important;
+  font-size: 12px;
+  text-align: left !important;
+  padding-left: 2px;
+}
+/* shogi piece inverted */
+.sp-i {
+  transform: rotate(180deg);
+  transform-origin: 11px 11px;
+  padding-left: 0px !important;
+}
+
+/* shogi piece promoted */
+.sp-p {
+  color: #d9534f;
+}
+
+/* shogi piece last move */
+.sp-b {
+  font-weight: bold;
+}
+
