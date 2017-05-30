@@ -66,7 +66,7 @@ object Controller {
       case (Some(u), _) => loadGame(Game.parseUsenString(u)) // parse USEN string
       case (_, Some(s)) => loadGame(Game.parseSfenString(s)) // parse SFEN string
       case _ => Game()
-    }).copy(gameInfo = args.gameInfo)
+    }).copy(newGameInfo = args.gameInfo)
 
     // update comments
     val comments = for {
@@ -74,7 +74,7 @@ object Controller {
       (pos, c) <- m
       h <- gg.getHistoryHash(GamePosition(b, pos))
     } yield h -> c
-    gg.copy(comments = comments)
+    gg.copy(newComments = comments)
   }
 
   /**
