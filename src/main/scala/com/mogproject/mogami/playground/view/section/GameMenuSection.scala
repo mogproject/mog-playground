@@ -30,7 +30,10 @@ object GameMenuSection extends Section {
         br(),
         ImageLinkButton.output,
         br(),
-        SfenStringCopyButton.output
+        SfenStringCopyButton.output,
+        br(),
+        NotesViewButton.output,
+        NotesViewShortenButton.output
       )
     ),
     AccordionMenu(
@@ -56,10 +59,11 @@ object GameMenuSection extends Section {
   )
 
   def updateCommentOmissionWarning(displayWarning: Boolean): Unit =
-    if (displayWarning)
+    if (displayWarning) {
       RecordCopyButton.showWarning()
-    else
+    } else {
       RecordCopyButton.hideWarning()
+    }
 
   def updateBranchButtons(game: Game, gamePosition: GamePosition, language: Language): Unit =
     BranchButton.updateButtons(game, gamePosition, language)

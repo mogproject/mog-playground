@@ -206,6 +206,9 @@ trait GameController extends ModeController {
     renderer.updateSnapshotUrl(argumentsBuilder.toSnapshotUrl)
     renderer.updateSnapshotShortUrl("", completed = false)
 
+    renderer.updateNotesViewUrl(argumentsBuilder.toNotesViewUrl)
+    renderer.updateNotesViewShortUrl("", completed = false)
+
     renderer.updateCommentOmissionWarning(argumentsBuilder.commentOmitted)
   }
 
@@ -230,6 +233,13 @@ trait GameController extends ModeController {
     renderer.updateRecordShortUrl("creating...", completed = false)
     shortener.makeShortenedURL(renderer.getRecordUrl, renderer.updateRecordShortUrl(_, completed = true), s => {
       renderer.updateRecordShortUrl(s, completed = false)
+    })
+  }
+
+  def shortenNotesViewUrl(shortener: URLShortener): Unit = {
+    renderer.updateNotesViewShortUrl("creating...", completed = false)
+    shortener.makeShortenedURL(renderer.getNotesViewUrl, renderer.updateNotesViewShortUrl(_, completed = true), s => {
+      renderer.updateNotesViewShortUrl(s, completed = false)
     })
   }
 
