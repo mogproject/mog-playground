@@ -8,21 +8,25 @@ import scalatags.JsDom.all._
 /**
   *
   */
-object RecordCopyButton extends CopyButtonLike with WarningLabelLike {
-  override protected val ident = "record-copy"
+object NotesViewButton extends CopyButtonLike with ViewButtonLike {
+  override protected val ident = "notes-view"
 
-  override protected val labelString = "Record URL"
+  override protected val labelString = "Notes View"
 
   override lazy val output: Div = div(
-    warningLabel,
     label(labelString),
     div(cls := "input-group",
       inputElem,
       div(
         cls := "input-group-btn",
+        viewButton,
         copyButton
       )
     )
   ).render
 
+  override def updateValue(value: String): Unit = {
+    super.updateValue(value)
+    updateViewUrl(value)
+  }
 }

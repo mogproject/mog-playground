@@ -157,6 +157,11 @@ object Controller {
     case _ =>
   }
 
+  def shortenNotesViewUrl(): Unit = modeController match {
+    case Some(gc: GameController) => gc.shortenNotesViewUrl(urlShortener)
+    case _ =>
+  }
+
   def saveRecord(format: RecordFormat, fileName: String): Unit = modeController match {
     case Some(gc: GameController) => gc.saveRecord(format, fileName)
     case _ =>

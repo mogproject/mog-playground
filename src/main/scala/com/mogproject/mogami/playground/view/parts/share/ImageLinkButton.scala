@@ -6,7 +6,7 @@ import org.scalajs.dom.html.Div
 import scalatags.JsDom.all._
 
 
-object ImageLinkButton extends CopyButtonLike {
+object ImageLinkButton extends CopyButtonLike with ViewButtonLike {
 
   /**
     * definitions of image sizes
@@ -29,13 +29,6 @@ object ImageLinkButton extends CopyButtonLike {
 
   private[this] val sizeButton = DropdownMenu(Vector(Small, Medium, Large), 1, "Image Size", _ => updateValueWithSize())
 
-  private[this] val viewButton = a(
-    cls := "btn btn-default",
-    tpe := "button",
-    target := "_blank",
-    "View"
-  ).render
-
   override lazy val output: Div = div(
     label(labelString),
     div(cls := "input-group",
@@ -57,7 +50,7 @@ object ImageLinkButton extends CopyButtonLike {
     val url = base.replaceAll("[&]size=\\d+", "") + sizeParams
 
     super.updateValue(url)
-    viewButton.href = url
+    updateViewUrl(url)
   }
 
 }

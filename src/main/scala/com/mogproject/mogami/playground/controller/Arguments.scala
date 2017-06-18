@@ -122,7 +122,7 @@ case class ArgumentsBuilder(game: Game,
 
   private[this] lazy val instantGame = Game(Branch(game.getState(gamePosition).get))
 
-  lazy val fullRecordUrl: String = createUrl(gameParams ++ commentParams ++ gameInfoParams ++ positionParams)
+  lazy val fullRecordUrl: String = createUrl(recordParams(createFullUrl = true))
 
   /**
     * true if comments are too long and omitted
@@ -157,6 +157,8 @@ case class ArgumentsBuilder(game: Game,
     }
   }
 
+  def toNotesViewUrl: String = createUrl(notesViewActionParams ++ recordParams())
+
   private[this] def gameInfoParams: Seq[(String, String)] = {
     val params = List(("bn", 'blackName), ("wn", 'whiteName))
     params.flatMap { case (q, k) => game.gameInfo.tags.get(k).map((q, _)) }
@@ -167,7 +169,12 @@ case class ArgumentsBuilder(game: Game,
     (gamePosition.branch != 0 || gamePosition.position != game.trunk.offset).option(("move", s"${prefix}${gamePosition.position}")).toSeq
   }
 
+  private[this] def recordParams(createFullUrl: Boolean = false): Seq[(String, String)] =
+    gameParams ++ (createFullUrl || !commentOmitted).fold(commentParams, Seq.empty) ++ gameInfoParams ++ positionParams
+
   private[this] def imageActionParams: Seq[(String, String)] = Seq(("action", "image"))
+
+  private[this] def notesViewActionParams: Seq[(String, String)] = Seq(("action", "notes"))
 
   private[this] def createUrl(params: Seq[(String, String)]) = {
     config.baseUrl + "?" + (params.map { case (k, v) => k + "=" + encodeURIComponent(v) } ++ config.toQueryParameters).mkString("&")

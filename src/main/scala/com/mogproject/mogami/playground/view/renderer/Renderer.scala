@@ -145,6 +145,12 @@ class Renderer extends BoardRenderer {
 
   def updateSfenString(sfen: String): Unit = SfenStringCopyButton.updateValue(sfen)
 
+  def getNotesViewUrl: String = NotesViewButton.getValue
+
+  def updateNotesViewUrl(url: String): Unit = NotesViewButton.updateValue(url)
+
+  def updateNotesViewShortUrl(url: String, completed: Boolean): Unit = NotesViewShortenButton.updateValue(url, completed)
+
   def updateCommentOmissionWarning(displayWarning: Boolean): Unit = GameMenuSection.updateCommentOmissionWarning(displayWarning)
 
   // navigator section
