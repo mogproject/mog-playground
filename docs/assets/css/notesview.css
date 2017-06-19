@@ -1,9 +1,7 @@
 .shogi-state {
-  background-color: #f0f0f0;
-  border: 1px solid #cccccc;
+  border: 1px solid #aaaaaa;
   line-height: 1.0;
-  width: 216px;
-  height: 300px;
+  width: 480px;
   margin: 14px;
   padding: 0;
 }
@@ -11,20 +9,27 @@
 .shogi-header {
   background-color: #ffffff;
   padding: 8px 0px 8px 14px;
+  border-style: solid;
+  border-width: 0px 0px 1px 0px;
+  border-color: #aaaaaa;
 }
 
 .shogi-body {
+  width: 220px;
+  background-color: #f0f0f0;
   padding: 0px 0px 0px 8px;
   font-family: "Source Han Serif", "Hiragino Mincho ProN", serif;
   font-size: 18px;
 }
 
 .shogi-hand {
+  width: 208px;
   padding: 6px 0px 6px 0px;
   font-size: 16px;
 }
 
 .shogi-board {
+  width: 202px;
   border-collapse: collapse;
   background-color: #ffffff;
   margin-left: 4px;
@@ -37,11 +42,20 @@
   text-align: center;
 }
 
+.shogi-comment {
+  font-size: 14px;
+  background-color: #ffffff;
+  width: 100%;
+  padding: 8px 8px 8px 12px;
+  border-style: solid;
+  border-width: 0px 0px 0px 1px;
+  border-color: #aaaaaa;
+}
+
 /* shogi board index (filewise) */
 .sb-f {
   border: none !important;
   height: 10px !important;
-  border-top: 1px solid #f0f0f0 !important;
   background-color: #f0f0f0 !important;
   font-size: 12px;
   vertical-align: bottom;
@@ -49,7 +63,7 @@
 
 /* shogi board index (rankwise) */
 .sb-r {
-  border: 1px solid #f0f0f0 !important;
+  border: none !important;
   background-color: #f0f0f0 !important;
   width: 10px !important;
   font-size: 12px;
