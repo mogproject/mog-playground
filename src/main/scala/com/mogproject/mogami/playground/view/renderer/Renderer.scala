@@ -248,6 +248,6 @@ class Renderer extends BoardRenderer {
   //
   def drawNotes(game: Game, recordLang: Language)(implicit stateCache: StateCache): Unit = {
     dom.window.document.head.appendChild(link(rel := "stylesheet", tpe := "text/css", href :="assets/css/notesview.css").render)
-    dom.window.document.body.innerHTML = game.trunk.toHtmlString(recordLang == Japanese)
+    dom.window.document.body.innerHTML = game.trunk.toHtmlString(recordLang == Japanese, game.comments)
   }
 }
