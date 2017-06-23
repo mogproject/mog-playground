@@ -46,11 +46,13 @@ object MenuDialog extends ModalLike {
   }
 
   override def show(): Unit = {
+    GameMenuSection.showBranchMenu()
     dialogElem.getOrElse(createDialog()).modal("show")
   }
 
   def hide(): Unit = {
     dialogElem.foreach(_.modal("hide"))
+    GameMenuSection.hideBranchMenu()
   }
 
 }

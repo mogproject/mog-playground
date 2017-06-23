@@ -14,6 +14,17 @@ import scalatags.JsDom.all._
   *
   */
 object GameMenuSection extends Section {
+  private[this] val branchMenu = AccordionMenu(
+    "Branch",
+    "Branch",
+    "share-alt",
+    isExpanded = false,
+    isVisible = false,
+    div(
+      BranchButton.output
+    )
+  )
+
   override val accordions: Seq[AccordionMenu] = Seq(
     AccordionMenu(
       "Share",
@@ -36,16 +47,7 @@ object GameMenuSection extends Section {
         NotesViewShortenButton.output
       )
     ),
-    AccordionMenu(
-      "Branch",
-      "Branch",
-      "share-alt",
-      isExpanded = false,
-      isVisible = true,
-      div(
-        BranchButton.output
-      )
-    ),
+    branchMenu,
     AccordionMenu(
       "Manage",
       "Manage",
@@ -71,6 +73,10 @@ object GameMenuSection extends Section {
   def showBranchEditMenu(): Unit = BranchButton.showEditMenu()
 
   def hideBranchEditMenu(): Unit = BranchButton.hideEditMenu()
+
+  def showBranchMenu(): Unit = branchMenu.output.style.display = display.block.v
+
+  def hideBranchMenu(): Unit = branchMenu.output.style.display = display.none.v
 
   def getIsNewBranchMode: Boolean = BranchButton.getIsNewBranchMode
 

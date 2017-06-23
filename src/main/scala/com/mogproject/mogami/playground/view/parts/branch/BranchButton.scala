@@ -5,29 +5,34 @@ import com.mogproject.mogami.core.game.Game.GamePosition
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.parts.common.RadioButton
-import org.scalajs.dom.html.{Button, Div}
+import org.scalajs.dom.html.{Button, Div, Span}
 import org.scalajs.dom.raw.HTMLSelectElement
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
+import org.scalajs.dom.Event
 
+import scalatags.JsDom.TypedTag
 import scalatags.JsDom.all._
 
 /**
   *
   */
 object BranchButton {
+  private[this] var compactButtonInitiated = false
 
-  private[this] lazy val changeBranchButton: HTMLSelectElement = select(
+  /** generation functions */
+  private[this] def createBranchButton: HTMLSelectElement = select(
     cls := "form-control",
     width := "100%",
-    onchange := (() => Controller.changeBranch(changeBranchButton.selectedIndex, None))
+    onchange := { e: Event =>
+      e.target match {
+        case elem: HTMLSelectElement => Controller.changeBranch(elem.selectedIndex, None)
+        case _ => // do nothing
+      }
+    }
   ).render
 
-  private[this] lazy val forksButtons = div("").render
-
-  private[this] lazy val newBranchButton: RadioButton[Boolean] = RadioButton(Seq(false, true), Map(English -> Seq("Off", "On")))
-
-  private[this] lazy val deleteBranchButton = button(
+  private[this] def createDeleteBranchButton(label: Either[String, TypedTag[Span]]) = button(
     tpe := "button",
     cls := "btn btn-default btn-block",
     data("toggle") := "tooltip",
@@ -35,21 +40,59 @@ object BranchButton {
     data("original-title") := "Delete this branch",
     data("dismiss") := "modal",
     onclick := { () => Controller.askDeleteBranch() },
-    "Delete"
+    label.isLeft.fold(label.left.get, label.right.get)
   ).render
+
+  private[this] def createNewBranchButton(isCompact: Boolean): RadioButton[Boolean] = RadioButton(
+    Seq(false, true),
+    Map(English -> Seq("Off", "On")),
+    onClick = { _ => updateNewBranchButtons(isCompact) },
+    tooltip = isCompact.option("Creates a new branch")
+  )
+
+  private[this] lazy val changeBranchButton: HTMLSelectElement = createBranchButton
+
+  private[this] lazy val forksButtons = div("").render
+
+  private[this] lazy val newBranchButton: RadioButton[Boolean] = createNewBranchButton(false)
+
+  private[this] lazy val deleteBranchButton = createDeleteBranchButton(Left("Delete"))
+
+  /** elements for the compact version */
+  private[this] lazy val changeBranchButtonCompact: HTMLSelectElement = createBranchButton
+
+  private[this] lazy val newBranchButtonCompact: RadioButton[Boolean] = createNewBranchButton(true)
+
+  private[this] lazy val deleteBranchButtonCompact = createDeleteBranchButton(Right(span(cls := "glyphicon glyphicon-trash")))
+
+  private[this] lazy val forksButtonsCompact = div("").render
 
   private[this] def branchNoToString(branchNo: BranchNo): String = (branchNo == 0).fold("Trunk", s"Branch#${branchNo}")
 
   private[this] def updateBranchList(numBranches: Int, displayBranch: BranchNo): Unit = {
-    changeBranchButton.innerHTML = (0 to numBranches).map(s => option(branchNoToString(s))).toString
+    val s = (0 to numBranches).map(s => option(branchNoToString(s))).toString
+    changeBranchButton.innerHTML = s
     changeBranchButton.selectedIndex = displayBranch
+
+    if (compactButtonInitiated) {
+      changeBranchButtonCompact.innerHTML = s
+      changeBranchButtonCompact.selectedIndex = displayBranch
+    }
   }
 
-  private[this] def createForkButton(move: Move, branchNo: BranchNo, language: Language): Button = button(
+  private[this] def updateNewBranchButtons(isCompact: Boolean): Unit = {
+    if (isCompact) {
+      newBranchButton.updateValue(newBranchButtonCompact.getValue)
+    } else if (compactButtonInitiated) {
+      newBranchButtonCompact.updateValue(newBranchButton.getValue)
+    }
+  }
+
+  private[this] def createForkButton(move: Move, branchNo: BranchNo, language: Language, tooltipPlacement: String): Button = button(
     tpe := "button",
     cls := "btn btn-default btn-block",
     data("toggle") := "tooltip",
-    data("placement") := "bottom",
+    data("placement") := tooltipPlacement,
     data("original-title") := branchNoToString(branchNo),
     data("dismiss") := "modal",
     onclick := { () => dom.window.setTimeout(() => Controller.changeBranch(branchNo, Some(1)), 0) },
@@ -88,38 +131,94 @@ object BranchButton {
     playModeMenu
   ).render
 
+  lazy val outputCompact: Div = {
+    compactButtonInitiated = true
+
+    div(
+      div(cls := "row",
+        marginRight := 12.px,
+        marginBottom := 10.px,
+        div(cls := "col-xs-6", label("Branch")),
+        div(cls := "col-xs-6", marginTop := (-6).px,
+          newBranchButtonCompact.output)
+      ),
+      div(
+        marginLeft := 14.px,
+        marginBottom := 20.px,
+        div(cls := "btn-group", role := "group",
+          div(cls := "btn-group", width := 130.px, marginBottom := 10.px, changeBranchButtonCompact),
+          div(cls := "btn-group", deleteBranchButtonCompact)
+        ),
+        forksButtonsCompact
+      )
+    ).render
+  }
+
   //
   // initialize
   //
   def initialize(): Unit = {
     newBranchButton.initialize(false, English)
+
+    if (compactButtonInitiated) {
+      newBranchButtonCompact.initialize(false, English)
+    }
   }
 
   //
   // actions
   //
-  def showEditMenu(): Unit = playModeMenu.style.display = display.block.v
+  private[this] def playModeElements = Seq(
+    playModeMenu
+  ) ++ compactButtonInitiated.fold(Seq(newBranchButtonCompact.output, deleteBranchButtonCompact), Seq.empty)
 
-  def hideEditMenu(): Unit = playModeMenu.style.display = display.none.v
+  def showEditMenu(): Unit = playModeElements.foreach(_.style.display = display.block.v)
+
+  def hideEditMenu(): Unit = playModeElements.foreach(_.style.display = display.none.v)
 
   def updateButtons(game: Game, gamePosition: GamePosition, language: Language): Unit = {
     updateBranchList(game.branches.length, gamePosition.branch)
 
     deleteBranchButton.disabled = gamePosition.isTrunk
 
+    if (compactButtonInitiated) {
+      deleteBranchButtonCompact.disabled = gamePosition.isTrunk
+    }
+
     val forks = game.getForks(gamePosition)
+
+    if (compactButtonInitiated) forksButtonsCompact.innerHTML = ""
 
     if (forks.isEmpty) {
       forksButtons.innerHTML = "No forks."
+
     } else {
       val nextMove = game.getMove(gamePosition).map(_ -> gamePosition.branch)
-      val buttons = (nextMove.toSeq ++ forks).map { case (m, b) => createForkButton(m, b, language) }
-      Tooltip.enableHoverToolTip(buttons)
+
+      def elem(isCompact: Boolean) = {
+        val buttons = (nextMove.toSeq ++ forks).map { case (m, b) => createForkButton(m, b, language, isCompact.fold("right", "bottom")) }
+        Tooltip.enableHoverToolTip(buttons)
+
+        if (isCompact) {
+          div(
+            cls := "row",
+            marginLeft := 0.px,
+            buttons.map(div(cls := "col-xs-8", paddingLeft := 0.px, _))
+          ).render
+        } else {
+          div(
+            cls := "row",
+            buttons.map(div(cls := "col-sm-4 col-xs-6", _))
+          ).render
+        }
+      }
+
       forksButtons.innerHTML = ""
-      forksButtons.appendChild(div(
-        cls := "row",
-        buttons.map(div(cls := "col-sm-4 col-xs-6", _))
-      ).render)
+      forksButtons.appendChild(elem(false))
+
+      if (compactButtonInitiated) {
+        forksButtonsCompact.appendChild(elem(true))
+      }
     }
   }
 
