@@ -119,7 +119,7 @@
 
 .long-select {
   width: 168px;
-  margin-left: calc(50% - 84px);
+  margin-left: 14px;
   margin-right: auto;
 
   -webkit-transition: margin-left 0.3s;
@@ -222,6 +222,15 @@ select {
 
 .sidebar-heading {
   cursor: pointer;
+}
+
+.sidebar-left-content {
+  max-width: 240px;
+  -webkit-transition: margin-left 0.3s;
+  -moz-transition: margin-left 0.3s;
+  -ms-transition: margin-left 0.3s;
+  -o-transition: margin-left 0.3s;
+  transition: margin-left 0.3s;
 }
 
 .panel-heading {

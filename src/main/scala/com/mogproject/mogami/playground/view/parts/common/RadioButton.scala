@@ -12,16 +12,19 @@ case class RadioButton[Key](keys: Seq[Key],
                             labels: Map[Language, Seq[String]],
                             buttonClasses: Seq[String] = Seq("btn-sm"),
                             buttonGroupClasses: Seq[String] = Seq("btn-group-justified"),
-                            onClick: Key => Unit = { _: Key => {} }) extends ButtonLike[Key, Anchor, Div] {
+                            onClick: Key => Unit = { _: Key => {} },
+                            tooltip: Option[String] = None
+                           ) extends ButtonLike[Key, Anchor, Div] {
 
   override protected def generateInput(key: Key): Anchor = a(
     cls := ("btn" :: "btn-primary" :: buttonClasses.toList).mkString(" ")
   ).render
 
-
   private[this] def inputs: Seq[Anchor] = keys.map(inputMap)
 
-  override val output: Div = div(cls := "input-group",
+  override val output: Div = div(
+    cls := "input-group",
+    tooltip.map { s => Seq(data("toggle") := "tooltip", data("placement") := "bottom", data("original-title") := s) },
     div(cls := ("btn-group" :: buttonGroupClasses.toList).mkString(" "),
       inputs
     )

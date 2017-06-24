@@ -66,15 +66,12 @@ trait ModeController {
     renderer.drawIndexes()
 
     // update flip button
-    renderer.updateFlip(config)
+    renderer.updateFlip(config.flip)
 
     // update language buttons
     renderer.updateMessageLang(config.messageLang)
     renderer.updateRecordLang(config.recordLang)
     renderer.updatePieceLang(config.pieceLang)
-
-    // update flip button
-    renderer.updateFlip(config)
   }
 
   def initializeBoardControl(): Unit

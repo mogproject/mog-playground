@@ -12,6 +12,8 @@ object SideBarRight extends SideBarLike {
 
   val EXPANDED_WIDTH: Int = 460
 
+  lazy val menuPane = MenuPane(false)
+
   override protected val outputClass: String = "sidebar-right"
 
   override lazy val titleExpanded: Heading = h4(
@@ -31,16 +33,16 @@ object SideBarRight extends SideBarLike {
   override def content: Div = div(
     titleExpanded,
     titleCollapsed,
-    MenuPane.output
+    menuPane.output
   ).render
 
   override def collapseSideBar(): Unit = if (!isCollapsed) {
     super.collapseSideBar()
-    MenuPane.collapseMenu()
+    menuPane.collapseMenu()
   }
 
   override def expandSideBar(): Unit = if (isCollapsed) {
     super.expandSideBar()
-    MenuPane.expandMenu()
+    menuPane.expandMenu()
   }
 }

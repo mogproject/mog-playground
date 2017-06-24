@@ -9,23 +9,32 @@ import org.scalajs.dom.html.{Button, Div}
 import org.scalajs.dom.raw.HTMLSelectElement
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
+import org.scalajs.dom.Event
 
 import scalatags.JsDom.all._
 
 /**
-  *
+  * Branch buttons on Left Sidebar for PC/tablet, or Menu Modal for mobile
   */
-object BranchButton {
+case class BranchButton(isMobile: Boolean) {
 
+  /** HTML elements */
   private[this] lazy val changeBranchButton: HTMLSelectElement = select(
     cls := "form-control",
     width := "100%",
-    onchange := (() => Controller.changeBranch(changeBranchButton.selectedIndex, None))
+    onchange := { e: Event =>
+      e.target match {
+        case elem: HTMLSelectElement => Controller.changeBranch(elem.selectedIndex, None)
+        case _ => // do nothing
+      }
+    }
   ).render
 
-  private[this] lazy val forksButtons = div("").render
-
-  private[this] lazy val newBranchButton: RadioButton[Boolean] = RadioButton(Seq(false, true), Map(English -> Seq("Off", "On")))
+  private[this] lazy val newBranchButton: RadioButton[Boolean] = RadioButton(
+    Seq(false, true),
+    Map(English -> Seq("Off", "On")),
+    tooltip = (!isMobile).option("Creates a new branch")
+  )
 
   private[this] lazy val deleteBranchButton = button(
     tpe := "button",
@@ -35,21 +44,25 @@ object BranchButton {
     data("original-title") := "Delete this branch",
     data("dismiss") := "modal",
     onclick := { () => Controller.askDeleteBranch() },
-    "Delete"
+    isMobile.fold("Delete", span(cls := "glyphicon glyphicon-trash"))
   ).render
 
+  private[this] lazy val forksButtons = div("").render
+
+  /** Utility functions */
   private[this] def branchNoToString(branchNo: BranchNo): String = (branchNo == 0).fold("Trunk", s"Branch#${branchNo}")
 
   private[this] def updateBranchList(numBranches: Int, displayBranch: BranchNo): Unit = {
-    changeBranchButton.innerHTML = (0 to numBranches).map(s => option(branchNoToString(s))).toString
+    val s = (0 to numBranches).map(s => option(branchNoToString(s))).toString
+    changeBranchButton.innerHTML = s
     changeBranchButton.selectedIndex = displayBranch
   }
 
-  private[this] def createForkButton(move: Move, branchNo: BranchNo, language: Language): Button = button(
+  private[this] def createForkButton(move: Move, branchNo: BranchNo, language: Language, tooltipPlacement: String): Button = button(
     tpe := "button",
     cls := "btn btn-default btn-block",
     data("toggle") := "tooltip",
-    data("placement") := "bottom",
+    data("placement") := tooltipPlacement,
     data("original-title") := branchNoToString(branchNo),
     data("dismiss") := "modal",
     onclick := { () => dom.window.setTimeout(() => Controller.changeBranch(branchNo, Some(1)), 0) },
@@ -77,7 +90,9 @@ object BranchButton {
     )
   ).render
 
-  lazy val output: Div = div(
+  lazy val output: Div = isMobile.fold(outputOnMenu, outputCompact).render
+
+  private[this] def outputOnMenu = div(
     div(cls := "row",
       div(cls := "col-xs-6 col-sm-8", label(paddingTop := "6px", "Change Branch")),
       div(cls := "col-xs-6 col-sm-4", changeBranchButton)
@@ -86,7 +101,26 @@ object BranchButton {
     br(),
     forksButtons,
     playModeMenu
-  ).render
+  )
+
+  private[this] def outputCompact = div(
+    div(cls := "row",
+      marginRight := 12.px,
+      marginBottom := 10.px,
+      div(cls := "col-xs-6", label("Branch")),
+      div(cls := "col-xs-6", marginTop := (-6).px,
+        newBranchButton.output)
+    ),
+    div(
+      marginLeft := 14.px,
+      marginBottom := 20.px,
+      div(cls := "btn-group", role := "group",
+        div(cls := "btn-group", width := 130.px, marginBottom := 10.px, changeBranchButton),
+        div(cls := "btn-group", deleteBranchButton)
+      ),
+      forksButtons
+    )
+  )
 
   //
   // initialize
@@ -95,12 +129,22 @@ object BranchButton {
     newBranchButton.initialize(false, English)
   }
 
+  initialize()
+
   //
   // actions
   //
-  def showEditMenu(): Unit = playModeMenu.style.display = display.block.v
+  def hide(): Unit = output.style.display = display.none.v
 
-  def hideEditMenu(): Unit = playModeMenu.style.display = display.none.v
+  def show(): Unit = output.style.display = display.block.v
+
+  private[this] def playModeElements = Seq(
+    playModeMenu
+  ) ++ isMobile.fold(Seq.empty, Seq(newBranchButton.output, deleteBranchButton))
+
+  def showEditMenu(): Unit = playModeElements.foreach(_.style.display = display.block.v)
+
+  def hideEditMenu(): Unit = playModeElements.foreach(_.style.display = display.none.v)
 
   def updateButtons(game: Game, gamePosition: GamePosition, language: Language): Unit = {
     updateBranchList(game.branches.length, gamePosition.branch)
@@ -110,16 +154,28 @@ object BranchButton {
     val forks = game.getForks(gamePosition)
 
     if (forks.isEmpty) {
-      forksButtons.innerHTML = "No forks."
+      forksButtons.innerHTML = isMobile.fold("No forks.", "")
     } else {
       val nextMove = game.getMove(gamePosition).map(_ -> gamePosition.branch)
-      val buttons = (nextMove.toSeq ++ forks).map { case (m, b) => createForkButton(m, b, language) }
+
+      val buttons = (nextMove.toSeq ++ forks).map { case (m, b) => createForkButton(m, b, language, isMobile.fold("bottom", "right")) }
       Tooltip.enableHoverToolTip(buttons)
+
+      val elem = (if (isMobile) {
+        div(
+          cls := "row",
+          buttons.map(div(cls := "col-sm-4 col-xs-6", _))
+        )
+      } else {
+        div(
+          cls := "row",
+          marginLeft := 0.px,
+          buttons.map(div(cls := "col-xs-8", paddingLeft := 0.px, _))
+        )
+      }).render
+
       forksButtons.innerHTML = ""
-      forksButtons.appendChild(div(
-        cls := "row",
-        buttons.map(div(cls := "col-sm-4 col-xs-6", _))
-      ).render)
+      forksButtons.appendChild(elem)
     }
   }
 

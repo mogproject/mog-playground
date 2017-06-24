@@ -1,6 +1,7 @@
 package com.mogproject.mogami.playground.view.section
 
 import com.mogproject.mogami.playground.controller.Controller
+import com.mogproject.mogami.playground.view.parts.branch.BranchButton
 import org.scalajs.dom.html.{Div, Heading}
 
 import scalatags.JsDom.all._
@@ -10,13 +11,21 @@ import scalatags.JsDom.all._
   */
 class SideBarLeft(private[this] var controlSection: ControlSection) extends SideBarLike {
 
-  val EXPANDED_WIDTH: Int = SideBarLeft.EXPANDED_WIDTH
+  override val EXPANDED_WIDTH: Int = SideBarLeft.EXPANDED_WIDTH
 
   override protected val outputClass: String = "sidebar-left"
 
   private[this] val longSelector: Div = div(cls := "long-select", controlSection.outputLongSelector).render
 
-  override def content: Div = longSelector
+  lazy val branchButton = BranchButton(false)
+
+  override lazy val content: Div = div(
+    marginLeft := SideBarLeft.EXPANDED_MARGIN,
+    cls := "sidebar-left-content",
+    longSelector,
+    br(),
+    branchButton.output
+  ).render
 
   override lazy val titleExpanded: Heading = h4(
     cls := "sidebar-heading",
@@ -35,12 +44,12 @@ class SideBarLeft(private[this] var controlSection: ControlSection) extends Side
 
   override def collapseSideBar(): Unit = if (!isCollapsed) {
     super.collapseSideBar()
-    longSelector.style.marginLeft = (-EXPANDED_WIDTH).px
+    content.style.marginLeft = (-EXPANDED_WIDTH).px
   }
 
   override def expandSideBar(): Unit = if (isCollapsed) {
     super.expandSideBar()
-    longSelector.style.marginLeft = "calc(50% - 84px)"
+    content.style.marginLeft = SideBarLeft.EXPANDED_MARGIN
   }
 
   def updateControlSection(cs: ControlSection): Unit = {
@@ -48,10 +57,18 @@ class SideBarLeft(private[this] var controlSection: ControlSection) extends Side
     longSelector.appendChild(cs.outputLongSelector)
     controlSection = cs
   }
+
+  def hideControlSection(): Unit = {
+    branchButton.hide()
+  }
+
+  def showControlSection(): Unit = {
+    branchButton.show()
+  }
 }
 
 object SideBarLeft {
-
   val EXPANDED_WIDTH: Int = 240
 
+  val EXPANDED_MARGIN: String = "calc(50% - 98px)"
 }

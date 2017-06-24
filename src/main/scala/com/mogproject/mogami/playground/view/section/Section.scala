@@ -15,7 +15,7 @@ trait Section {
 
   def output: Div = div().render
 
-  val accordions: Seq[AccordionMenu] = Seq.empty
+  lazy val accordions: Seq[AccordionMenu] = Seq.empty
 
   def outputs: Seq[Div] = accordions.map(_.output)
 
