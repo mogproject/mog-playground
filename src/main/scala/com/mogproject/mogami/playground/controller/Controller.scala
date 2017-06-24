@@ -123,7 +123,9 @@ object Controller {
 
   def canInvokeWithoutSelection(cursor: Cursor): Boolean = modeController.get.canInvokeWithoutSelection(cursor)
 
-  def invokeCursor(selected: Cursor, invoked: Cursor, isFlipped: Boolean): Unit = doAction(_.invokeCursor(selected, invoked, isFlipped), _.renderAll())
+  def invokeCursor(selected: Cursor, invoked: Cursor, isFlipped: Boolean): Unit = doAction(
+    _.invokeCursor(selected, invoked, isFlipped), { mc => mc.renderAll(); mc.renderer.focusLongSelector() }
+  )
 
   def invokeHoldEvent(invoked: Cursor, isFlipped: Boolean): Unit = doAction(_.invokeHoldEvent(invoked, isFlipped), _.renderAll())
 
@@ -182,7 +184,9 @@ object Controller {
   def showCommentModal(): Unit = modeController.get.renderer.showCommentModal(modeController.get.config)
 
   // Branch Section
-  def changeBranch(branchNo: BranchNo, moveOffset: Option[Int]): Unit = doAction(_.changeBranch(branchNo, moveOffset), _.renderAll())
+  def changeBranch(branchNo: BranchNo, moveOffset: Option[Int]): Unit = doAction(
+    _.changeBranch(branchNo, moveOffset), { mc => mc.renderAll(); mc.renderer.focusLongSelector() }
+  )
 
   def askDeleteBranch(): Unit = modeController match {
     case Some(gc: GameController) => gc.renderer.askDeleteBranch(gc.config.messageLang, gc.displayBranchNo, () => deleteBranch(gc.displayBranchNo))

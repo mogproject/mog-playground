@@ -238,6 +238,8 @@ case class Renderer(isMobile: Boolean) extends BoardRenderer {
     recenterMainPane()
   }
 
+  def focusLongSelector(): Unit = controlSection.focusLongSelector()
+
   /**
     * @note Never happens on mobile
     */

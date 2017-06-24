@@ -61,6 +61,8 @@ case class ControlSection(canvasWidth: Int, isMobile: Boolean, isMobileLandscape
 
   def clearHoldEvent(): Unit = controlBar.clearHoldEvent()
 
+  def focusLongSelector(): Unit = if (!isMobile) controlBar.focusLongSelector()
+
   override def show(): Unit = {
     outputControlBar.style.display = display.block.v
     outputComment.style.display = display.block.v
