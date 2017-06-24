@@ -9,7 +9,7 @@ import scalatags.JsDom.all._
   *
   */
 object AnalyzeSection extends Section {
-  override val accordions: Seq[AccordionMenu] = Seq(
+  override lazy val accordions: Seq[AccordionMenu] = Seq(
     AccordionMenu(
       "Analyze",
       "Analyze",

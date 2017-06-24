@@ -6,17 +6,15 @@ import com.mogproject.mogami.playground.controller._
 import com.mogproject.mogami.playground.controller.mode.Mode
 import com.mogproject.mogami.playground.view.bootstrap.Tooltip
 import com.mogproject.mogami.playground.view.modal._
-import com.mogproject.mogami.playground.view.renderer.BoardRenderer.DoubleBoard
+import com.mogproject.mogami.playground.view.renderer.BoardRenderer.{DoubleBoard, FlipType}
 import com.mogproject.mogami.{BranchNo, GamePosition, _}
 import com.mogproject.mogami.core.state.StateCache
 import org.scalajs.dom.UIEvent
-import org.scalajs.dom.html.Div
 
 // todo: don't use parts directly but use only sections
 import com.mogproject.mogami.playground.view.parts.edit.EditReset
 import com.mogproject.mogami.playground.view.parts.settings.{MessageLanguageSelector, PieceLanguageSelector, RecordLanguageSelector}
 import com.mogproject.mogami.playground.view.parts.manage.SaveLoadButton
-import com.mogproject.mogami.playground.view.parts.navigator.FlipButton
 import com.mogproject.mogami.playground.view.parts.share._
 import com.mogproject.mogami.playground.view.section._
 import com.mogproject.mogami.util.Implicits._
@@ -28,24 +26,30 @@ import scalatags.JsDom.all._
 /**
   * controls canvas rendering
   */
-class Renderer extends BoardRenderer {
+case class Renderer(isMobile: Boolean) extends BoardRenderer {
   //
   // HTML elements
   //
+  protected lazy val navigatorSection = NavigatorSection(isMobile)
+
   // todo: refactor to use val
   protected var controlSection: ControlSection = ControlSection(0, isMobile = false, isMobileLandscape = false)
 
-  protected val sideBarLeft: SideBarLeft = new SideBarLeft(controlSection)
+  protected lazy val sideBarLeft: SideBarLeft = new SideBarLeft(controlSection)
 
   private[this] def createMainPane(canvasWidth: Int, numBoards: Int, isMobile: Boolean, isLandscape: Boolean) = div(
-    div(cls := "navbar", tag("nav")(cls := "navbar navbar-default navbar-fixed-top", NavigatorSection.output)),
+    div(cls := "navbar", tag("nav")(cls := "navbar navbar-default navbar-fixed-top", navigatorSection.output)),
     div(cls := "container-fluid",
       isMobile.fold(Seq(position := position.fixed.v, width := "100%", padding := 0), ""),
-      div(cls := "row no-margin no-overflow",
-        SideBarRight.output, // right sidebar
-        sideBarLeft.output, // left sidebar
-        mainPane // main content
-      ),
+      if (isMobile) {
+        mainPane
+      } else {
+        div(cls := "row no-margin no-overflow",
+          SideBarRight.output, // right sidebar
+          sideBarLeft.output, // left sidebar
+          mainPane // main content
+        )
+      },
       hr(),
       small(p(textAlign := "right", marginRight := 20, "Shogi Playground © 2017 ", a(href := "https://mogproject.com", target := "_blank", "mogproject")))
     )
@@ -59,8 +63,7 @@ class Renderer extends BoardRenderer {
 
     initializeBoardRenderer(config)
     config.isMobile.fold(widenMainPane(), recenterMainPane())
-    NavigatorSection.initialize()
-    MenuPane.initialize()
+    navigatorSection.initialize()
 
     // initialize clipboard.js
     val cp = new Clipboard(".btn")
@@ -90,9 +93,15 @@ class Renderer extends BoardRenderer {
 
   def hideEditSection(): Unit = List(EditSection, EditHelpSection).foreach(_.hide())
 
-  def showControlSection(): Unit = List(controlSection, GameMenuSection, GameHelpSection, AnalyzeSection).foreach(_.show())
+  def showControlSection(): Unit = {
+    List(controlSection, GameMenuSection, GameHelpSection, AnalyzeSection).foreach(_.show())
+    if (isMobile) BranchSection.show() else sideBarLeft.showControlSection()
+  }
 
-  def hideControlSection(): Unit = List(controlSection, GameMenuSection, GameHelpSection, AnalyzeSection).foreach(_.hide())
+  def hideControlSection(): Unit = {
+    List(controlSection, GameMenuSection, GameHelpSection, AnalyzeSection).foreach(_.hide())
+    if (isMobile) BranchSection.hide() else sideBarLeft.hideControlSection()
+  }
 
   def askPromote(config: Configuration, isFlipped: Boolean, piece: Piece, callbackUnpromote: () => Unit, callbackPromote: () => Unit): Unit = {
     PromotionDialog(config, isFlipped, getPieceRenderer, piece, callbackUnpromote, callbackPromote).show()
@@ -154,9 +163,9 @@ class Renderer extends BoardRenderer {
   def updateCommentOmissionWarning(displayWarning: Boolean): Unit = GameMenuSection.updateCommentOmissionWarning(displayWarning)
 
   // navigator section
-  def updateMode(mode: Mode): Unit = NavigatorSection.updateMode(mode)
+  def updateMode(mode: Mode): Unit = navigatorSection.updateMode(mode)
 
-  def updateFlip(config: Configuration): Unit = FlipButton.updateValue(config.flip)
+  def updateFlip(flip: FlipType): Unit = navigatorSection.updateFlip(flip)
 
   // record
   def updateRecordContent(game: Game, branchNo: BranchNo, lng: Language): Unit = controlSection.updateRecordContent(game, branchNo, lng)
@@ -198,13 +207,15 @@ class Renderer extends BoardRenderer {
   def displayTextLoadTooltip(message: String): Unit = SaveLoadButton.displayTextLoadTooltip(message)
 
   // branch section
-  def updateBranchButtons(game: Game, gamePosition: GamePosition, language: Language): Unit = GameMenuSection.updateBranchButtons(game, gamePosition, language)
+  private[this] def getBranchButton = isMobile.fold(BranchSection.branchButton, sideBarLeft.branchButton)
 
-  def showBranchEditMenu(): Unit = GameMenuSection.showBranchEditMenu()
+  def updateBranchButtons(game: Game, gamePosition: GamePosition, language: Language): Unit = getBranchButton.updateButtons(game, gamePosition, language)
 
-  def hideBranchEditMenu(): Unit = GameMenuSection.hideBranchEditMenu()
+  def showBranchEditMenu(): Unit = getBranchButton.showEditMenu()
 
-  def getIsNewBranchMode: Boolean = GameMenuSection.getIsNewBranchMode
+  def hideBranchEditMenu(): Unit = getBranchButton.hideEditMenu()
+
+  def getIsNewBranchMode: Boolean = getBranchButton.getIsNewBranchMode
 
   // action section
   def showActionSection(): Unit = ActionSection.show()
@@ -247,7 +258,7 @@ class Renderer extends BoardRenderer {
   // Notes action
   //
   def drawNotes(game: Game, recordLang: Language)(implicit stateCache: StateCache): Unit = {
-    dom.window.document.head.appendChild(link(rel := "stylesheet", tpe := "text/css", href :="assets/css/notesview.css").render)
+    dom.window.document.head.appendChild(link(rel := "stylesheet", tpe := "text/css", href := "assets/css/notesview.css").render)
     dom.window.document.body.innerHTML = game.trunk.toHtmlString(recordLang == Japanese, game.comments)
   }
 }

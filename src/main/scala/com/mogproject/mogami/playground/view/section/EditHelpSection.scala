@@ -8,7 +8,7 @@ import scalatags.JsDom.all._
   *
   */
 object EditHelpSection extends Section {
-  override val accordions: Seq[AccordionMenu] = Seq(
+  override lazy val accordions: Seq[AccordionMenu] = Seq(
     AccordionMenu(
       "EditHelp",
       "Help",

@@ -1,8 +1,10 @@
 package com.mogproject.mogami.playground.view.section
 
+import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.controller.mode.{Editing, Mode, Playing, Viewing}
 import com.mogproject.mogami.playground.view.layout.Layout
 import com.mogproject.mogami.playground.view.parts.navigator.{FlipButton, MenuButton, ModeSelector}
+import com.mogproject.mogami.playground.view.renderer.BoardRenderer.FlipType
 import org.scalajs.dom.html.Div
 
 import scalatags.JsDom.all._
@@ -10,7 +12,7 @@ import scalatags.JsDom.all._
 /**
   * Navbar
   */
-object NavigatorSection extends Section {
+case class NavigatorSection(isMobile: Boolean) extends Section {
   override val output: Div = div(
     div(cls := "container", padding := 0,
       div(cls := "navbar-header",
@@ -18,7 +20,7 @@ object NavigatorSection extends Section {
           li(cls := "navbar-brand hidden-xs", "Shogi Playground"),
           li(ModeSelector.output),
           li(FlipButton.output),
-          li(paddingLeft := "10px", div(cls := "visible-xs", MenuButton.output))
+          isMobile.fold(li(paddingLeft := "10px", div(MenuButton.output)), "")
         )
       )
     )
@@ -29,13 +31,15 @@ object NavigatorSection extends Section {
 
     ModeSelector.initialize()
     FlipButton.initialize()
-    MenuButton.initialize()
+    if (isMobile) MenuButton.initialize()
   }
 
   def updateMode(mode: Mode): Unit = {
     ModeSelector.updateValue(mode)
     updateBackground(mode)
   }
+
+  def updateFlip(flip: FlipType): Unit = FlipButton.updateValue(flip)
 
   private[this] def updateBackground(mode: Mode): Unit = output.style.backgroundColor = mode match {
     case Playing => Layout.color.bsDefault

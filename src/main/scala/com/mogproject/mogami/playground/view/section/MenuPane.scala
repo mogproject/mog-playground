@@ -2,19 +2,23 @@ package com.mogproject.mogami.playground.view.section
 
 import org.scalajs.jquery.jQuery
 import com.mogproject.mogami.playground.view.bootstrap.BootstrapJQuery
+import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom.html.Div
 
 import scala.scalajs.js
 import scalatags.JsDom.all._
 
 /**
-  *
+  * Menu used for the right pane (PC/tablet) and for the menu modal (mobile)
   */
-object MenuPane {
+case class MenuPane(isMobile: Boolean) {
 
-  private[this] val sections = Seq(
+  private[this] val sections: Seq[Section] = Seq(
     GameMenuSection,
-    ActionSection,
+    ActionSection
+  ) ++ isMobile.fold(
+    Seq(BranchSection), Seq.empty
+  ) ++ Seq(
     AnalyzeSection,
     EditSection,
     SettingsSection,
@@ -27,6 +31,8 @@ object MenuPane {
     cls := "panel-group", id := "accordion", role := "tablist", aria.multiselectable := true,
     sections.map(_.outputs)
   ).render
+
+  initialize()
 
   def initialize(): Unit = {
     sections.foreach(_.initialize())

@@ -23,7 +23,7 @@ trait SideBarLike {
 
   def titleCollapsed: Heading
 
-  lazy val output: Div = div(cls := "hidden-xs sidebar " + outputClass,
+  lazy val output: Div = div(cls := "sidebar " + outputClass,
     width := EXPANDED_WIDTH,
     div(
       titleExpanded,

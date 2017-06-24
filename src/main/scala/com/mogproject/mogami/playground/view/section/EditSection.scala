@@ -14,7 +14,7 @@ object EditSection extends Section {
     EditReset.initialize()
   }
 
-  override val accordions: Seq[AccordionMenu] = Seq(
+  override lazy val accordions: Seq[AccordionMenu] = Seq(
     AccordionMenu(
       "Reset",
       "Reset",

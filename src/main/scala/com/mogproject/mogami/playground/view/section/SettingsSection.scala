@@ -22,7 +22,7 @@ object SettingsSection extends Section {
     PieceLanguageSelector.initialize()
   }
 
-  override val accordions: Seq[AccordionMenu] = Seq(AccordionMenu(
+  override lazy val accordions: Seq[AccordionMenu] = Seq(AccordionMenu(
     "Settings",
     "Settings",
     "wrench",

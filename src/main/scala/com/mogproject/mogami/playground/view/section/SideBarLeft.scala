@@ -17,12 +17,14 @@ class SideBarLeft(private[this] var controlSection: ControlSection) extends Side
 
   private[this] val longSelector: Div = div(cls := "long-select", controlSection.outputLongSelector).render
 
+  lazy val branchButton = BranchButton(false)
+
   override lazy val content: Div = div(
     marginLeft := SideBarLeft.EXPANDED_MARGIN,
     cls := "sidebar-left-content",
     longSelector,
     br(),
-    BranchButton.outputCompact
+    branchButton.output
   ).render
 
   override lazy val titleExpanded: Heading = h4(
@@ -55,10 +57,17 @@ class SideBarLeft(private[this] var controlSection: ControlSection) extends Side
     longSelector.appendChild(cs.outputLongSelector)
     controlSection = cs
   }
+
+  def hideControlSection(): Unit = {
+    branchButton.hide()
+  }
+
+  def showControlSection(): Unit = {
+    branchButton.show()
+  }
 }
 
 object SideBarLeft {
-
   val EXPANDED_WIDTH: Int = 240
 
   val EXPANDED_MARGIN: String = "calc(50% - 98px)"

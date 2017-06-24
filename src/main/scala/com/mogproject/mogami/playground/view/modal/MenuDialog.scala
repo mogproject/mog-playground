@@ -15,7 +15,9 @@ object MenuDialog extends ModalLike {
 
   override val title = "Menu"
 
-  override lazy val modalBody: ElemType = div(bodyDefinition, MenuPane.output)
+  lazy val menuPane = MenuPane(true)
+
+  override lazy val modalBody: ElemType = div(bodyDefinition, menuPane.output)
 
   override lazy val modalFooter: ElemType = div(footerDefinition,
     div(cls := "row",
@@ -46,13 +48,11 @@ object MenuDialog extends ModalLike {
   }
 
   override def show(): Unit = {
-    GameMenuSection.showBranchMenu()
     dialogElem.getOrElse(createDialog()).modal("show")
   }
 
   def hide(): Unit = {
     dialogElem.foreach(_.modal("hide"))
-    GameMenuSection.hideBranchMenu()
   }
 
 }

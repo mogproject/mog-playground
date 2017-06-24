@@ -36,7 +36,7 @@ object Controller {
     val game = createGameFromArgs(args)
 
     // create renderer
-    val renderer = new Renderer
+    val renderer = new Renderer(config.isMobile)
     renderer.initialize(elem, config)
 
     // update mode
@@ -44,7 +44,7 @@ object Controller {
 
     modeController = Some(isSnapshot.fold(
       PlayModeController(renderer, config, game, 0, 0),
-      ViewModeController(renderer, config, game, args.gamePosition.branch, math.max(0,  args.gamePosition.position - game.trunk.offset))
+      ViewModeController(renderer, config, game, args.gamePosition.branch, math.max(0, args.gamePosition.position - game.trunk.offset))
     ))
 
     // render all parts
