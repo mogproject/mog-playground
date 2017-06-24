@@ -144,4 +144,6 @@ case class ControlBar(sectionWidth: Int, isSmall: Boolean) extends EventManageab
     controlInput2.disabled = !forwardEnabled
     controlInput3.disabled = !forwardEnabled
   }
+
+  def focusLongSelector(): Unit = recordSelectorLong.focus()
 }
