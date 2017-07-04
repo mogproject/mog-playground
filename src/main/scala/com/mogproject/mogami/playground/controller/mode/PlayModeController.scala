@@ -75,7 +75,8 @@ case class PlayModeController(renderer: Renderer,
         MoveBuilderSfen(from, to, promote).toMove(selectedState, getLastMove.map(_.to)).flatMap { mv =>
           if (renderer.getIsNewBranchMode) {
             // New Branch Mode
-            game.getMove(gamePosition) match {
+            /** @note compare moves regardless of elapsed time */
+            game.getMove(gamePosition).map(_.copy(elapsedTime = None)) match {
               case Some(m) if m == mv => Some(this.copy(displayPosition = displayPosition + 1)) // move next
               case Some(_) => game.getForks(gamePosition).find(_._1 == mv) match {
                 case Some((_, br)) => moveToBranch(br)
