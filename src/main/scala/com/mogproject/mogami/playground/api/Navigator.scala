@@ -1,10 +1,10 @@
 package com.mogproject.mogami.playground.api
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSName
+import scala.scalajs.js.annotation.JSGlobal
 
 @js.native
-@JSName("Navigator")
+@JSGlobal("Navigator")
 class Navigator extends js.Object {
   @js.native
   def languages: js.UndefOr[js.Array[String]] = js.native

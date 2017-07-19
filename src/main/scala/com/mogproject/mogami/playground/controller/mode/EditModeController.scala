@@ -18,7 +18,8 @@ case class EditModeController(renderer: Renderer,
                               board: BoardType,
                               hand: HandType,
                               box: Map[Ptype, Int],
-                              override val gameInfo: GameInfo
+                              override val gameInfo: GameInfo,
+                              lastCursorInvoked: Option[Cursor] = None
                              ) extends ModeController {
 
   val mode: Mode = Editing
@@ -65,6 +66,10 @@ case class EditModeController(renderer: Renderer,
     renderAll()
   }
 
+  override def startMoveAnimation(): Unit = {
+    renderer.startMoveAction(lastCursorInvoked)
+  }
+
   override def canActivate(cursor: Cursor): Boolean = true
 
   override def canSelect(cursor: Cursor): Boolean = cursor match {
@@ -87,43 +92,54 @@ case class EditModeController(renderer: Renderer,
         (board(s1), board.get(s2)) match {
           case (p1, Some(p2)) if s1 == s2 =>
             // change piece attributes
-            Some(this.copy(board = board.updated(s1, p1.canPromote.fold(p1.promoted, !p1.demoted))))
+            Some(this.copy(board = board.updated(s1, p1.canPromote.fold(p1.promoted, !p1.demoted)), lastCursorInvoked = Some(invoked)))
           case (p1, Some(p2)) =>
             // change pieces
-            Some(this.copy(board = board.updated(s1, p2).updated(s2, p1)))
+            Some(this.copy(board = board.updated(s1, p2).updated(s2, p1), lastCursorInvoked = Some(invoked)))
           case (p1, None) =>
-            Some(this.copy(board = board.updated(s2, p1) - s1))
+            // move to an empty square
+            Some(this.copy(board = board.updated(s2, p1) - s1, lastCursorInvoked = Some(invoked)))
         }
       case (Cursor(Some(s), None, None, None), Cursor(None, Some(h), None, None)) if board(s).ptype != KING =>
+        // board to hand
         val pt = board(s).ptype.demoted
-        Some(this.copy(board = board - s, hand = MapUtil.incrementMap(hand, Hand(h.owner, pt))))
+        val newHand = Hand(h.owner, pt)
+        Some(this.copy(board = board - s, hand = MapUtil.incrementMap(hand, newHand), lastCursorInvoked = Some(Cursor(newHand))))
       case (Cursor(Some(s), None, None, None), Cursor(None, None, Some(_), None)) =>
+        // board to box
         val pt = board(s).ptype.demoted
-        Some(this.copy(board = board - s, box = MapUtil.incrementMap(box, pt)))
+        Some(this.copy(board = board - s, box = MapUtil.incrementMap(box, pt), lastCursorInvoked = Some(Cursor(pt))))
 
       // hand is selected
       case (Cursor(None, Some(h), None, None), Cursor(Some(s), None, None, None)) if !board.get(s).exists(_.ptype == KING) =>
+        // hand to board
         val hx = MapUtil.decrementMap(hand, h)
         val hy = board.get(s).map { p => MapUtil.incrementMap(hx, Hand(h.owner, p.ptype.demoted)) }.getOrElse(hx)
-        Some(this.copy(board = board.updated(s, h.toPiece), hand = hy))
+        Some(this.copy(board = board.updated(s, h.toPiece), hand = hy, lastCursorInvoked = Some(invoked)))
       case (Cursor(None, Some(h1), None, None), Cursor(None, Some(h2), None, None)) if h1.owner != h2.owner =>
+        // hand to hand
         val hx = MapUtil.decrementMap(hand, h1)
         val hy = MapUtil.incrementMap(hx, Hand(!h1.owner, h1.ptype))
-        Some(this.copy(hand = hy))
+        val newHand = Hand(!h1.owner, h1.ptype)
+        Some(this.copy(hand = hy, lastCursorInvoked = Some(Cursor(newHand))))
       case (Cursor(None, Some(h), None, None), Cursor(None, None, Some(_), None)) =>
-        Some(this.copy(hand = MapUtil.decrementMap(hand, h), box = MapUtil.incrementMap(box, h.ptype)))
+        // hand to box
+        Some(this.copy(hand = MapUtil.decrementMap(hand, h), box = MapUtil.incrementMap(box, h.ptype), lastCursorInvoked = Some(Cursor(h.ptype))))
 
       // box is selected
       case (Cursor(None, None, Some(pt), None), Cursor(Some(s), None, None, None)) =>
+        // box to board
         val bx = MapUtil.decrementMap(box, pt)
         val by = board.get(s).map { p => MapUtil.incrementMap(bx, p.ptype.demoted) }.getOrElse(bx)
-        Some(this.copy(board = board.updated(s, Piece(Player.BLACK, pt)), box = by))
+        Some(this.copy(board = board.updated(s, Piece(Player.BLACK, pt)), box = by, lastCursorInvoked = Some(invoked)))
       case (Cursor(None, None, Some(pt), None), Cursor(None, Some(h), None, None)) if pt != KING =>
-        Some(this.copy(hand = MapUtil.incrementMap(hand, Hand(h.owner, pt)), box = MapUtil.decrementMap(box, pt)))
+        // box to hand
+        val newHand = Hand(h.owner, pt)
+        Some(this.copy(hand = MapUtil.incrementMap(hand, newHand), box = MapUtil.decrementMap(box, pt), lastCursorInvoked = Some(Cursor(newHand))))
 
       // player is clicked
       case (_, Cursor(None, None, None, Some(p))) =>
-        Some(this.copy(turn = p))
+        Some(this.copy(turn = p, lastCursorInvoked = None))
       case _ => None
     }
   }
