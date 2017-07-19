@@ -2,9 +2,9 @@ package com.mogproject.mogami.playground.view.parts.board
 
 import com.mogproject.mogami._
 import com.mogproject.mogami.playground.controller.{Controller, Cursor}
-import com.mogproject.mogami.playground.view.layout.BoardLayout
+import com.mogproject.mogami.playground.view.layout.{BoardLayout, Layout}
 import com.mogproject.mogami.playground.view.parts.common.EventManageable
-import com.mogproject.mogami.playground.view.renderer.Rectangle
+import com.mogproject.mogami.playground.view.renderer.{Circle, Rectangle}
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.html.Canvas
@@ -17,6 +17,8 @@ trait CursorManageable extends EventManageable {
   // variables
   private[this] var activeCursor: Option[Cursor] = None
   private[this] var selectedCursor: Option[Cursor] = None
+  private[this] var animationScheduler: Option[Int] = None
+  private[this] var selectAnimationActive: Boolean = false
 
   // constants
   private[this] val boxPtypes: Seq[Ptype] = Ptype.KING +: Ptype.inHand
@@ -27,6 +29,7 @@ trait CursorManageable extends EventManageable {
   protected val layer0: CanvasRenderingContext2D
   protected val layer3: CanvasRenderingContext2D
   protected val layer4: CanvasRenderingContext2D
+  protected val layer5: CanvasRenderingContext2D
 
   def isFlipped: Boolean
 
@@ -138,6 +141,7 @@ trait CursorManageable extends EventManageable {
   def drawSelectedArea(cursor: Cursor): Unit = {
     cursorToRect(cursor).drawFill(layer0, layout.color.cursor, 2)
     selectedCursor = Some(cursor)
+    startSelectAnimation(cursor)
   }
 
   /**
@@ -146,6 +150,7 @@ trait CursorManageable extends EventManageable {
   def clearSelectedArea(): Unit = {
     selectedCursor.foreach(cursorToRect(_).clear(layer0))
     selectedCursor = None
+    stopSelectAnimation()
   }
 
   /**
@@ -170,6 +175,65 @@ trait CursorManageable extends EventManageable {
     layout.board.clear(layer0)
     layout.handWhite.clear(layer0)
     layout.handBlack.clear(layer0)
+  }
+
+  /**
+    * Animation while selecting a piece
+    */
+  def startSelectAnimation(cursor: Cursor): Unit = {
+    val layer = layer5
+
+    val rect = cursorToRect(cursor)
+    val drawArea = Rectangle(rect.left - layout.PIECE_WIDTH, rect.top - layout.PIECE_HEIGHT, layout.PIECE_WIDTH * 3, layout.PIECE_HEIGHT * 3)
+    val centerX = (rect.left + rect.right) / 2.0
+    val centerY = (rect.top + rect.bottom) / 2.0
+    val strokeWidth = rect.width / 10.0
+
+    def f(frame: Int): Unit = {
+      if (selectAnimationActive) {
+        if (frame <= 40) {
+          drawArea.clear(layer)
+          val radius = rect.width * (0.4 + frame / 40.0)
+          Circle(centerX, centerY, radius).stroke(layer, layout.color.flash, math.max(1, strokeWidth.toInt), 1.0 - (frame / 40.0))
+        }
+        dom.window.requestAnimationFrame(_ => f((frame + 1) % 100))
+      } else {
+        drawArea.clear(layer)
+      }
+    }
+
+    selectAnimationActive = true
+    dom.window.requestAnimationFrame(_ => f(0))
+  }
+
+  def stopSelectAnimation(): Unit = {
+    selectAnimationActive = false
+  }
+
+  /**
+    * Animation after making a move
+    */
+  def startMoveAnimation(move: Option[Move]): Unit = {
+    move.foreach { mv =>
+      val layer = layer5
+
+      val rect = cursorToRect(Cursor(mv.to))
+      val drawArea = Rectangle(rect.left - layout.PIECE_WIDTH, rect.top - layout.PIECE_HEIGHT, layout.PIECE_WIDTH * 3, layout.PIECE_HEIGHT * 3)
+      val centerX = (rect.left + rect.right) / 2.0
+      val centerY = (rect.top + rect.bottom) / 2.0
+      val strokeWidth = rect.width / 10.0
+
+      def f(frame: Int): Unit = {
+        if (frame <= 20) {
+          drawArea.clear(layer)
+          val radius = rect.width * (0.4 + frame / 20.0)
+          Circle(centerX, centerY, radius).stroke(layer, layout.color.cursor, math.max(1, strokeWidth.toInt), 1.0 - (frame / 20.0))
+          dom.window.requestAnimationFrame(_ => f(frame + 1))
+        }
+      }
+
+      dom.window.requestAnimationFrame(_ => f(0))
+    }
   }
 
   //
