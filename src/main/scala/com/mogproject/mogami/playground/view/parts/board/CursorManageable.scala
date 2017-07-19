@@ -177,29 +177,51 @@ trait CursorManageable extends EventManageable {
     layout.handBlack.clear(layer0)
   }
 
+
+  /**
+    * Circular animation
+    */
+  case class CircularAnimation(centerX: Double, centerY: Double, minRadius: Double, maxRadius: Double, strokeWidth: Int, strokeColor: String) {
+    private[this] lazy val layer: CanvasRenderingContext2D = layer5
+
+    private[this] lazy val drawArea = Rectangle(
+      (centerX - maxRadius - strokeWidth).toInt - 1,
+      (centerY - maxRadius - strokeWidth).toInt - 1,
+      ((maxRadius + strokeWidth).toInt + 1) * 2,
+      ((maxRadius + strokeWidth).toInt + 1) * 2
+    )
+
+    def draw(ratio: Double): Unit = {
+      drawArea.clear(layer)
+      val r = minRadius + (maxRadius - minRadius) * ratio
+      Circle(centerX, centerY, r).stroke(layer, strokeColor, math.max(1, strokeWidth), 1.0 - ratio)
+    }
+
+    def clear(): Unit = {
+      drawArea.clear(layer)
+    }
+  }
+
+  object CircularAnimation {
+    def apply(cursor: Cursor, color: String): CircularAnimation = {
+      val rect = cursorToRect(cursor)
+      val centerX = (rect.left + rect.right) / 2.0
+      val centerY = (rect.top + rect.bottom) / 2.0
+      CircularAnimation(centerX, centerY, layout.PIECE_WIDTH * 0.4, layout.PIECE_WIDTH * 2.0, (layout.PIECE_WIDTH / 10.0).toInt, color)
+    }
+  }
+
   /**
     * Animation while selecting a piece
     */
   def startSelectAnimation(cursor: Cursor): Unit = {
-    val layer = layer5
+    val animation = CircularAnimation(cursor, layout.color.flash)
 
-    val rect = cursorToRect(cursor)
-    val drawArea = Rectangle(rect.left - layout.PIECE_WIDTH, rect.top - layout.PIECE_HEIGHT, layout.PIECE_WIDTH * 3, layout.PIECE_HEIGHT * 3)
-    val centerX = (rect.left + rect.right) / 2.0
-    val centerY = (rect.top + rect.bottom) / 2.0
-    val strokeWidth = rect.width / 10.0
-
-    def f(frame: Int): Unit = {
-      if (selectAnimationActive) {
-        if (frame <= 40) {
-          drawArea.clear(layer)
-          val radius = rect.width * (0.4 + frame / 40.0)
-          Circle(centerX, centerY, radius).stroke(layer, layout.color.flash, math.max(1, strokeWidth.toInt), 1.0 - (frame / 40.0))
-        }
-        dom.window.requestAnimationFrame(_ => f((frame + 1) % 100))
-      } else {
-        drawArea.clear(layer)
-      }
+    def f(frame: Int): Unit = if (selectAnimationActive) {
+      if (frame <= 40) animation.draw(frame / 40.0)
+      dom.window.requestAnimationFrame(_ => f((frame + 1) % 100))
+    } else {
+      animation.clear()
     }
 
     selectAnimationActive = true
@@ -215,21 +237,11 @@ trait CursorManageable extends EventManageable {
     */
   def startMoveAnimation(move: Option[Move]): Unit = {
     move.foreach { mv =>
-      val layer = layer5
+      val animation = CircularAnimation(Cursor(mv.to), layout.color.cursor)
 
-      val rect = cursorToRect(Cursor(mv.to))
-      val drawArea = Rectangle(rect.left - layout.PIECE_WIDTH, rect.top - layout.PIECE_HEIGHT, layout.PIECE_WIDTH * 3, layout.PIECE_HEIGHT * 3)
-      val centerX = (rect.left + rect.right) / 2.0
-      val centerY = (rect.top + rect.bottom) / 2.0
-      val strokeWidth = rect.width / 10.0
-
-      def f(frame: Int): Unit = {
-        if (frame <= 20) {
-          drawArea.clear(layer)
-          val radius = rect.width * (0.4 + frame / 20.0)
-          Circle(centerX, centerY, radius).stroke(layer, layout.color.cursor, math.max(1, strokeWidth.toInt), 1.0 - (frame / 20.0))
-          dom.window.requestAnimationFrame(_ => f(frame + 1))
-        }
+      def f(frame: Int): Unit = if (frame <= 20) {
+        animation.draw(frame / 20.0)
+        dom.window.requestAnimationFrame(_ => f(frame + 1))
       }
 
       dom.window.requestAnimationFrame(_ => f(0))
