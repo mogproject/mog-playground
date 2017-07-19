@@ -2,6 +2,7 @@ package com.mogproject.mogami.playground.api.google
 
 import scala.scalajs.js
 import scala.scalajs.js.|
+import scala.scalajs.js.annotation.JSGlobal
 
 /**
   * Google API Client Facade
@@ -26,6 +27,7 @@ object RequestParams {
 }
 
 @js.native
+@JSGlobal
 object gapi extends js.Object {
 
   @js.native

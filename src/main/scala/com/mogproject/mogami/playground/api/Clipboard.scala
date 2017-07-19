@@ -3,11 +3,11 @@ package com.mogproject.mogami.playground.api
 import org.scalajs.dom.{Element, NodeListOf}
 
 import scala.scalajs.js
-import js.annotation._
-import js.|
+import scala.scalajs.js.annotation.JSGlobal
+import scala.scalajs.js.|
 
 @js.native
-@JSName("Clipboard")
+@JSGlobal("Clipboard")
 class Clipboard(selector: String | Element | NodeListOf[Element] = js.native,
                 options: Clipboard.Options = js.native) extends js.Object {
 
@@ -17,7 +17,7 @@ class Clipboard(selector: String | Element | NodeListOf[Element] = js.native,
 }
 
 @js.native
-@JSName("Clipboard")
+@JSGlobal("Clipboard")
 object Clipboard extends js.Object {
 
   @js.native
