@@ -11,41 +11,100 @@ import org.scalajs.jquery.JQuery
   */
 trait EventManageable {
 
-  // variables
-  private[this] var activeHoldEvent: Option[Int] = None
-
   // constants
   protected val holdInterval: Double = 1000
+  private[this] val touchEndInterval: Double = 350 // ms
 
-  def hasTouchEvent: Boolean = dom.window.hasOwnProperty("ontouchstart")
+  // variables
+  private[this] var activeHoldEvent: Option[Int] = None
+  private[this] var lastTouchEnd: Double = -touchEndInterval
+
+  lazy val hasTouchEvent: Boolean = dom.window.hasOwnProperty("ontouchstart")
+
+  private[this] def withCommonWrapper[E <: UIEvent](preventDefault: Boolean = true, check: E => Boolean = { _: E => true })
+                                                   (f: E => Unit): E => Unit = { evt: E =>
+    if (check(evt)) {
+      clearHoldEvent()
+      if (preventDefault) evt.preventDefault
+      f(evt)
+    }
+  }
+
+  private[this] def isValidMouseEvent(evt: MouseEvent): Boolean = evt.button == 0 && lastTouchEnd < evt.timeStamp - touchEndInterval
+
+  private[this] def nullEvent = withCommonWrapper(preventDefault = false) { _ => }
+
+  /**
+    * Register 'touchstart' event
+    */
+  def registerTouchStart(elem: HTMLElement, f: TouchEvent => Unit): Unit = if (hasTouchEvent) {
+    val wrapper = withCommonWrapper[TouchEvent](check = _.changedTouches.length == 1)(f)
+    elem.addEventListener("touchstart", wrapper, useCapture = false)
+  }
+
+  /**
+    * Register 'touchend' event
+    */
+  def registerTouchEnd(elem: HTMLElement, f: TouchEvent => Unit): Unit = if (hasTouchEvent) {
+    val wrapper = withCommonWrapper[TouchEvent]() { evt => lastTouchEnd = evt.timeStamp; f(evt) }
+    elem.addEventListener("touchend", wrapper, useCapture = false)
+  }
+
+  /**
+    * Register 'touchcancel' event
+    */
+  def registerTouchCancel(elem: HTMLElement): Unit = if (hasTouchEvent) {
+    elem.addEventListener("touchcancel", nullEvent, useCapture = false)
+  }
+
+  /**
+    * Register 'mousedown' event
+    *
+    * @note Reacts only to the left click. (button == 0)
+    */
+  def registerMouseDown(elem: HTMLElement, f: MouseEvent => Unit): Unit = {
+    elem.addEventListener("mousedown", withCommonWrapper(check = isValidMouseEvent)(f), useCapture = false)
+  }
+
+  /**
+    * Register 'mouseup' event
+    *
+    * @note Reacts only to the left click. (button == 0)
+    */
+  def registerMouseUp(elem: HTMLElement, f: MouseEvent => Unit): Unit = {
+    elem.addEventListener("mouseup", withCommonWrapper(check = isValidMouseEvent)(f), useCapture = false)
+  }
+
+  /**
+    * Register 'mouseout' event
+    *
+    * @note Reacts only to the left click. (button == 0)
+    */
+  def registerMouseOut(elem: HTMLElement): Unit = {
+    elem.addEventListener("mouseout", nullEvent, useCapture = false)
+  }
+
+  /**
+    * Register 'mousemove' event
+    */
+  def registerMouseMove(elem: HTMLElement, f: MouseEvent => Unit): Unit = {
+    elem.addEventListener("mousemove", f, useCapture = false)
+  }
+
 
   def setClickEvent(elem: HTMLElement, onClick: () => Unit, onHold: Option[() => Unit] = None, checker: Option[() => Boolean] = None): Unit = {
     def onClickEvent(evt: UIEvent): Unit = {
-      clearHoldEvent()
-      evt.preventDefault()
       onClick()
       onHold.foreach(g => registerHoldEvent(g, checker))
     }
 
-    if (hasTouchEvent) {
-      // touch
-      val f = (evt: TouchEvent) => if (evt.changedTouches.length == 1) onClickEvent(evt)
-      val g = (_: TouchEvent) => clearHoldEvent()
+    registerTouchStart(elem, onClickEvent)
+    registerMouseDown(elem, onClickEvent)
 
-      elem.addEventListener("touchstart", f, useCapture = false)
-      if (onHold.isDefined) {
-        elem.addEventListener("touchend", g, useCapture = false)
-        elem.addEventListener("touchcancel", g, useCapture = false)
-      }
-    } else {
-      // mouse
-      val f = (evt: MouseEvent) => if (evt.button == 0 /* left click */ ) onClickEvent(evt)
-      val g = (evt: MouseEvent) => if (evt.button == 0) clearHoldEvent()
-
-      elem.addEventListener("mousedown", f, useCapture = false)
-      if (onHold.isDefined) {
-        elem.addEventListener("mouseup", g, useCapture = false)
-      }
+    if (onHold.isDefined) {
+      registerTouchEnd(elem, { _ => })
+      registerTouchCancel(elem)
+      registerMouseUp(elem, { _ => })
     }
   }
 

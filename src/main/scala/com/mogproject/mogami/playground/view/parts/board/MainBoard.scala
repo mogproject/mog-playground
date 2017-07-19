@@ -1,14 +1,13 @@
 package com.mogproject.mogami.playground.view.parts.board
 
 import com.mogproject.mogami.{BoardType, _}
-import com.mogproject.mogami.util.MapUtil
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.controller.{English, Japanese, Language}
 import com.mogproject.mogami.playground.view.effect.MoveNextEffect
 import com.mogproject.mogami.playground.view.layout.BoardLayout
 import com.mogproject.mogami.playground.view.renderer.piece.{EnglishPieceRenderer, PieceRenderer, SimpleJapanesePieceRenderer}
 import com.mogproject.mogami.playground.view.renderer.{Circle, Line, Rectangle, TextRenderer}
-import org.scalajs.dom.{CanvasRenderingContext2D, UIEvent}
+import org.scalajs.dom.CanvasRenderingContext2D
 import org.scalajs.dom.html.{Canvas, Div}
 
 import scalatags.JsDom.all._
@@ -65,21 +64,17 @@ case class MainBoard(canvasWidth: Int,
     ).render
   }
 
-  private[this] def setEventListener[A](eventType: String, f: A => Unit): Unit = canvasContainer.addEventListener(eventType, f, useCapture = false)
-
   def initialize(): Unit = {
-
     // register events to the canvas
-    if (hasTouchEvent) {
-      setEventListener("touchstart", touchStart)
-      setEventListener("touchend", touchEnd)
-      setEventListener("touchcancel", { _: UIEvent => clearHoldEvent() })
-    } else {
-      setEventListener("mousemove", mouseMove)
-      setEventListener("mousedown", mouseDown)
-      setEventListener("mouseup", mouseUp)
-      setEventListener("mouseout", { _: UIEvent => clearHoldEvent() })
-    }
+    registerTouchStart(canvasContainer, { evt => mouseDown(evt.changedTouches(0).clientX, evt.changedTouches(0).clientY) })
+    registerTouchEnd(canvasContainer, { evt => mouseUp(evt.changedTouches(0).clientX, evt.changedTouches(0).clientY) })
+    registerTouchCancel(canvasContainer)
+
+    registerMouseDown(canvasContainer, { evt => mouseDown(evt.clientX, evt.clientY) })
+    registerMouseUp(canvasContainer, { evt => mouseUp(evt.clientX, evt.clientY) })
+    registerMouseOut(canvasContainer)
+
+    registerMouseMove(canvasContainer, mouseMove)
 
     // draw board
     drawBoard()

@@ -8,7 +8,7 @@ import com.mogproject.mogami.playground.view.renderer.Rectangle
 import com.mogproject.mogami.util.Implicits._
 import org.scalajs.dom
 import org.scalajs.dom.html.Canvas
-import org.scalajs.dom.{CanvasRenderingContext2D, MouseEvent, TouchEvent}
+import org.scalajs.dom.{CanvasRenderingContext2D, MouseEvent}
 
 /**
   *
@@ -175,22 +175,7 @@ trait CursorManageable extends EventManageable {
   //
   // mouseDown
   //
-  protected def touchStart(evt: TouchEvent): Unit = {
-    if (evt.changedTouches.length == 1) {
-      evt.preventDefault()
-      mouseDown(evt.changedTouches(0).clientX, evt.changedTouches(0).clientY)
-    }
-  }
-
-  /**
-    * Detect the left click. (button == 0)
-    */
-  protected def mouseDown(evt: MouseEvent): Unit = if (evt.button == 0) {
-    evt.preventDefault()
-    mouseDown(evt.clientX, evt.clientY)
-  }
-
-  private[this] def mouseDown(x: Double, y: Double): Unit = mouseDown(getCursor(x, y))
+  protected def mouseDown(x: Double, y: Double): Unit = mouseDown(getCursor(x, y))
 
   private[this] def mouseDown(cursor: Option[Cursor]): Unit = {
     cursor.foreach(c => if (Controller.canActivate(c)) flashCursor(c))
@@ -214,17 +199,7 @@ trait CursorManageable extends EventManageable {
   //
   // mouseUp
   //
-  protected def touchEnd(evt: TouchEvent): Unit = {
-    evt.preventDefault()
-    mouseUp(evt.changedTouches(0).clientX, evt.changedTouches(0).clientY)
-  }
-
-  protected def mouseUp(evt: MouseEvent): Unit = if (evt.button == 0) {
-    evt.preventDefault()
-    mouseUp(evt.clientX, evt.clientY)
-  }
-
-  private[this] def mouseUp(x: Double, y: Double): Unit = mouseUp(getCursor(x, y))
+  protected def mouseUp(x: Double, y: Double): Unit = mouseUp(getCursor(x, y))
 
   private[this] def mouseUp(cursor: Option[Cursor]): Unit = {
     (cursor, selectedCursor) match {

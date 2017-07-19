@@ -59,8 +59,6 @@ case class ControlSection(canvasWidth: Int, isMobile: Boolean, isMobileLandscape
 
   def getComment: String = commentButton.getComment
 
-  def clearHoldEvent(): Unit = controlBar.clearHoldEvent()
-
   def focusLongSelector(): Unit = if (!isMobile) controlBar.focusLongSelector()
 
   override def show(): Unit = {
