@@ -180,7 +180,6 @@ case class Renderer(isMobile: Boolean) extends BoardRenderer {
 
   // control section
   def updateControlBar(backwardEnabled: Boolean, forwardEnabled: Boolean): Unit = {
-    controlSection.clearHoldEvent() // click -> disabled => event still remains
     controlSection.updateLabels(backwardEnabled: Boolean, forwardEnabled: Boolean)
   }
 
