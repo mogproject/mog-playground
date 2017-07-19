@@ -97,7 +97,7 @@ trait BoardRenderer {
     width := canvasWidth * 2 + 60,
     div(cls := "row",
       div(cls := "col-xs-6", mainBoards.head.canvasContainer),
-      div(cls := "col-xs-6", (numBoards == 2).fold(mainBoards(1).canvasContainer,  controlSection.outputComment))
+      div(cls := "col-xs-6", (numBoards == 2).fold(mainBoards(1).canvasContainer, controlSection.outputComment))
     ),
     div(cls := "row", controlSection.outputControlBar)
   )
@@ -152,7 +152,7 @@ trait BoardRenderer {
 
   def drawLastMove(move: Option[Move]): Unit = mainBoards.foreach(_.drawLastMove(move))
 
-  def startMoveAction(move: Option[Move]): Unit = mainBoards.foreach(_.startMoveAnimation(move))
+  def startMoveAction(cursor: Option[Cursor]): Unit = cursor.foreach(cs => mainBoards.foreach(_.startMoveAnimation(cs)))
 
   def clearLastMove(): Unit = mainBoards.foreach(_.clearLastMove())
 

@@ -45,7 +45,7 @@ case class PlayModeController(renderer: Renderer,
   }
 
   override def startMoveAnimation(): Unit = {
-    renderer.startMoveAction(getLastMove)
+    renderer.startMoveAction(getLastMove.map(mv => Cursor(mv.to)))
   }
 
   override def canActivate(cursor: Cursor): Boolean = !cursor.isBox

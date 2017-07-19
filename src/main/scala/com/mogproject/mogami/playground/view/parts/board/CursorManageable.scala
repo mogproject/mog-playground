@@ -235,17 +235,15 @@ trait CursorManageable extends EventManageable {
   /**
     * Animation after making a move
     */
-  def startMoveAnimation(move: Option[Move]): Unit = {
-    move.foreach { mv =>
-      val animation = CircularAnimation(Cursor(mv.to), layout.color.cursor)
+  def startMoveAnimation(cursor: Cursor): Unit = {
+    val animation = CircularAnimation(cursor, layout.color.cursor)
 
-      def f(frame: Int): Unit = if (frame <= 20) {
-        animation.draw(frame / 20.0)
-        dom.window.requestAnimationFrame(_ => f(frame + 1))
-      }
-
-      dom.window.requestAnimationFrame(_ => f(0))
+    def f(frame: Int): Unit = if (frame <= 20) {
+      animation.draw(frame / 20.0)
+      dom.window.requestAnimationFrame(_ => f(frame + 1))
     }
+
+    dom.window.requestAnimationFrame(_ => f(0))
   }
 
   //
