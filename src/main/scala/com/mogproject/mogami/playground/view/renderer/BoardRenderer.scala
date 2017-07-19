@@ -152,6 +152,8 @@ trait BoardRenderer {
 
   def drawLastMove(move: Option[Move]): Unit = mainBoards.foreach(_.drawLastMove(move))
 
+  def startMoveAction(move: Option[Move]): Unit = mainBoards.foreach(_.startMoveAnimation(move))
+
   def clearLastMove(): Unit = mainBoards.foreach(_.clearLastMove())
 
   def clearActiveCursor(): Unit = mainBoards.foreach(_.clearActiveCursor())

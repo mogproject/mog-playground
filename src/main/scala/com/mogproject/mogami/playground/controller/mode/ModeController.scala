@@ -74,6 +74,8 @@ trait ModeController {
     renderer.updatePieceLang(config.pieceLang)
   }
 
+  def startMoveAnimation(): Unit = {}
+
   def initializeBoardControl(): Unit
 
   def collapseByDefault(): Unit = if (config.collapseByDefault) renderer.collapseSideBarRight()

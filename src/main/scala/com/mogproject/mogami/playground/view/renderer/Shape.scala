@@ -44,6 +44,15 @@ case class Line(fromX: Double, fromY: Double, toX: Double, toY: Double) extends 
 }
 
 case class Circle(x: Double, y: Double, r: Double) extends Shape {
+  def stroke(ctx: CanvasRenderingContext2D, color: String = "black", lineWidth: Int = 1, alpha: Double = 1.0): Unit = {
+    ctx.beginPath()
+    ctx.globalAlpha = alpha
+    ctx.arc(x, y, r, 0, math.Pi * 2, anticlockwise = true)
+    ctx.lineWidth = math.abs(lineWidth)
+    ctx.strokeStyle = color
+    ctx.stroke()
+  }
+
   override def draw(ctx: CanvasRenderingContext2D, color: String = "black", lineWidth: Int = 0, alpha: Double = 1.0): Unit = {
     ctx.beginPath()
     ctx.arc(x, y, r, 0, math.Pi * 2, anticlockwise = true)

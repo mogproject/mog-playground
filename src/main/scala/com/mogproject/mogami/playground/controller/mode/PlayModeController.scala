@@ -44,6 +44,10 @@ case class PlayModeController(renderer: Renderer,
     renderer.updateActionSection(config.messageLang, canResign)
   }
 
+  override def startMoveAnimation(): Unit = {
+    renderer.startMoveAction(getLastMove)
+  }
+
   override def canActivate(cursor: Cursor): Boolean = !cursor.isBox
 
   override def canSelect(cursor: Cursor): Boolean = cursor match {
@@ -100,8 +104,8 @@ case class PlayModeController(renderer: Renderer,
                 p <- selectedState.board.get(s)
               } yield {
                 renderer.askPromote(config, isFlipped, p,
-                  () => Controller.update(f(to, promote = false)),
-                  () => Controller.update(f(to, promote = true))
+                  () => Controller.update(f(to, promote = false), { mc => mc.renderAll(); mc.startMoveAnimation() }),
+                  () => Controller.update(f(to, promote = true), { mc => mc.renderAll(); mc.startMoveAnimation() })
                 )
               }
               None
