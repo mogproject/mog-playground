@@ -17,7 +17,6 @@ trait CursorManageable extends EventManageable {
   // variables
   private[this] var activeCursor: Option[Cursor] = None
   private[this] var selectedCursor: Option[Cursor] = None
-  private[this] var animationScheduler: Option[Int] = None
   private[this] var selectAnimationActive: Boolean = false
 
   // constants
@@ -32,6 +31,8 @@ trait CursorManageable extends EventManageable {
   protected val layer5: CanvasRenderingContext2D
 
   def isFlipped: Boolean
+
+  def visualEffectEnabled: Boolean
 
   /**
     * Convert MouseEvent to Cursor
@@ -214,7 +215,7 @@ trait CursorManageable extends EventManageable {
   /**
     * Animation while selecting a piece
     */
-  def startSelectAnimation(cursor: Cursor): Unit = {
+  def startSelectAnimation(cursor: Cursor): Unit = if (visualEffectEnabled) {
     val animation = CircularAnimation(cursor, layout.color.flash)
 
     def f(frame: Int): Unit = if (selectAnimationActive) {
@@ -235,7 +236,7 @@ trait CursorManageable extends EventManageable {
   /**
     * Animation after making a move
     */
-  def startMoveAnimation(cursor: Cursor): Unit = {
+  def startMoveAnimation(cursor: Cursor): Unit = if (visualEffectEnabled) {
     val animation = CircularAnimation(cursor, layout.color.cursor)
 
     def f(frame: Int): Unit = if (frame <= 20) {

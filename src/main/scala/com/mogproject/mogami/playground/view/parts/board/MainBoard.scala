@@ -18,7 +18,8 @@ import scalatags.JsDom.all._
 case class MainBoard(canvasWidth: Int,
                      isFlipped: Boolean,
                      pieceLang: Language,
-                     recordLang: Language
+                     recordLang: Language,
+                     visualEffectEnabled: Boolean
                     ) extends CursorManageable with MoveNextEffect {
 
   protected val layout = BoardLayout(canvasWidth)

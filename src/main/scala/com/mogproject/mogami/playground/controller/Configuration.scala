@@ -18,7 +18,8 @@ case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
                          messageLang: Language = Configuration.browserLanguage,
                          recordLang: Language = Configuration.browserLanguage,
                          pieceLang: Language = Japanese,
-                         flip: FlipType = FlipDisabled
+                         flip: FlipType = FlipDisabled,
+                         visualEffectEnabled: Boolean = true
                         ) {
 
   def toQueryParameters: List[String] = {
@@ -47,7 +48,8 @@ case class Configuration(baseUrl: String = Configuration.defaultBaseUrl,
       flip = ls.doubleBoardMode.contains(true).fold(DoubleBoard, flip),
       messageLang = ls.messageLang.getOrElse(messageLang),
       recordLang = ls.recordLang.getOrElse(recordLang),
-      pieceLang = ls.pieceLang.getOrElse(pieceLang)
+      pieceLang = ls.pieceLang.getOrElse(pieceLang),
+      visualEffectEnabled = ls.visualEffect.getOrElse(true)
     )
   }
 }

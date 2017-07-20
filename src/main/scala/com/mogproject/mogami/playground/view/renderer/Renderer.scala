@@ -78,6 +78,7 @@ case class Renderer(isMobile: Boolean) extends BoardRenderer {
 
     // initialize settings
     SettingsSection.updateDoubleBoardButton(config.flip == DoubleBoard)
+    SettingsSection.updateVisualEffectButton(config.visualEffectEnabled)
   }
 
   def initializeControlSection(config: Configuration): Unit = {
