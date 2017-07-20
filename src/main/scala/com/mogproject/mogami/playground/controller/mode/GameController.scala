@@ -79,6 +79,7 @@ trait GameController extends ModeController {
 
   protected def selectedState: State = game.getState(gamePosition).get
 
+  protected def isFinishedState: Boolean = isLastStatusPosition && (displayBranch.status != GameStatus.Playing)
 
   /**
     * Change mode
@@ -345,7 +346,7 @@ trait GameController extends ModeController {
     val points = selectedState.board.filter(_._2.owner == t).map(x => f(x._2.ptype.demoted)).sum +
       selectedState.hand.filter(_._1.owner == t).map { case (k, v) => f(k.ptype) * v }.sum
     val isKingInPromotionZone = selectedState.turnsKing.exists(_.isPromotionZone(t))
-    val numPiecesInPromotionZone = selectedState.board.count { case (k, v) => k.isPromotionZone(t) && v.owner == t && v.ptype != KING}
+    val numPiecesInPromotionZone = selectedState.board.count { case (k, v) => k.isPromotionZone(t) && v.owner == t && v.ptype != KING }
     val plural = (1 < numPiecesInPromotionZone).fold("s", "")
 
     val msg = Seq(

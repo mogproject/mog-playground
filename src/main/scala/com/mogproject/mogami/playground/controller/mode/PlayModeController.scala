@@ -50,11 +50,11 @@ case class PlayModeController(renderer: Renderer,
 
   override def canActivate(cursor: Cursor): Boolean = !cursor.isBox
 
-  override def canSelect(cursor: Cursor): Boolean = cursor match {
+  override def canSelect(cursor: Cursor): Boolean = (!isFinishedState) && (cursor match {
     case Cursor(Some(sq), None, None, None) => selectedState.board.get(sq).exists(selectedState.turn == _.owner)
     case Cursor(None, Some(h), None, None) => h.owner == selectedState.turn && selectedState.hand.get(h).exists(_ > 0)
     case _ => false
-  }
+  })
 
   private[this] def canResign: Boolean = (displayBranch.finalAction, displayBranch.status, displayPosition - currentMoves.length) match {
     case (Some(_), _, n) => n <= 0
