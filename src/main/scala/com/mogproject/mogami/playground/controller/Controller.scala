@@ -242,6 +242,11 @@ object Controller {
     }
   }, _.refreshBoard())
 
+  def setVisualEffect(enabled: Boolean): Unit = doAction({ mc =>
+    LocalStorage.saveVisualEffect(enabled)
+    Some(mc.updateConfig(mc.config.copy(visualEffectEnabled = enabled)))
+  }, _.refreshBoard())
+
   def changeBoardSize(size: PresetBoardSize): Unit = doAction({ mc =>
     val newConfig = if (size == Automatic) {
       LocalStorage.clearSize()

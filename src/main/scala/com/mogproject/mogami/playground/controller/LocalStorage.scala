@@ -11,7 +11,8 @@ case class LocalStorage(canvasSize: Option[Int] = None,
                         doubleBoardMode: Option[Boolean] = None,
                         messageLang: Option[Language] = None,
                         recordLang: Option[Language] = None,
-                        pieceLang: Option[Language] = None)
+                        pieceLang: Option[Language] = None,
+                        visualEffect: Option[Boolean] = None)
 
 object LocalStorage {
   def load(): LocalStorage = {
@@ -20,7 +21,8 @@ object LocalStorage {
       ("double", s => ls => ls.copy(doubleBoardMode = parseBooleanString(s))),
       ("mlang", s => ls => ls.copy(messageLang = Language.parseString(s))),
       ("rlang", s => ls => ls.copy(recordLang = Language.parseString(s))),
-      ("plang", s => ls => ls.copy(pieceLang = Language.parseString(s)))
+      ("plang", s => ls => ls.copy(pieceLang = Language.parseString(s))),
+      ("ve", s => ls => ls.copy(visualEffect = parseBooleanString(s)))
     )
     keys.foldLeft[LocalStorage](LocalStorage()) { case (ls, (k, f)) => f(dom.window.localStorage.getItem(k))(ls) }
   }
@@ -36,6 +38,8 @@ object LocalStorage {
   def saveRecordLang(lang: Language): Unit = setItem("rlang", lang)
 
   def savePieceLang(lang: Language): Unit = setItem("plang", lang)
+
+  def saveVisualEffect(enabled: Boolean): Unit = setItem("ve", enabled)
 
   private[this] def parseBooleanString(s: String): Option[Boolean] = s match {
     case "true" => Some(true)

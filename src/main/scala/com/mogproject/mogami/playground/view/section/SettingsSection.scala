@@ -12,10 +12,13 @@ import scalatags.JsDom.all._
 object SettingsSection extends Section {
   private[this] lazy val doubleBoardButton: RadioButton[Boolean] = RadioButton(Seq(false, true), Map(English -> Seq("Off", "On")), onClick = Controller.setDoubleBoard)
 
+  private[this] lazy val visualEffectButton: RadioButton[Boolean] = RadioButton(Seq(false, true), Map(English -> Seq("Off", "On")), onClick = Controller.setVisualEffect)
+
   override def initialize(): Unit = {
     super.initialize()
 
     doubleBoardButton.initialize(false, English)
+    visualEffectButton.initialize(true, English)
 
     MessageLanguageSelector.initialize()
     RecordLanguageSelector.initialize()
@@ -40,6 +43,12 @@ object SettingsSection extends Section {
         div(cls := "col-xs-7 col-sm-9 small-padding", label(marginTop := 6, "Double Board Mode")),
         div(cls := "col-xs-5 col-sm-3", doubleBoardButton.output)
       ),
+      div(cls := "row",
+        marginLeft := (-10).px,
+        marginBottom := 10.px,
+        div(cls := "col-xs-7 col-sm-9 small-padding", label(marginTop := 6, "Visual Effects")),
+        div(cls := "col-xs-5 col-sm-3", visualEffectButton.output)
+      ),
       MessageLanguageSelector.output,
       RecordLanguageSelector.output,
       PieceLanguageSelector.output,
@@ -51,4 +60,6 @@ object SettingsSection extends Section {
   ))
 
   def updateDoubleBoardButton(isDoubleBoard: Boolean): Unit = doubleBoardButton.updateValue(isDoubleBoard)
+
+  def updateVisualEffectButton(enabled: Boolean): Unit = visualEffectButton.updateValue(enabled)
 }

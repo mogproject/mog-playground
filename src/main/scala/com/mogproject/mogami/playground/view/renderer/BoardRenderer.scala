@@ -51,9 +51,9 @@ trait BoardRenderer {
     */
   def initializeBoardRenderer(config: Configuration): Unit = {
     mainBoards = if (config.flip == DoubleBoard) {
-      Seq(false, true).map(f => MainBoard(config.canvasWidth, f, config.pieceLang, config.recordLang))
+      Seq(false, true).map(f => MainBoard(config.canvasWidth, f, config.pieceLang, config.recordLang, config.visualEffectEnabled))
     } else {
-      Seq(MainBoard(config.canvasWidth, config.flip == FlipEnabled, config.pieceLang, config.recordLang))
+      Seq(MainBoard(config.canvasWidth, config.flip == FlipEnabled, config.pieceLang, config.recordLang, config.visualEffectEnabled))
     }
 
     val node = (config.isMobile, config.isLandscape, config.flip == DoubleBoard) match {
