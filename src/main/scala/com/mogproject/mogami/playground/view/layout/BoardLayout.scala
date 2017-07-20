@@ -66,7 +66,7 @@ case class BoardLayout(canvasWidth: Int) {
 
   // fonts
   object font {
-    private[this] val japanese = """source-han-serif-japanese, "游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "HG明朝E", "ＭＳ Ｐ明朝", "ＭＳ 明朝", "Noto Sans", "Noto Sans CJK JP", serif"""
+    private[this] val japanese = """"Source Han Serif", "游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "HG明朝E", "ＭＳ Ｐ明朝", "ＭＳ 明朝", "Noto Sans", "Noto Sans CJK JP", serif"""
     private[this] val english = "Times, serif"
     private[this] val menu = "Helvetica Neue"
 
