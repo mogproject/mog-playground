@@ -1,7 +1,7 @@
 package com.mogproject.mogami.playground.view.parts.control
 
 import com.mogproject.mogami.{BranchNo, Game, GamePosition, GameStatus, Move}
-import com.mogproject.mogami.core.move.SpecialMove
+import com.mogproject.mogami.core.move.{DeclareWin, SpecialMove}
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.playground.controller.{Controller, English, Japanese, Language}
 import com.mogproject.mogami.playground.view.parts.common.EventManageable
@@ -100,6 +100,8 @@ case class ControlBar(sectionWidth: Int, isSmall: Boolean) extends EventManageab
         case (GameStatus.PerpetualCheck, English) => List("Perpetual Check")
         case (GameStatus.Uchifuzume, Japanese) => List("打ち歩詰め")
         case (GameStatus.Uchifuzume, English) => List("Uchifuzume")
+        case (GameStatus.Jishogi, Japanese) => List(DeclareWin().toJapaneseNotationString)
+        case (GameStatus.Jishogi, English) => List(DeclareWin().toWesternNotationString)
         case (GameStatus.IllegallyMoved, Japanese) => br.finalAction.get.toJapaneseNotationString.split("\n").toList.drop(1)
         case (GameStatus.IllegallyMoved, English) => br.finalAction.get.toWesternNotationString.split("\n").toList.drop(1)
         case _ => Nil
