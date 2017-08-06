@@ -248,7 +248,7 @@ case class MainBoard(canvasWidth: Int,
         r.drawFill(layer0, layout.color.active)
         f(r, "TURN", t.isWhite)
       case GameStatus.Mated | GameStatus.Resigned | GameStatus.TimedUp | GameStatus.IllegallyMoved => drawWinLose(false)
-      case GameStatus.PerpetualCheck | GameStatus.Uchifuzume => drawWinLose(true)
+      case GameStatus.PerpetualCheck | GameStatus.Uchifuzume | GameStatus.Jishogi => drawWinLose(true)
       case GameStatus.Drawn =>
         layout.indicatorWhite.drawFill(layer0, layout.color.draw)
         layout.indicatorBlack.drawFill(layer0, layout.color.draw)
