@@ -28,4 +28,6 @@ object ModeSelector extends ButtonLike[Mode, Anchor, Div] {
     updateLabel(English)
   }
 
+  def focusActiveSelector(): Unit = inputMap(getValue).focus()
+
 }

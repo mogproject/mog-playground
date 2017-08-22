@@ -124,7 +124,7 @@ object Controller {
   def canInvokeWithoutSelection(cursor: Cursor): Boolean = modeController.get.canInvokeWithoutSelection(cursor)
 
   def invokeCursor(selected: Cursor, invoked: Cursor, isFlipped: Boolean): Unit = doAction(
-    _.invokeCursor(selected, invoked, isFlipped), { mc => mc.renderAll(); mc.startMoveAnimation(); mc.renderer.focusLongSelector() }
+    _.invokeCursor(selected, invoked, isFlipped), { mc => mc.renderAll(); mc.startMoveAnimation(); mc.renderer.focusActiveModeSelector() }
   )
 
   def invokeHoldEvent(invoked: Cursor, isFlipped: Boolean): Unit = doAction(_.invokeHoldEvent(invoked, isFlipped), _.renderAll())
@@ -185,7 +185,7 @@ object Controller {
 
   // Branch Section
   def changeBranch(branchNo: BranchNo, moveOffset: Option[Int]): Unit = doAction(
-    _.changeBranch(branchNo, moveOffset), { mc => mc.renderAll(); mc.renderer.focusLongSelector() }
+    _.changeBranch(branchNo, moveOffset), { mc => mc.renderAll(); mc.renderer.focusActiveModeSelector() }
   )
 
   def askDeleteBranch(): Unit = modeController match {
