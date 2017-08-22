@@ -240,6 +240,8 @@ case class Renderer(isMobile: Boolean) extends BoardRenderer {
 
   def focusLongSelector(): Unit = controlSection.focusLongSelector()
 
+  def focusActiveModeSelector(): Unit = navigatorSection.focusActiveModeSelector()
+
   /**
     * @note Never happens on mobile
     */

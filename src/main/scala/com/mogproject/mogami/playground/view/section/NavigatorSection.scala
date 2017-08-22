@@ -46,4 +46,6 @@ case class NavigatorSection(isMobile: Boolean) extends Section {
     case Viewing => Layout.color.bsInfo
     case Editing => Layout.color.bsWarning
   }
+
+  def focusActiveModeSelector(): Unit = ModeSelector.focusActiveSelector()
 }
