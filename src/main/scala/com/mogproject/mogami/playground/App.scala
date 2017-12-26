@@ -12,6 +12,7 @@ import com.mogproject.mogami.playground.view.PlaygroundView
 
 import scala.scalajs.js.JSApp
 import org.scalajs.dom
+import org.scalajs.dom.html.Div
 
 import scala.util.{Failure, Success, Try}
 
@@ -20,12 +21,14 @@ import scala.util.{Failure, Success, Try}
   */
 object App extends JSApp {
   override def main(): Unit = {
-
+    PlaygroundSettings
 
     // get args
     val args = Arguments()
       .loadLocalStorage()
       .parseQueryString(dom.window.location.search)
+    if (args.config.isDebug) println(s"Parsed arguments.")
+    if (args.config.isDev) println("Dev Mode enabled.")
 
     // load game
     val game = createGameFromArgs(args)
@@ -42,7 +45,8 @@ object App extends JSApp {
     val model = PlaygroundModel(mode, args.config)
 
     // create view
-    val view = PlaygroundView(args.config.deviceType.isMobile, args.config.isDev, args.config.isDebug, dom.document.getElementById("app"))
+    val rootElem = dom.document.getElementById("app").asInstanceOf[Div]
+    val view = PlaygroundView(args.config.deviceType.isMobile, args.config.isDev, args.config.isDebug, rootElem)
 
     // handle special actions
     args.action match {
@@ -54,12 +58,14 @@ object App extends JSApp {
         view.drawAsImage(conf, mode.getGameControl.get)
       case PlayAction =>
         // initialize state
+        if (args.config.isDebug) println("Initializing...")
         PlaygroundSAM.initialize(PlaygroundModel.adapter)
         SAM.initialize(PlaygroundState(model, view))
 
-        // show debug message
-        if (args.config.isDebug) println("Debug Log enabled.")
-        if (args.config.isDev) println("Dev Mode enabled.")
+        // hide loading message and show the main contents
+        if (args.config.isDebug) println("Finished initialization.")
+        rootElem.style.display = scalatags.JsDom.all.display.block.v
+        dom.document.getElementById("messageWindow").textContent = ""
     }
   }
 

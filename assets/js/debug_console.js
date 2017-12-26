@@ -1,15 +1,33 @@
 //
 // Replace the function console.log with this original function.
 //
-replaceConsoleLog = function() {
-  console.old = console.log;
+(function() {
 
-  console.log = function() {
+  printLog = function() {
+    var now = new Date().toISOString();
+    var logLevel = arguments[0];
+    var args = arguments[1];
+    var origFunc = arguments[2];
     var logger = document.getElementById('debugLog');
-    var prefix = '[' + new Date().toISOString() + '] ';
-    for (var i = 0; i < arguments.length; i++) {
-      logger.innerHTML += prefix + arguments[i] + '<br />';
+    var prefix = '[' + now + '] ' + (logLevel ? logLevel + ': ' : '');
+    for (var i = 0; i < args.length; i++) {
+      logger.innerHTML += prefix + args[i] + '<br />';
     }
-    console.old.apply(undefined, arguments);
+    origFunc.apply(undefined, args);
   };
-};
+
+
+  console.log_orig = console.log;
+  console.log = function() { printLog('', arguments, console.log_orig); };
+
+  console.info_orig = console.error;
+  console.info = function() { printLog('INFO', arguments, console.info_orig); };
+
+  console.warn_orig = console.error;
+  console.warn = function() { printLog('WARN', arguments, console.warn_orig); };
+
+  console.error_orig = console.error;
+  console.error = function() { printLog('ERROR', arguments, console.error_orig); };
+
+  console.log("Debug Log enabled.")
+})();
