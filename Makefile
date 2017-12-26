@@ -29,7 +29,7 @@ server:
 	python -m 'http.server' ${DEV_PORT}
 
 server_prod:
-	cd docs && python -m 'http.server'
+	cd docs && python -m 'http.server' ${DEV_PORT}
 
 publish: clean test
 	sbt fullOptJS && ${COPY_PROD}
