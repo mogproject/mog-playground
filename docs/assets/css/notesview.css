@@ -2,6 +2,7 @@
   border: 1px solid #aaaaaa;
   line-height: 1.0;
   width: 480px;
+  max-width: 93%;
   margin: 14px;
   padding: 0;
 }

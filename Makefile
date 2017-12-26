@@ -21,8 +21,14 @@ clean:
 local:
 	${OPEN} http://localhost:8000/index-dev.html?debug=true
 
+local_prod:
+	${OPEN} http://localhost:8000/
+
 server:
 	python -m 'http.server'
+
+server_prod:
+	cd docs && python -m 'http.server'
 
 publish: test
 	sbt fullOptJS && ${COPY_PROD}
@@ -30,5 +36,5 @@ publish: test
 publish_assets:
 	${COPY_PROD}
 
-.PHONY: build test console clean local server publish publish_assets
+.PHONY: build test console clean local local_prod server server_prod publish publish_assets
 
