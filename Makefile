@@ -4,10 +4,11 @@ APP_NAME = mog-playground
 PROD_RSC = docs
 TEST_ASS = assets
 PROD_ASS = ${PROD_RSC}/assets
+DEV_PORT = 8000
 COPY_PROD = cp -f target/scala-2.12/${APP_NAME}-opt.js ${PROD_ASS}/js/ && cp -rf ${TEST_ASS}/* ${PROD_ASS}/
 
 build:
-	${DEV_CMD}
+	${SBT} fastOptJS
 
 test:
 	${SBT} test
@@ -19,13 +20,13 @@ clean:
 	rm -rf ~/.sbt/0.13/staging/*/mog-* && ${SBT} clean
 
 local:
-	${OPEN} http://localhost:8000/index-dev.html?debug=true
+	${OPEN} http://localhost:${DEV_PORT}/index-dev.html?debug=true
 
 local_prod:
-	${OPEN} http://localhost:8000/
+	${OPEN} http://localhost:${DEV_PORT}/
 
 server:
-	python -m 'http.server'
+	python -m 'http.server' ${DEV_PORT}
 
 server_prod:
 	cd docs && python -m 'http.server'
