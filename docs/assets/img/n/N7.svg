@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
  "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="-539 -571 2048 1876">
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="2048" height="2048" viewBox="-539 -571 2048 1876">
 <g transform="translate(-539,1140) scale(1,-1)" fill="#000000" stroke="none">
 <path d="M809 909v-774q0 -52 29 -65q39 -18 334 -18q355 0 413 25q77 33 105 408l57 -20q-2 -55 -2 -125q0 -163 25 -215q18 -41 71 -41q-9 -105 -106 -127q-92 -18 -525 -18q-420 0 -477 35q-53 34 -53 145v774l-537 -70l-24 56l561 73v666q217 -9 217 -59q0 -28 -88 -62v-526 l852 112l94 158q92 -68 168 -147l-16 -43z" />
 </g>
