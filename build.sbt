@@ -1,11 +1,3 @@
-import wav.devtools.sbt.httpserver.{SbtHttpServerPlugin, FileServer}
-import SbtHttpServerPlugin.autoImport._
-
-enablePlugins(SbtHttpServerPlugin)
-addHttpServices(
-  _ += FileServer.service("test", (resourceDirectories in Test).value)
-)
-
 enablePlugins(ScalaJSPlugin)
 
 lazy val root = (project in file("."))
@@ -19,7 +11,6 @@ lazy val root = (project in file("."))
       "org.scala-js" %%% "scalajs-dom" % "0.9.1",
       "be.doeraene" %%% "scalajs-jquery" % "0.9.1",
       "com.lihaoyi" %%% "scalatags" % "0.6.2",
-//      "com.github.marklister" %%% "base64" % "0.2.3",
       "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
       "org.scalacheck" %%% "scalacheck" % "1.13.4" % Test
     ),
@@ -29,9 +20,9 @@ lazy val root = (project in file("."))
 
     jsDependencies ++= Seq(
       RuntimeDOM,
-      ProvidedJS / "assets/js/ecl_new.js"
+      ProvidedJS / "assets/js/ecl_new.js" % Test
     )
   )
-  .dependsOn(mogCore)
+  .dependsOn(mogFrontend)
 
-lazy val mogCore = ProjectRef(uri("git://github.com/mogproject/mog-core-scala.git#master"), "mogCoreJS")
+lazy val mogFrontend = ProjectRef(uri("git://github.com/mogproject/mog-frontend.git#master"), "root")

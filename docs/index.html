@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/html1/DTD/xhtml1-strict.dtd">
 <html>
 
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport"
         content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+
   <meta name="description" content="A mobile-friendly shogi playground">
   <meta name="author" content="mogproject">
   <link rel="shortcut icon" href="assets/ico/favicon.ico" type="image/x-icon" />
@@ -23,12 +24,16 @@
   <link rel="icon" type="image/png" href="assets/ico/android-chrome-192x192.png" sizes="192x192">
   <meta name="msapplication-config" content="/browserconfig.xml" />
 
+
   <title>Shogi Playground</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="assets/css/main.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css"/>
+  <link rel="stylesheet" type="text/css" href="assets/css/main.css"/>
+  <link rel="stylesheet" type="text/css" href="assets/css/svg.css"/>
+  <link rel="stylesheet" type="text/css" href="assets/css/pg.css"/>
+
   <script src="https://cdn.jsdelivr.net/clipboard.js/1.5.16/clipboard.min.js"></script>
-  <script async src="https://apis.google.com/js/client.js?onload=init"></script>
-  <!-- Google Analytics -->
+  <script defer src="https://apis.google.com/js/client.js?onload=init"></script>
+
   <script>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -41,15 +46,21 @@ ga('send', 'pageview');
 
 <body>
 <div id="app" style="position: relative;"></div>
-<!-- Include JavaScript dependencies -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/latest/js/bootstrap.min.js"></script>
-<script src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.min.js"></script>
-<script type="text/javascript" src="assets/js/ecl_new.js"></script>
-<!-- Include Scala.js compiled code -->
-<script type="text/javascript" src="assets/js/mog-playground-opt.js"></script>
-<!-- Run application -->
+<script defer src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.min.js"></script>
+<script defer type="text/javascript" src="assets/js/ecl_new.js"></script>
+<script type="text/javascript" src="assets/js/debug_console.js"></script>
+<script type="text/javascript" src="assets/js/WebAudioAPISound.js"></script>
+<script type="text/javascript" src="target/scala-2.12/mog-playground-opt.js"></script>
 <script type="text/javascript">com.mogproject.mogami.playground.App().main();</script>
+<noscript>
+    <div>
+        <h3>JavaScript Required</h3>
+        <p>Thank you for visiting Shogi Playground. Please enable JavaScript and reload this page.</p>
+    </div>
+</noscript>
 </body>
 
 </html>
+

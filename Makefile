@@ -1,13 +1,10 @@
 SBT = sbt
 OPEN = open
-TEST_RSC = src/test/resources
+APP_NAME = mog-playground
 PROD_RSC = docs
-TEST_ASS = ${TEST_RSC}/assets
+TEST_ASS = assets
 PROD_ASS = ${PROD_RSC}/assets
-CSS_FILES = css/main.css css/notesview.css
-COPY_DEV = mkdir -p ${TEST_ASS}/js ${TEST_ASS}/css && cp -f target/scala-2.12/mog-playground-fastopt.js ${TEST_ASS}/js/ && cp -f ${CSS_FILES} ${TEST_ASS}/css/ && cp -f ${PROD_ASS}/js/ecl_new.js ${TEST_ASS}/js/
-COPY_PROD = cp -f target/scala-2.12/mog-playground-opt.js ${PROD_ASS}/js/ && cp -f ${CSS_FILES} ${PROD_ASS}/css/
-
+COPY_PROD = cp -f target/scala-2.12/${APP_NAME}-opt.js ${PROD_ASS}/js/ && cp -rf ${TEST_ASS}/* ${PROD_ASS}/
 
 build:
 	${DEV_CMD}
@@ -19,19 +16,19 @@ console:
 	${SBT} test:console
 
 clean:
-	rm -rf ~/.sbt/0.13/staging/*/mog-core-scala && ${SBT} clean
+	rm -rf ~/.sbt/0.13/staging/*/mog-* && ${SBT} clean
 
 local:
-	${COPY_DEV} && ${OPEN} http://localhost:8083/test/index-dev.html
+	${OPEN} http://localhost:8000/index-dev.html?debug=true
 
-local_mobile:
-	${COPY_DEV} && ${OPEN} http://localhost:8083/test/index-dev.html?mobile=true
+server:
+	python -m 'http.server'
 
 publish: test
 	sbt fullOptJS && ${COPY_PROD}
 
-publish_css:
+publish_assets:
 	${COPY_PROD}
 
-.PHONY: build test console clean local local_mobile publish publish_css
+.PHONY: build test console clean local server publish publish_assets
 
