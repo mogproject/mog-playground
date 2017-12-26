@@ -31,7 +31,7 @@ server:
 server_prod:
 	cd docs && python -m 'http.server'
 
-publish: test
+publish: clean test
 	sbt fullOptJS && ${COPY_PROD}
 
 publish_assets:
