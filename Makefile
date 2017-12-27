@@ -22,20 +22,26 @@ clean:
 local:
 	${OPEN} http://localhost:${DEV_PORT}/index-dev-debug.html?debug=true
 
-local_prod:
+local-prod:
 	${OPEN} http://localhost:${DEV_PORT}/
 
 server:
 	python -m 'http.server' ${DEV_PORT}
 
-server_prod:
+server-prod:
 	cd docs && python -m 'http.server' ${DEV_PORT}
 
 publish: clean test
 	sbt fullOptJS && ${COPY_PROD}
 
-publish_assets:
+publish-commit: publish
+	git add . && git commit -m Publish && git push
+
+publish-assets:
 	${COPY_PROD}
 
-.PHONY: build test console clean local local_prod server server_prod publish publish_assets
+merge:
+	git checkout master && git pull && git checkout develop && git merge master && git push
+
+.PHONY: build test console clean local local-prod server server-prod publish publish-commit publish-assets merge
 
