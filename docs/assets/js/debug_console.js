@@ -29,5 +29,5 @@
   console.error_orig = console.error;
   console.error = function() { printLog('ERROR', arguments, console.error_orig); };
 
-  console.log("Debug Log enabled.")
+  console.log("Debug Console enabled.")
 })();

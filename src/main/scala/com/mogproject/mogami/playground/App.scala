@@ -27,7 +27,7 @@ object App extends JSApp {
     val args = Arguments()
       .loadLocalStorage()
       .parseQueryString(dom.window.location.search)
-    if (args.config.isDebug) println(s"Parsed arguments.")
+    if (args.config.isDebug) println("Debug Mode enabled.")
     if (args.config.isDev) println("Dev Mode enabled.")
 
     // load game
