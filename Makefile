@@ -20,7 +20,7 @@ clean:
 	rm -rf ~/.sbt/0.13/staging/*/mog-* && ${SBT} clean
 
 local:
-	${OPEN} http://localhost:${DEV_PORT}/index-dev.html?debug=true
+	${OPEN} http://localhost:${DEV_PORT}/index-dev-debug.html?debug=true
 
 local_prod:
 	${OPEN} http://localhost:${DEV_PORT}/
