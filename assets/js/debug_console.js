@@ -29,5 +29,11 @@
   console.error_orig = console.error;
   console.error = function() { printLog('ERROR', arguments, console.error_orig); };
 
+  // catch all errors
+  window.onerror = function(msg, url, lineNo, columnNo, error) {
+    console.error(msg);
+    return false;
+  }
+
   console.log("Debug Console enabled.")
 })();

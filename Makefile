@@ -31,7 +31,10 @@ server:
 server-prod:
 	cd docs && python -m 'http.server' ${DEV_PORT}
 
-publish: clean test
+sync_frontend_assets:
+	cp -rf ../mog-frontend/assets .
+
+publish: sync_frontend_assets clean test
 	sbt fullOptJS && ${COPY_PROD}
 
 publish-commit: publish
