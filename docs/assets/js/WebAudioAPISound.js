@@ -109,7 +109,8 @@ WebAudioAPISound.prototype = {
     makeSource: function (buffer) {
         var source = this.manager.context.createBufferSource();
         var gainNode = this.manager.context.createGain(); // old -> createGainNode()
-        gainNode.gain.value = this.volume;
+        // gainNode.gain.value = this.volume; // deprecated
+        gainNode.gain.setTargetAtTime(this.volume, 0, 0.01);
         source.buffer = buffer;
         source.connect(gainNode);
         gainNode.connect(this.manager.context.destination);
