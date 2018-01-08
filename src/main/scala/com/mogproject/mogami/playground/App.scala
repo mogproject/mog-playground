@@ -64,7 +64,7 @@ object App extends JSApp {
       case ImageAction =>
         // todo: support compact layout
         val conf = if (verifiedConfig.layout == SVGCompactLayout) verifiedConfig.copy(layout = SVGStandardLayout) else verifiedConfig
-        view.drawAsImage(conf, mode.getGameControl.get)
+        view.drawAsImage(conf, mode)
       case PlayAction =>
         // initialize state
         if (verifiedConfig.isDebug) println("Initializing...")
