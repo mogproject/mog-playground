@@ -5,6 +5,7 @@ import com.mogproject.mogami.core.state.StateCache.Implicits.DefaultStateCache
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.mogami.frontend._
 import com.mogproject.mogami.frontend.model.{GameControl => _, _}
+import com.mogproject.mogami.frontend.view.BrowserInfo
 import com.mogproject.mogami.frontend.view.board.{SVGCompactLayout, SVGStandardLayout}
 import com.mogproject.mogami.playground.model.PlaygroundModel
 import com.mogproject.mogami.playground.state.PlaygroundState
@@ -27,7 +28,10 @@ object App extends JSApp {
     val args = Arguments()
       .loadLocalStorage()
       .parseQueryString(dom.window.location.search)
-    if (args.config.isDebug) println("Debug Mode enabled.")
+    if (args.config.isDebug) {
+      println("Debug Mode enabled.")
+      println(s"Sound supported: ${BrowserInfo.isSoundSupported}")
+    }
     if (args.config.isDev) println("Dev Mode enabled.")
 
     // load game
@@ -41,29 +45,34 @@ object App extends JSApp {
       ViewMode(GameControl(game, args.gamePosition.branch, math.max(0, args.gamePosition.position - game.trunk.offset)))
     )
 
+    // update config
+    val verifiedConfig = args.config.copy(
+      soundEffectEnabled = args.config.soundEffectEnabled && BrowserInfo.isSoundSupported
+    )
+
     // create model
-    val model = PlaygroundModel(mode, args.config)
+    val model = PlaygroundModel(mode, verifiedConfig)
 
     // create view
     val rootElem = dom.document.getElementById("app").asInstanceOf[Div]
-    val view = PlaygroundView(args.config.deviceType.isMobile, args.config.isDev, args.config.isDebug, rootElem)
+    val view = PlaygroundView(verifiedConfig.deviceType.isMobile, verifiedConfig.isDev, verifiedConfig.isDebug, rootElem)
 
     // handle special actions
     args.action match {
       case NotesAction =>
-        view.drawNotes(game, args.config.recordLang)
+        view.drawNotes(game, verifiedConfig.recordLang)
       case ImageAction =>
         // todo: support compact layout
-        val conf = if (args.config.layout == SVGCompactLayout) args.config.copy(layout = SVGStandardLayout) else args.config
+        val conf = if (verifiedConfig.layout == SVGCompactLayout) verifiedConfig.copy(layout = SVGStandardLayout) else verifiedConfig
         view.drawAsImage(conf, mode.getGameControl.get)
       case PlayAction =>
         // initialize state
-        if (args.config.isDebug) println("Initializing...")
+        if (verifiedConfig.isDebug) println("Initializing...")
         PlaygroundSAM.initialize(PlaygroundModel.adapter)
         SAM.initialize(PlaygroundState(model, view))
 
         // hide loading message and show the main contents
-        if (args.config.isDebug) println("Finished initialization.")
+        if (verifiedConfig.isDebug) println("Finished initialization.")
         rootElem.style.display = scalatags.JsDom.all.display.block.v
         dom.document.getElementById("messageWindow").textContent = ""
     }
