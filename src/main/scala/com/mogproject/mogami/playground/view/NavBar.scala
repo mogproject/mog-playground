@@ -13,11 +13,13 @@ import com.mogproject.mogami.playground.model.PlaygroundModel
 /**
   *
   */
-case class NavBar(isMobile: Boolean) extends NavBarLike with SAMObserver[PlaygroundModel] {
+case class NavBar(isMobile: Boolean, embeddedMode: Boolean) extends NavBarLike with SAMObserver[PlaygroundModel] {
+
+  private[this] def availableModes: Seq[ModeType] = Seq(PlayModeType, ViewModeType) ++ (!embeddedMode).option(EditModeType)
 
   lazy val modeButton: RadioButton[ModeType] = RadioButton(
-    Seq(PlayModeType, ViewModeType, EditModeType),
-    (_: Messages) => Map(PlayModeType -> "Play", ViewModeType -> "View", EditModeType -> "Edit"),
+    availableModes,
+    (_: Messages) => Map[ModeType, String](PlayModeType -> "Play", ViewModeType -> "View", EditModeType -> "Edit").filterKeys(availableModes.contains),
     (mt: ModeType) => doAction(ChangeModeAction(mt, confirmed = false)),
     Seq("thin-btn", "mode-select"),
     Seq.empty
