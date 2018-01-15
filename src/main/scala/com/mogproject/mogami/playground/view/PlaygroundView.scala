@@ -4,6 +4,6 @@ import com.mogproject.mogami.frontend.view.{BasePlaygroundView, PlaygroundSiteLi
 import org.scalajs.dom.Element
 
 
-case class PlaygroundView(isMobile: Boolean, freeMode: Boolean, isDev: Boolean, isDebug: Boolean, rootElem: Element) extends BasePlaygroundView {
-  override lazy val website: PlaygroundSiteLike = PlaygroundSite(isMobile, freeMode, isDev, isDebug)
+case class PlaygroundView(isMobile: Boolean, freeMode: Boolean, embeddedMode: Boolean, isDev: Boolean, isDebug: Boolean, rootElem: Element) extends BasePlaygroundView {
+  override lazy val website: PlaygroundSiteLike = PlaygroundSite(isMobile, freeMode, embeddedMode, isDev, isDebug)
 }
