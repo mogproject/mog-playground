@@ -32,7 +32,7 @@ server-prod:
 	cd docs && python -m 'http.server' ${DEV_PORT}
 
 sync_frontend_assets:
-	cp -rf ../mog-frontend/assets .
+	cp -rf ../mog-frontend/assets . && rm -f assets/js/bootstrap.js
 
 publish: sync_frontend_assets clean test
 	sbt fullOptJS && ${COPY_PROD}
