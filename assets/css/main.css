@@ -386,10 +386,16 @@ ul {
 }
 
 .dropdown-menu.left {
-  left:auto;
-  right:0;
-  ::before {left:auto !important; right:9px;}
-  ::after {left:auto !important; right:10px;}
+  left: auto;
+  right: 0;
+}
+.dropdown-menu.left:before {
+  left: auto !important;
+  right: 9px;
+}
+.dropdown-menu.left:after {
+  left: auto !important;
+  right: 10px;
 }
 
 .dropdown-record {
