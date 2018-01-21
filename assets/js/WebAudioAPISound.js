@@ -83,8 +83,9 @@ if ("audioContext" in window) {
     WebAudioAPISound.prototype = {
         play: function () {
             var buffer = this.manager.bufferList[this.url];
+            var bufferLoaded = typeof buffer !== "undefined";
             //Only play if it's loaded yet
-            if (typeof buffer !== "undefined") {
+            if (bufferLoaded) {
                 var source = this.makeSource(buffer);
                 source.loop = this.settings.loop;
                 source.start(); // old -> .noteOn(0)
@@ -93,6 +94,7 @@ if ("audioContext" in window) {
                     this.manager.playingSounds[this.url] = [];
                 this.manager.playingSounds[this.url].push(source);
             }
+            return bufferLoaded;
         },
         stop: function () {
             this.manager.stopSoundWithUrl(this.url);
