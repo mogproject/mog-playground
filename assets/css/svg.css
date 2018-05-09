@@ -94,7 +94,6 @@
 
 .board-cursor {
   fill: none;
-  stroke: #e1b265;
   stroke-width: 18px;
 }
 
@@ -105,12 +104,10 @@
 }
 
 .board-selected {
-  fill: #e1b265;
   stroke: none;
 }
 
 .board-last {
-  fill: #e0e0e0;
   stroke: none;
 }
 
