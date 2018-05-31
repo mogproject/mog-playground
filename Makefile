@@ -6,6 +6,7 @@ TEST_ASS = assets
 PROD_ASS = ${PROD_RSC}/assets
 DEV_PORT = 8000
 COPY_PROD = cp -f target/scala-2.12/${APP_NAME}-opt.js ${PROD_ASS}/js/ && cp -rf ${TEST_ASS}/* ${PROD_ASS}/
+REMOVE_MAPPING = sed -i '' -e '/\/\/\# sourceMappingURL.*/d' ${PROD_ASS}/js/${APP_NAME}-opt.js
 UGLIFY_CSS = rm -f ${PROD_ASS}/css/* && uglifycss ${TEST_ASS}/css/* > ${PROD_ASS}/css/pg.min.css
 
 build:
@@ -36,13 +37,13 @@ sync_frontend_assets:
 	cp -rf ../mog-frontend/assets . && rm -f assets/js/bootstrap.js
 
 publish: sync_frontend_assets clean test
-	sbt fullOptJS && ${COPY_PROD} && ${UGLIFY_CSS}
+	sbt fullOptJS && ${COPY_PROD} && ${REMOVE_MAPPING} && ${UGLIFY_CSS}
 
 publish-commit: publish
 	git add . && git commit -m Publish && git push
 
 publish-assets:
-	${COPY_PROD} && ${UGLIFY_CSS}
+	${COPY_PROD} && ${REMOVE_MAPPING} && ${UGLIFY_CSS}
 
 merge:
 	git checkout master && git pull && git checkout develop && git merge master && git push
