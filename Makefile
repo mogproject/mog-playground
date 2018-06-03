@@ -19,7 +19,8 @@ console:
 	${SBT} test:console
 
 clean:
-	rm -rf ~/.sbt/0.13/staging/*/mog-* && ${SBT} clean
+	rm -rf ~/.sbt/0.13/staging/*/mog-*
+	${SBT} clean
 
 local:
 	${OPEN} http://localhost:${DEV_PORT}/index-dev-debug.html?debug=true
@@ -34,19 +35,31 @@ server-prod:
 	cd docs && python -m 'http.server' ${DEV_PORT}
 
 sync_frontend_assets:
-	cp -rf ../mog-frontend/assets . && rm -f assets/js/bootstrap.js
+	cp -rf ../mog-frontend/assets .
+	rm -f assets/js/bootstrap.js
 
 publish: sync_frontend_assets clean test
-	sbt fullOptJS && ${COPY_PROD} && ${REMOVE_MAPPING} && ${UGLIFY_CSS}
+	sbt fullOptJS
+	${COPY_PROD}
+	${REMOVE_MAPPING}
+	${UGLIFY_CSS}
 
 publish-commit: publish
-	git add . && git commit -m Publish && git push
+	git add .
+	git commit -m Publish
+	git push
 
 publish-assets:
-	${COPY_PROD} && ${REMOVE_MAPPING} && ${UGLIFY_CSS}
+	${COPY_PROD}
+	${REMOVE_MAPPING}
+	${UGLIFY_CSS}
 
 merge:
-	git checkout master && git pull && git checkout develop && git merge master && git push
+	git checkout master
+	git pull
+	git checkout develop
+	git merge master
+	git push
 
 .PHONY: build test console clean local local-prod server server-prod publish publish-commit publish-assets merge
 
