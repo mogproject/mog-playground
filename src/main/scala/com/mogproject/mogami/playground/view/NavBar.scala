@@ -1,19 +1,16 @@
 package com.mogproject.mogami.playground.view
 
-
 import com.mogproject.mogami.util.Implicits._
-import com.mogproject.mogami.frontend.action.ChangeModeAction
 import com.mogproject.mogami.frontend._
-import com.mogproject.mogami.frontend.sam.SAMObserver
+import com.mogproject.mogami.frontend.action.ChangeModeAction
 import com.mogproject.mogami.frontend.state.ObserveFlag
 import com.mogproject.mogami.frontend.view.button.RadioButton
 import com.mogproject.mogami.frontend.view.nav.NavBarLike
-import com.mogproject.mogami.playground.model.PlaygroundModel
 
 /**
   *
   */
-case class NavBar(isMobile: Boolean, embeddedMode: Boolean) extends NavBarLike with SAMObserver[PlaygroundModel] {
+case class NavBar(isMobile: Boolean, embeddedMode: Boolean) extends NavBarLike with PlaygroundSAMObserver {
 
   private[this] def availableModes: Seq[ModeType] = Seq(PlayModeType, ViewModeType) ++ (!embeddedMode).option(EditModeType)
 
@@ -21,7 +18,7 @@ case class NavBar(isMobile: Boolean, embeddedMode: Boolean) extends NavBarLike w
     availableModes,
     (_: Messages) => Map[ModeType, String](PlayModeType -> "Play", ViewModeType -> "View", EditModeType -> "Edit").filterKeys(availableModes.contains),
     (mt: ModeType) => doAction(ChangeModeAction(mt, confirmed = false)),
-    Seq("thin-btn", "mode-select"),
+    Seq(classButtonThin, "mode-select"),
     Seq.empty
   )
 

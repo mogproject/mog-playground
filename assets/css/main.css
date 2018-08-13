@@ -97,8 +97,8 @@ ul {
   margin-bottom: 2px !important;
   padding-top: 2px !important;
   padding-bottom: 2px !important;
-  padding-right: 10px !important;
-  padding-left: 10px !important;
+  padding-right: 8px !important;
+  padding-left: 8px !important;
   height: 24px !important;
 }
 
@@ -277,10 +277,6 @@ ul {
 .navbar-nav>li>a {
   padding-top: 4px;
   padding-bottom: 4px;
-}
-
-.btn-resign {
-  margin-left: 40px;
 }
 
 /*

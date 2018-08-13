@@ -1,5 +1,6 @@
 SBT = sbt
 OPEN = open
+PYTHON = python3
 APP_NAME = mog-playground
 PROD_RSC = docs
 TEST_ASS = assets
@@ -29,10 +30,10 @@ local-prod:
 	${OPEN} http://localhost:${DEV_PORT}/
 
 server:
-	python -m 'http.server' ${DEV_PORT}
+	${PYTHON} -m 'http.server' ${DEV_PORT}
 
 server-prod:
-	cd docs && python -m 'http.server' ${DEV_PORT}
+	cd docs && ${PYTHON} -m 'http.server' ${DEV_PORT}
 
 sync_frontend_assets:
 	cp -rf ../mog-frontend/assets .
