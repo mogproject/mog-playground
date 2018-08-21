@@ -487,6 +487,7 @@ ul {
 
 .control-long {
   width: 100%;
+  max-height: 495px;
   margin-bottom: 6px;
 }
 
