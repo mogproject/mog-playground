@@ -149,7 +149,7 @@ ul {
 }
 
 .long-select {
-  width: 168px;
+  width: 195px;
   margin-left: 14px;
   margin-right: auto;
 
@@ -160,6 +160,83 @@ ul {
   transition: margin-left 0.3s;
 }
 
+/*
+ * Move List
+ */
+.move-list {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin: 0px 0px 10px 0px;
+}
+
+.move-list > table {
+  margin: 0;
+  table-layout: fixed;
+}
+
+.move-list > table > tbody, .move-list > table > thead {
+  display: block;
+}
+
+.move-list > table > tbody {
+  height: 420px; /* 21px * 20 rows */
+  overflow-y: auto;
+  width: 100%;
+  position: relative;
+}
+
+.move-list > table > thead {
+  border-bottom: 1px solid #ccc;
+}
+.move-list > table > thead > th, .move-list > table > tbody > tr > td {
+  height: 20px;
+  padding: 0px 2px 0px 2px;
+  overflow-x: visible;
+  overflow-y: hidden;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+.move-list > table > tbody > tr > td {
+  text-align: right;
+  border-top: 0;
+  border-bottom: 1px solid #ccc;
+}
+
+.move-list > table > tbody > tr > .mv {
+  text-align: left !important;
+}
+
+.move-list > table > tbody > tr > .mv-7char {
+  font-size: 12px;
+}
+
+.move-list > table > tbody > tr > .mv-8char {
+  font-size: 11px;
+}
+
+.move-list-index {
+  width: 30px;
+  text-align: center;
+}
+
+.move-list-flag {
+  padding: 0 !important;
+  width: 8px;
+}
+
+.move-list-move {
+  width: 100px;
+}
+
+.move-list-time {
+  width: 47px;
+  /*max-width: 47px;*/
+}
+
+/*
+ * Buttons
+ */
 .btn-default.active {
   background-color: #fff;
 }
@@ -459,7 +536,6 @@ ul {
 /*
  * Control Bar
  */
-
 @media screen and (max-width: 299px) {
   .control-bar {
     padding-top: 5px;
@@ -502,13 +578,6 @@ ul {
 .control-small {
   height: 28px !important
 }
-
-.control-long {
-  width: 100%;
-  max-height: 495px;
-  margin-bottom: 6px;
-}
-
 
 /*
  * Comment Area
@@ -557,4 +626,12 @@ small div .panel-heading {
 small div .panel-body {
   padding-top: 4px;
   padding-bottom: 4px;
+}
+
+/*
+ * Common Classes
+ */
+.hidden {
+  display: none;
+  visibility: hidden;
 }
