@@ -203,6 +203,11 @@ ul {
   border-bottom: 1px solid #ccc;
 }
 
+/* hide new lines inside cells */
+.move-list > table > tbody br {
+  display: none;
+}
+
 .move-list > table > tbody > tr > .mv {
   text-align: left !important;
 }
