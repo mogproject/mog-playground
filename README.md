@@ -10,6 +10,7 @@
 
 ```
 npm install jsdom
+npm install uglifycss -g
 sbt gen-idea  # workaround
 ```
 

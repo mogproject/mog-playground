@@ -31,5 +31,5 @@ src/debug/
 node_modules/
 
 # for local testing
-src/test/resources/assets
+!src/test/resources/assets/js/ecl_new.js
 
