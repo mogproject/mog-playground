@@ -10,7 +10,7 @@ COPY_PROD = cp -f target/scala-2.12/${APP_NAME}-opt.js ${PROD_ASS}/js/ && cp -rf
 REMOVE_MAPPING = sed -i '' -e '/\/\/\# sourceMappingURL.*/d' ${PROD_ASS}/js/${APP_NAME}-opt.js
 UGLIFY_CSS = rm -f ${PROD_ASS}/css/* && uglifycss ${TEST_ASS}/css/[bmps]* > ${PROD_ASS}/css/pg.min.css && uglifycss ${TEST_ASS}/css/notesview.css > ${PROD_ASS}/css/notesview.css
 
-build:
+build: sync_frontend_assets
 	${SBT} fastOptJS
 
 test:
