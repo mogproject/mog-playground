@@ -8,6 +8,10 @@ Visit `Shogi Playground <https://play.mogproject.com/>`_.
    :target: https://mog-playground-docs.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
+.. image:: https://badges.gitter.im/shogi-playground/community.svg
+   :target: https://gitter.im/shogi-playground/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+   :alt: Gitter
+
 
 What is shogi?
 ==============
