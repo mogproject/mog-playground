@@ -1,9 +1,0 @@
-<?xml version="1.0" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
- "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="2048" height="2048" viewBox="-539 -571 2048 1876">
-<g transform="translate(-539,1140) scale(1,-1)" fill="#d9534f" stroke="none">
-<path d="M1063 432v-399h602l109 145q84 -78 143 -155l-22 -41h-1741l-25 51h809v399h-608l-21 51h629v311q215 -3 215 -51q0 -28 -90 -59v-201h440l101 135q80 -75 139 -147l-21 -39h-659zM1063 1264v-359h557l109 135l20 -18q64 -58 117 -129l-23 -39h-1642l-21 51h758v359h-569
-l-17 51h586v346q207 -9 207 -53q0 -26 -82 -53v-240h399l103 131q65 -59 135 -141l-25 -41h-612z" />
-</g>
-</svg>

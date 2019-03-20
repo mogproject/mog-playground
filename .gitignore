@@ -33,3 +33,6 @@ node_modules/
 # for local testing
 !src/test/resources/assets/js/ecl_new.js
 
+# assets
+assets/
+
