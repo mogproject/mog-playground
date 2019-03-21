@@ -20,7 +20,7 @@ console:
 	${SBT} test:console
 
 clean:
-	rm -rf ~/.sbt/0.13/staging/*/mog-*
+	rm -rf ~/.sbt/1.0/staging/*/mog-*
 	${SBT} clean
 
 local:
