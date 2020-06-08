@@ -16,7 +16,7 @@ case class NavBar(isMobile: Boolean, embeddedMode: Boolean) extends NavBarLike w
 
   lazy val modeButton: RadioButton[ModeType] = RadioButton(
     availableModes,
-    (_: Messages) => Map[ModeType, String](PlayModeType -> "Play", ViewModeType -> "View", EditModeType -> "Edit").filterKeys(availableModes.contains),
+    (_: Messages) => Map[ModeType, String](PlayModeType -> "Play", ViewModeType -> "View", EditModeType -> "Edit").view.filterKeys(availableModes.contains).toMap,
     (mt: ModeType) => doAction(ChangeModeAction(mt, confirmed = false)),
     Seq(classButtonThin, "mode-select"),
     Seq.empty
