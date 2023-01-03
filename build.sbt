@@ -14,8 +14,12 @@ lazy val root = (project in file("."))
     ),
     scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation"),
 
-    skip in packageJSDependencies := false
+    skip in packageJSDependencies := false,
+
+    jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(
+      org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv.Config().withArgs(List("--dns-result-order=ipv4first"))
+    )
   )
   .dependsOn(mogFrontend)
 
-lazy val mogFrontend = ProjectRef(uri("git://github.com/mogproject/mog-frontend.git#master"), "root")
+lazy val mogFrontend = ProjectRef(uri("ssh://git@github.com/mogproject/mog-frontend.git#master"), "root")
